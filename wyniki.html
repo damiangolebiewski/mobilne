@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Moje wyniki — INF.04 — Aplikacje mobilne</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-root="" data-page="results">
+<header class="topbar"><div class="in"><a class="brand" href="index.html">INF.04 — Aplikacje mobilne</a><nav><a href="index.html">Bloki</a><a href="zadania/index.html">Zadania</a><a href="sciaga/android.html">Ściąga Android</a><a href="sciaga/java.html">Ściąga Java</a><a href="sciaga/procedura.html">Procedura egzaminu</a><a href="wyniki.html" class="active">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="page">
+<div class="block-head"><h1>Moje wyniki</h1><div><button type="button" class="btn print-btn">Drukuj podsumowanie</button></div></div>
+<p class="print-only">Wydruk z dnia: <span id="print-date"></span> · Imię i nazwisko: ______________________ · Klasa: ______</p>
+<p class="muted small no-print">Dane pochodzą z tej przeglądarki<span class="sync-only"> (a po zalogowaniu — z Twojego konta online, które widzi też nauczyciel)</span>. Pokaż ten ekran nauczycielowi lub wydrukuj podsumowanie.</p>
+<div id="results"></div>
+<div class="no-print" style="margin-top:2rem">
+<h2>Reset postępu</h2>
+<p class="small">Usuwa ukończone bloki, wyniki testów, zaznaczone checklisty, wykonane zadania i czas pracy z tej przeglądarki<span class="sync-only"> (a gdy jesteś zalogowany — także z Twojego konta online)</span>.</p>
+<button type="button" class="btn danger" id="reset-btn">Resetuj postęp</button>
+<div class="confirm-row" id="reset-confirm"><span>Na pewno usunąć cały postęp?</span><button type="button" class="btn danger small" id="reset-yes">Tak, usuń</button><button type="button" class="btn secondary small" id="reset-no">Anuluj</button></div>
+<p id="reset-msg" class="small"></p>
+</div></div>
+</main>
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/progress.js"></script>
+<script src="js/sync.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
