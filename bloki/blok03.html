@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blok 3 — Formularz: odczyt danych, konwersja i obliczenia</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../" data-page="block" data-block="b03">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html" class="active">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="block-layout"><aside class="toc no-print"><strong>Blok 3</strong><ol><li><a href="#cel">Cel</a></li><li><a href="#przypomnienie">Krótkie przypomnienie</a></li><li><a href="#przyklad">Przykład</a></li><li><a href="#mikro">Mikroćwiczenia</a></li><li><a href="#prowadzone">Zadanie prowadzone</a></li><li><a href="#samodzielne">Zadanie samodzielne</a></li><li><a href="#inf04">Zadanie w stylu INF.04</a></li><li><a href="#checklista">Checklista</a></li><li><a href="#test">Mini-test</a></li><li><a href="#dodatkowe">Skończyłeś wcześniej?</a></li></ol><a class="skip" href="#samodzielne">Silniejszy? Przejdź od razu do zadania samodzielnego →</a><p class="small muted" style="margin-top:.8rem">Słabszy? Przypomnienie → Przykład → Mikroćwiczenia → Zadanie prowadzone (z podpowiedziami).</p></aside><article class="page"><div class="block-head"><div><div class="muted small"><a href="../index.html">Bloki</a> › Blok 3</div><h1>Blok 3. Formularz: odczyt danych, konwersja i obliczenia</h1><span class="badge p1">Faza I — wyrównanie</span> <span id="block-status" class="badge">W trakcie</span></div><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button></div>
+<p>Pobierasz tekst z pól edycyjnych, zamieniasz go na liczby, liczysz i pokazujesz wynik. Uczysz się rozpoznać awarię w Logcat i zabezpieczyć konwersję.</p>
+<section class="sec" id="cel"><h2><span class="sec-num">1.</span> Cel</h2><p><strong>Po wykonaniu tego bloku będziesz potrafił:</strong></p><ul><li>dodać pole <code>EditText</code> z podpowiedzią (<code>hint</code>) i właściwym typem klawiatury (<code>inputType</code>),</li><li>odczytać tekst z pola: <code>getText().toString().trim()</code>,</li><li>zamienić tekst na liczbę (<code>Integer.parseInt</code>, <code>Double.parseDouble</code>) i zabezpieczyć się przed błędem (<code>try/catch</code>),</li><li>sformatować wynik (<code>String.format("%.2f", …)</code>) i pokazać go w <code>TextView</code> lub <code>Toast</code>,</li><li>odczytać przyczynę awarii w oknie <strong>Logcat</strong>.</li></ul><details class="hint"><summary>Plan czasu (4 × 45 min = 180 min)</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>Przypomnienie</td><td>15 min</td></tr><tr><td>Przykład</td><td>10 min</td></tr><tr><td>Mikroćwiczenia</td><td>25 min</td></tr><tr><td>Zadanie prowadzone</td><td>40 min</td></tr><tr><td>Zadanie samodzielne</td><td>35 min</td></tr><tr><td>Zadanie INF.04</td><td>45 min</td></tr><tr><td>Checklista + mini-test</td><td>10 min</td></tr><tr><th>Razem</th><th>180 min</th></tr></tbody></table></div></div></details><p class="small muted">Powiązanie z arkuszami: pola edycyjne z podpowiedzią — Arkusze 01, 05, 10, 13; <code>inputType</code> (hasło, liczba, czas) — 01, 13, 10; konwersja tekstu na liczbę — 13; wzorzec W2 (odczyt → konwersja → wynik).</p></section>
+<section class="sec" id="przypomnienie"><h2><span class="sec-num">2.</span> Krótkie przypomnienie</h2><h4>Pole edycyjne w XML</h4>
+<div class="code"><div class="code-bar"><span>XML</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml"><span class="t-k">&lt;EditText</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/etKwota"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+    <span class="t-a">android:hint</span>=<span class="t-s">"Kwota w PLN"</span>
+    <span class="t-a">android:inputType</span>=<span class="t-s">"numberDecimal"</span> <span class="t-k">/&gt;</span></code></pre></div>
+<div class="table-wrap"><table><thead><tr><th><code>inputType</code></th><th>Klawiatura / zachowanie</th><th>Arkusz</th></tr></thead><tbody><tr><td><code>text</code></td><td>zwykły tekst</td><td>05, 10</td></tr><tr><td><code>number</code></td><td>tylko cyfry (liczby całkowite)</td><td>13 („umożliwiające wpisywanie jedynie liczb”)</td></tr><tr><td><code>numberDecimal</code></td><td>cyfry i separator dziesiętny</td><td>—</td></tr><tr><td><code>textPassword</code></td><td>ukrywa znaki (kropki)</td><td>01</td></tr><tr><td><code>numberPassword</code></td><td>cyfry, ukryte</td><td>—</td></tr><tr><td><code>textEmailAddress</code></td><td>klawiatura z „@”</td><td>01</td></tr><tr><td><code>time</code></td><td>cyfry i „:”</td><td>10 (pole czasu)</td></tr></tbody></table></div>
+<h4>Odczyt → konwersja → wynik</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-t">String</span> tekst = etKwota.getText().toString().trim();   <span class="t-c">// Editable → String, bez spacji</span>
+<span class="t-k">double</span> kwota = <span class="t-t">Double</span>.parseDouble(tekst);              <span class="t-c">// "12.5" → 12.5</span>
+<span class="t-k">int</span> sztuki  = <span class="t-t">Integer</span>.parseInt(<span class="t-s">"3"</span>);                   <span class="t-c">// "3" → 3</span>
+tvWynik.setText(<span class="t-t">String</span>.format(<span class="t-s">"%.2f zł"</span>, kwota * <span class="t-n">1.23</span>)); <span class="t-c">// 2 miejsca po przecinku</span></code></pre></div>
+<div class="box box-err"><p><code>Integer.parseInt("")</code> (puste pole) i <code>Integer.parseInt("abc")</code> rzucają <strong>NumberFormatException</strong> — aplikacja się zamyka. Zabezpiecz konwersję:</p></div>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">try</span> {
+    <span class="t-k">int</span> liczba = <span class="t-t">Integer</span>.parseInt(etLiczba.getText().toString().trim());
+    tvWynik.setText(<span class="t-s">"Kwadrat: "</span> + (liczba * liczba));
+} <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) {
+    <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Wpisz liczbę"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+}</code></pre></div>
+<h4>Gdy aplikacja się zamyka — Logcat</h4>
+<p>Na dole Android Studio otwórz <strong>Logcat</strong>, w filtrze wpisz <code>level:error</code> i szukaj linii <code>FATAL EXCEPTION</code>. Kilka linii niżej jest nazwa wyjątku i numer linii w <code>MainActivity.java</code> (niebieski link). Przykład:</p>
+<div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">FATAL EXCEPTION: main
+java.lang.NumberFormatException: For input string: ""
+    at java.lang.Integer.parseInt(Integer.java:627)
+    at com.example.egzamin.MainActivity.lambda$onCreate$0(MainActivity.java:31)</code></pre></div>
+<div class="box box-tip"><p>Liczba z przecinkiem: w polskich ustawieniach klawiatura może wstawić „,”. <code>Double.parseDouble("2,5")</code> się nie uda — użyj <code>tekst.replace(',', '.')</code>.</p></div>
+<p><strong>Ćwiczenie natychmiastowe:</strong> w przykładzie poniżej zostaw pole roku puste i kliknij POWITAJ. Potem usuń <code>try/catch</code>, powtórz i znajdź wyjątek w Logcat. Przywróć <code>try/catch</code>.</p></section>
+<section class="sec" id="przyklad"><h2><span class="sec-num">3.</span> Przykład</h2><p>Formularz z dwoma polami: imię (tekst) i rok urodzenia (liczba). Wynik złożony z obu wartości; błędny rok obsłużony komunikatem <code>Toast</code>.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:12.8px"><div class="m-e" style="align-self:stretch"><span>Ola</span></div><div class="m-e" style="align-self:stretch"><span>2008</span></div><div class="m-b" style="background:#6750A4;color:#ffffff;align-self:center">POWITAJ</div><div class="m-t" style="font-size:16px;text-align:center;align-self:stretch">Cześć, Ola! W tym roku kończysz 18 lat.</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po wpisaniu danych</figcaption></figure></div><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etImie"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Twoje imię"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"textPersonName"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etRok"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Rok urodzenia"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"number"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnPowitaj"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"POWITAJ"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvWynik"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Toast</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">BIEZACY_ROK</span> = <span class="t-n">2026</span>;
+
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etImie;
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etRok;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvWynik;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etImie = findViewById(<span class="t-t">R</span>.id.etImie);
+        etRok = findViewById(<span class="t-t">R</span>.id.etRok);
+        tvWynik = findViewById(<span class="t-t">R</span>.id.tvWynik);
+        <span class="t-t">Button</span> btnPowitaj = findViewById(<span class="t-t">R</span>.id.btnPowitaj);
+
+        btnPowitaj.setOnClickListener(v -&gt; {
+            <span class="t-c">// 1. odczyt: getText() zwraca Editable -&gt; zamieniamy na String</span>
+            <span class="t-t">String</span> imie = etImie.getText().toString().trim();
+            <span class="t-t">String</span> rokTekst = etRok.getText().toString().trim();
+
+            <span class="t-c">// 2. konwersja tekst -&gt; liczba (może się nie udać!)</span>
+            <span class="t-k">try</span> {
+                <span class="t-k">int</span> rok = <span class="t-t">Integer</span>.parseInt(rokTekst);
+                <span class="t-k">int</span> wiek = <span class="t-t">BIEZACY_ROK</span> - rok;
+                <span class="t-c">// 3. wynik</span>
+                tvWynik.setText(<span class="t-s">"Cześć, "</span> + imie + <span class="t-s">"! W tym roku kończysz "</span> + wiek + <span class="t-s">" lat."</span>);
+            } <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) {
+                <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Podaj rok urodzenia"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+            }
+        });
+    }
+}</code></pre></div></section>
+<section class="sec" id="mikro"><h2><span class="sec-num">4.</span> Mikroćwiczenia</h2><div class="micro"><h4>Ćwiczenie 3.1 — Pole na hasło</h4><p>Napisz <code>EditText</code> z podpowiedzią „Podaj hasło”, który ukrywa wpisywane znaki i zajmuje całą szerokość (jak w Arkuszu_01).</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>XML</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml"><span class="t-k">&lt;EditText</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/etHaslo"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+    <span class="t-a">android:hint</span>=<span class="t-s">"Podaj hasło"</span>
+    <span class="t-a">android:inputType</span>=<span class="t-s">"textPassword"</span> <span class="t-k">/&gt;</span></code></pre></div></div></details></div><div class="micro"><h4>Ćwiczenie 3.2 — Znajdź błąd kompilacji</h4><p><code>String imie = etImie.getText();</code> — dlaczego się nie kompiluje?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>getText()</code> zwraca <code>Editable</code>, a nie <code>String</code>. Poprawnie: <code>etImie.getText().toString()</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 3.3 — Dzielenie całkowite</h4><p>Oceny 4, 5, 5. Kod: <code>double srednia = (o1 + o2 + o3) / 3;</code> Jaki będzie wynik i dlaczego? Popraw.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Wynik 4.0 zamiast 4.67 — <code>int / int</code> daje <code>int</code> (część ułamkowa jest obcinana przed zapisem do <code>double</code>). Poprawnie: <code>/ 3.0</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 3.4 — Formatowanie</h4><p>Zmienna <code>double cena = 12.5;</code>. Wyświetl w <code>tvCena</code> tekst „Cena: 12,50 zł” (dwa miejsca po przecinku).</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>tvCena.setText(String.format("Cena: %.2f zł", cena));</code> — w polskich ustawieniach systemu separatorem będzie przecinek.</p></div></details></div><div class="micro"><h4>Ćwiczenie 3.5 — Czytanie Logcat</h4><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">java.lang.NumberFormatException: For input string: "12a"
+    at com.example.egzamin.MainActivity.oblicz(MainActivity.java:44)</code></pre></div>
+<p>Co wpisał użytkownik, w której metodzie i linii wystąpił błąd, jak go uniknąć?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Użytkownik wpisał „12a”; błąd w metodzie <code>oblicz</code>, linia 44 <code>MainActivity.java</code>. Zabezpieczenie: <code>inputType="number"</code> w XML (klawiatura tylko z cyframi) oraz <code>try/catch (NumberFormatException e)</code> w kodzie.</p></div></details></div><div class="micro"><h4>Ćwiczenie 3.6 — Toast</h4><p>Napisz linię, która wyświetla krótki dymek „Zapisano”. Jaka jest różnica między <code>LENGTH_SHORT</code> i <code>LENGTH_LONG</code>? Co się stanie, gdy zapomnisz <code>.show()</code>?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>Toast.makeText(this, "Zapisano", Toast.LENGTH_SHORT).show();</code> — SHORT ok. 2 s, LONG ok. 3,5 s. Bez <code>.show()</code> nic się nie wyświetli (i nie ma błędu — łatwo przeoczyć).</p></div></details></div></section>
+<section class="sec" id="prowadzone"><h2><span class="sec-num">5.</span> Zadanie prowadzone</h2><div class="task" id="b03-prowadzone">
+<div class="task-head"><h3>Kantor: przelicznik walut</h3><span class="meta">⏱ ok. 40 min</span></div>
+<p>Przelicznik kwoty w złotych na euro lub dolary. Dwa przyciski wywołują tę samą metodę z innym kursem.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:0px"><div class="m-t" style="background:#1D4F91;color:#fff;font-size:24px;padding:8px;align-self:stretch">Kantor</div><div class="m-e" style="margin:8px;align-self:stretch"><span>100</span></div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch"><div class="m-b" style="background:#1D4F91;color:#ffffff;margin:0px 4px 0px 0px;flex:1 1 0;min-width:0">NA EUR</div><div class="m-b" style="background:#1D4F91;color:#ffffff;margin:0px 0px 0px 4px;flex:1 1 0;min-width:0">NA USD</div></div><div class="m-t" style="font-size:17.6px;margin:16px 0px 0px 0px;text-align:center;align-self:stretch">100,00 PLN = 23,26 EUR</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po kliknięciu „NA EUR”</figcaption></figure></div>
+<p><strong>Działanie:</strong> kurs EUR = 4,30, kurs USD = 3,95 (stałe w kodzie). Wynik = kwota / kurs, oba z dwoma miejscami po przecinku: „100,00 PLN = 23,26 EUR”. Gdy pole jest puste lub niepoprawne — <code>Toast</code> „Wpisz poprawną kwotę”.</p>
+<p><strong>Kroki:</strong></p>
+<ol><li>XML: tytuł, <code>EditText</code> (<code>numberDecimal</code>, podpowiedź „Kwota w PLN”), rząd dwóch przycisków (wagi), napis wyniku.</li><li>Java: stałe <code>KURS_EUR</code>, <code>KURS_USD</code>; pola <code>etKwota</code>, <code>tvWynik</code>.</li><li>Metoda <code>przelicz(double kurs, String waluta)</code> z <code>try/catch</code>.</li><li>Przyciski: <code>btnEur.setOnClickListener(v -&gt; przelicz(KURS_EUR, "EUR"));</code> i analogicznie USD.</li><li>Test: 100 → 23,26 EUR i 25,32 USD; puste pole → Toast; „12,5” (z przecinkiem) też działa.</li></ol>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Cała logika jest w jednej metodzie z dwoma parametrami. Obsługi przycisków tylko ją wywołują.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Przecinek zamień na kropkę przed konwersją: <code>…toString().trim().replace(',', '.')</code>. Formatowanie kilku liczb naraz: <code>String.format("%.2f PLN = %.2f %s", kwota, wynik, waluta)</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">przelicz(kurs, waluta):
+    tekst ← pole kwoty (trim, przecinek → kropka)
+    spróbuj:
+        kwota ← parseDouble(tekst)
+        wynik ← kwota / kurs
+        tvWynik ← sformatowany tekst
+    błąd konwersji:
+        Toast "Wpisz poprawną kwotę"</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">void</span> przelicz(<span class="t-k">double</span> kurs, <span class="t-t">String</span> waluta) {
+    <span class="t-t">String</span> tekst = etKwota.getText().toString().trim().replace(<span class="t-s">','</span>, <span class="t-s">'.'</span>);
+    <span class="t-k">try</span> {
+        <span class="t-k">double</span> kwota = <span class="t-t">Double</span>.parseDouble(tekst);
+        tvWynik.setText(<span class="t-t">String</span>.format(<span class="t-s">"%.2f PLN = %.2f %s"</span>, kwota, kwota / kurs, waluta));
+    } <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) {
+        <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Wpisz poprawną kwotę"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+    }
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#1D4F91"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Kantor"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"30sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etKwota"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Kwota w PLN"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"numberDecimal"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnEur"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginEnd</span>=<span class="t-s">"5dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#1D4F91"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"NA EUR"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnUsd"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"5dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#1D4F91"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"NA USD"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvWynik"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"20dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Wpisz kwotę i wybierz walutę"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"22sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Toast</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">double</span> <span class="t-t">KURS_EUR</span> = <span class="t-n">4.30</span>;
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">double</span> <span class="t-t">KURS_USD</span> = <span class="t-n">3.95</span>;
+
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etKwota;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvWynik;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etKwota = findViewById(<span class="t-t">R</span>.id.etKwota);
+        tvWynik = findViewById(<span class="t-t">R</span>.id.tvWynik);
+        <span class="t-t">Button</span> btnEur = findViewById(<span class="t-t">R</span>.id.btnEur);
+        <span class="t-t">Button</span> btnUsd = findViewById(<span class="t-t">R</span>.id.btnUsd);
+
+        btnEur.setOnClickListener(v -&gt; przelicz(<span class="t-t">KURS_EUR</span>, <span class="t-s">"EUR"</span>));
+        btnUsd.setOnClickListener(v -&gt; przelicz(<span class="t-t">KURS_USD</span>, <span class="t-s">"USD"</span>));
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> przelicz(<span class="t-k">double</span> kurs, <span class="t-t">String</span> waluta) {
+        <span class="t-t">String</span> tekst = etKwota.getText().toString().trim().replace(<span class="t-s">','</span>, <span class="t-s">'.'</span>);
+        <span class="t-k">try</span> {
+            <span class="t-k">double</span> kwota = <span class="t-t">Double</span>.parseDouble(tekst);
+            <span class="t-k">double</span> wynik = kwota / kurs;
+            tvWynik.setText(<span class="t-t">String</span>.format(<span class="t-s">"%.2f PLN = %.2f %s"</span>, kwota, wynik, waluta));
+        } <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) {
+            <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Wpisz poprawną kwotę"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+        }
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b03_prowadzone/">rozwiazania/b03_prowadzone/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b03-prowadzone">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="samodzielne"><h2><span class="sec-num">6.</span> Zadanie samodzielne</h2><div class="task" id="b03-samodzielne">
+<div class="task-head"><h3>Średnia z trzech ocen</h3><span class="meta">⏱ ok. 35 min</span></div>
+<p>Trzy pola liczbowe, jeden przycisk, wynik z dwoma miejscami po przecinku.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:12.8px"><div class="m-t" style="font-size:22.4px;font-weight:700;text-align:center;align-self:stretch">Średnia ocen</div><div class="m-e" style="align-self:stretch"><span>4</span></div><div class="m-e" style="align-self:stretch"><span>5</span></div><div class="m-e" style="align-self:stretch"><span>5</span></div><div class="m-b" style="background:#6750A4;color:#ffffff;margin:8px 0px 0px 0px;align-self:stretch">OBLICZ</div><div class="m-t" style="font-size:20.8px;margin:12.8px 0px 0px 0px;text-align:center;align-self:stretch">Średnia: 4,67</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po obliczeniu</figcaption></figure></div>
+<ul><li>Trzy pola z podpowiedziami „Ocena 1”, „Ocena 2”, „Ocena 3”, klawiatura tylko z cyframi.</li><li>Przycisk „OBLICZ” na całą szerokość.</li><li>Wynik: „Średnia: &lt;x&gt;” z dwoma miejscami po przecinku (4, 5, 5 → 4,67).</li><li>Gdy któreś pole jest puste — <code>Toast</code> „Uzupełnij wszystkie oceny”, napis wyniku się nie zmienia.</li><li><strong>Uwaga na dzielenie całkowite.</strong></li></ul>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Jedna próba konwersji wszystkich trzech pól w jednym bloku <code>try</code> wystarczy — jeśli którekolwiek jest puste, przejdziesz do <code>catch</code>.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Średnia: <code>(o1 + o2 + o3) / 3.0</code>. Formatowanie: <code>String.format("Średnia: %.2f", srednia)</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">OBLICZ:
+    spróbuj: o1, o2, o3 ← parseInt(pól); srednia ← suma / 3.0; pokaż
+    błąd: Toast</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">try</span> {
+    <span class="t-k">int</span> o1 = <span class="t-t">Integer</span>.parseInt(etOcena1.getText().toString().trim());
+    <span class="t-k">int</span> o2 = <span class="t-t">Integer</span>.parseInt(etOcena2.getText().toString().trim());
+    <span class="t-k">int</span> o3 = <span class="t-t">Integer</span>.parseInt(etOcena3.getText().toString().trim());
+    tvSrednia.setText(<span class="t-t">String</span>.format(<span class="t-s">"Średnia: %.2f"</span>, (o1 + o2 + o3) / <span class="t-n">3.0</span>));
+} <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) { … }</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Średnia ocen"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etOcena1"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Ocena 1"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"number"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etOcena2"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Ocena 2"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"number"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etOcena3"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Ocena 3"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"number"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnOblicz"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"OBLICZ"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvSrednia"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Średnia: —"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"26sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Toast</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etOcena1, etOcena2, etOcena3;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvSrednia;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etOcena1 = findViewById(<span class="t-t">R</span>.id.etOcena1);
+        etOcena2 = findViewById(<span class="t-t">R</span>.id.etOcena2);
+        etOcena3 = findViewById(<span class="t-t">R</span>.id.etOcena3);
+        tvSrednia = findViewById(<span class="t-t">R</span>.id.tvSrednia);
+        <span class="t-t">Button</span> btnOblicz = findViewById(<span class="t-t">R</span>.id.btnOblicz);
+
+        btnOblicz.setOnClickListener(v -&gt; {
+            <span class="t-k">try</span> {
+                <span class="t-k">int</span> o1 = <span class="t-t">Integer</span>.parseInt(etOcena1.getText().toString().trim());
+                <span class="t-k">int</span> o2 = <span class="t-t">Integer</span>.parseInt(etOcena2.getText().toString().trim());
+                <span class="t-k">int</span> o3 = <span class="t-t">Integer</span>.parseInt(etOcena3.getText().toString().trim());
+                <span class="t-k">double</span> srednia = (o1 + o2 + o3) / <span class="t-n">3.0</span>;   <span class="t-c">// 3.0, a nie 3 — inaczej dzielenie całkowite!</span>
+                tvSrednia.setText(<span class="t-t">String</span>.format(<span class="t-s">"Średnia: %.2f"</span>, srednia));
+            } <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) {
+                <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Uzupełnij wszystkie oceny"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+            }
+        });
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b03_samodzielne/">rozwiazania/b03_samodzielne/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b03-samodzielne">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="inf04"><h2><span class="sec-num">7.</span> Zadanie w stylu INF.04</h2><div class="task exam" id="b03-inf">
+<div class="task-head"><h3>Kalkulator spalania paliwa</h3><span class="meta">⏱ ok. 45 min</span></div>
+<p>Wykonaj aplikację mobilną obliczającą średnie spalanie samochodu i koszt przejechania 100 km.</p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>tytuł, 3 pola edycyjne, przycisk, 2 napisy wyników, napis autora</td></tr><tr><td>DANE</td><td>dystans (km), litry, cena za litr — liczby dziesiętne</td></tr><tr><td>ZDARZENIA</td><td>kliknięcie „OBLICZ”</td></tr><tr><td>LOGIKA</td><td>spalanie = litry / km × 100; koszt = spalanie × cena; walidacja: pola niepuste, dystans &gt; 0</td></tr><tr><td>WYNIK</td><td>dwa napisy z wynikiem (2 miejsca po przecinku) lub komunikat błędu</td></tr><tr><td>WYGLĄD</td><td>tło #ECEFF1; tytuł #37474F biały; pola na całą szerokość; przycisk #FF8F00 czarny pogrubiony; wyniki wyśrodkowane</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ECEFF1;padding:0px"><div class="m-t" style="background:#37474F;color:#fff;font-size:24px;padding:8px;align-self:stretch">Spalanie paliwa</div><div class="m-e" style="margin:8px 8px 0px 8px;align-self:stretch"><span class="m-hint" style="">Przejechane km</span></div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span class="m-hint" style="">Zatankowane litry</span></div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span class="m-hint" style="">Cena za litr (zł)</span></div><div class="m-b" style="background:#FF8F00;color:#000;margin:8px;align-self:stretch">OBLICZ</div><div class="m-t" style="font-size:17.6px;text-align:center;align-self:stretch">Spalanie: – l/100 km</div><div class="m-t" style="font-size:17.6px;text-align:center;align-self:stretch">Koszt 100 km: – zł</div><div class="m-t" style="color:#808080;margin:16px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Stan początkowy</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ECEFF1;padding:0px"><div class="m-t" style="background:#37474F;color:#fff;font-size:24px;padding:8px;align-self:stretch">Spalanie paliwa</div><div class="m-e" style="margin:8px 8px 0px 8px;align-self:stretch"><span>640</span></div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span>42,5</span></div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span>6,49</span></div><div class="m-b" style="background:#FF8F00;color:#000;margin:8px;align-self:stretch">OBLICZ</div><div class="m-t" style="font-size:17.6px;text-align:center;align-self:stretch">Spalanie: 6,64 l/100 km</div><div class="m-t" style="font-size:17.6px;text-align:center;align-self:stretch">Koszt 100 km: 43,10 zł</div><div class="m-t" style="color:#808080;margin:16px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 2. Po wybraniu „OBLICZ”</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Spalanie paliwa”.</li><li>Trzy pola edycyjne z podpowiedziami: „Przejechane km”, „Zatankowane litry”, „Cena za litr (zł)”; pola przyjmują liczby dziesiętne.</li><li>Przycisk „OBLICZ”.</li><li>Napisy „Spalanie: – l/100 km” i „Koszt 100 km: – zł”.</li><li>Napis „Autor: ”, dalej numer zdającego.</li></ul>
+<p><strong>Działanie aplikacji:</strong></p>
+<ul><li>Po wybraniu „OBLICZ”: spalanie = litry / km · 100, koszt 100 km = spalanie · cena za litr.</li><li>Wyniki są wyświetlane z dokładnością do dwóch miejsc po przecinku: „Spalanie: 6,64 l/100 km”, „Koszt 100 km: 43,10 zł”.</li><li>Jeżeli którekolwiek pole jest puste, zawiera niepoprawną liczbę lub dystans nie jest większy od 0 — w pierwszym napisie pojawia się „Uzupełnij poprawnie wszystkie pola”, drugi napis jest pusty. Aplikacja nie może się zamknąć.</li><li>Wpisanie liczby z przecinkiem (np. „42,5”) daje ten sam wynik co z kropką.</li></ul>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs w XML, rozkład liniowy pionowy.</li><li>Tło strony #ECEFF1; tytuł: tło #37474F, biała czcionka, największa w aplikacji, marginesy wewnętrzne 10.</li><li>Pola edycyjne i przycisk rozciągnięte na szerokość ekranu z marginesami bocznymi 10.</li><li>Przycisk: tło #FF8F00, czarna pogrubiona czcionka.</li><li>Odczyt liczby z pola zrealizuj w osobnej metodzie przyjmującej pole edycyjne jako parametr.</li></ul>
+
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b03-inf"><li><label><input type="checkbox"> <span>trzy pola mają <code>inputType="numberDecimal"</code> i właściwe podpowiedzi</span></label></li><li><label><input type="checkbox"> <span>dla 640 km, 42,5 l, 6,49 zł wynik to 6,64 l/100 km i 43,10 zł</span></label></li><li><label><input type="checkbox"> <span>puste pole → komunikat, aplikacja się nie zamyka</span></label></li><li><label><input type="checkbox"> <span>dystans 0 → komunikat (brak dzielenia przez zero)</span></label></li><li><label><input type="checkbox"> <span>wpisanie „42,5” i „42.5” daje ten sam wynik</span></label></li><li><label><input type="checkbox"> <span>jest osobna metoda odczytu liczby z pola (parametr <code>EditText</code>)</span></label></li><li><label><input type="checkbox"> <span>wygląd: kolory, marginesy boczne 10dp, przycisk pogrubiony, wyniki wyśrodkowane</span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Najpierw zapisz trzy wzory na kartce i policz przykład z obrazu 2 kalkulatorem — będziesz wiedzieć, jakiego wyniku się spodziewać.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Metoda pomocnicza: <code>private double odczytajLiczbe(EditText pole)</code> — zwraca <code>Double.parseDouble(...)</code> po zamianie przecinka. Wyjątek „wypłynie” do metody, która ją wywołała, i tam złapiesz go w <code>catch</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">oblicz():
+    spróbuj:
+        dystans, paliwo, cena ← odczytajLiczbe(...)
+        jeśli dystans &lt;= 0 → pokazBlad(); zakończ
+        spalanie ← paliwo / dystans * 100
+        koszt ← spalanie * cena
+        pokaż oba wyniki (%.2f)
+    błąd konwersji → pokazBlad()</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">double</span> odczytajLiczbe(<span class="t-t">EditText</span> pole) {
+    <span class="t-t">String</span> tekst = pole.getText().toString().trim().replace(<span class="t-s">','</span>, <span class="t-s">'.'</span>);
+    <span class="t-k">return</span> <span class="t-t">Double</span>.parseDouble(tekst);
+}
+
+<span class="t-k">private</span> <span class="t-k">void</span> pokazBlad() {
+    tvSpalanie.setText(<span class="t-s">"Uzupełnij poprawnie wszystkie pola"</span>);
+    tvKoszt.setText(<span class="t-s">""</span>);
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#ECEFF1"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#37474F"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Spalanie paliwa"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"30sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etDystans"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Przejechane km"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"numberDecimal"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etPaliwo"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Zatankowane litry"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"numberDecimal"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etCena"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Cena za litr (zł)"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"numberDecimal"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnOblicz"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#FF8F00"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"OBLICZ"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#000000"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvSpalanie"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Spalanie: – l/100 km"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"22sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvKoszt"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Koszt 100 km: – zł"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"22sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvAutor"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"20dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etDystans, etPaliwo, etCena;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvSpalanie, tvKoszt;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etDystans = findViewById(<span class="t-t">R</span>.id.etDystans);
+        etPaliwo = findViewById(<span class="t-t">R</span>.id.etPaliwo);
+        etCena = findViewById(<span class="t-t">R</span>.id.etCena);
+        tvSpalanie = findViewById(<span class="t-t">R</span>.id.tvSpalanie);
+        tvKoszt = findViewById(<span class="t-t">R</span>.id.tvKoszt);
+        <span class="t-t">Button</span> btnOblicz = findViewById(<span class="t-t">R</span>.id.btnOblicz);
+
+        btnOblicz.setOnClickListener(v -&gt; oblicz());
+    }
+
+    <span class="t-k">private</span> <span class="t-k">double</span> odczytajLiczbe(<span class="t-t">EditText</span> pole) {
+        <span class="t-t">String</span> tekst = pole.getText().toString().trim().replace(<span class="t-s">','</span>, <span class="t-s">'.'</span>);
+        <span class="t-k">return</span> <span class="t-t">Double</span>.parseDouble(tekst);   <span class="t-c">// rzuca NumberFormatException, gdy pole jest puste</span>
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> oblicz() {
+        <span class="t-k">try</span> {
+            <span class="t-k">double</span> dystans = odczytajLiczbe(etDystans);
+            <span class="t-k">double</span> paliwo = odczytajLiczbe(etPaliwo);
+            <span class="t-k">double</span> cena = odczytajLiczbe(etCena);
+            <span class="t-k">if</span> (dystans &lt;= <span class="t-n">0</span>) {
+                pokazBlad();
+                <span class="t-k">return</span>;
+            }
+            <span class="t-k">double</span> spalanie = paliwo / dystans * <span class="t-n">100</span>;
+            <span class="t-k">double</span> koszt = spalanie * cena;
+            tvSpalanie.setText(<span class="t-t">String</span>.format(<span class="t-s">"Spalanie: %.2f l/100 km"</span>, spalanie));
+            tvKoszt.setText(<span class="t-t">String</span>.format(<span class="t-s">"Koszt 100 km: %.2f zł"</span>, koszt));
+        } <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) {
+            pokazBlad();
+        }
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> pokazBlad() {
+        tvSpalanie.setText(<span class="t-s">"Uzupełnij poprawnie wszystkie pola"</span>);
+        tvKoszt.setText(<span class="t-s">""</span>);
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b03_inf/">rozwiazania/b03_inf/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b03-inf">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="checklista"><h2><span class="sec-num">8.</span> Checklista</h2><p class="small muted">Sprawdź swoją aplikację z zadania INF.04 punkt po punkcie (krok 10 procedury).</p><ul class="checklist" data-key="b03-check"><li><label><input type="checkbox"> <span>każde pole ma <code>hint</code> i dobrany <code>inputType</code></span></label></li><li><label><input type="checkbox"> <span>odczyt: <code>getText().toString().trim()</code></span></label></li><li><label><input type="checkbox"> <span>każda konwersja tekst → liczba jest w <code>try/catch (NumberFormatException e)</code></span></label></li><li><label><input type="checkbox"> <span>dzielenie z częścią ułamkową używa <code>double</code> (np. <code>/ 3.0</code>)</span></label></li><li><label><input type="checkbox"> <span>wynik liczbowy sformatowany (<code>String.format("%.2f", …)</code>)</span></label></li><li><label><input type="checkbox"> <span>aplikacja nie zamyka się przy pustych polach</span></label></li><li><label><input type="checkbox"> <span>potrafię znaleźć w Logcat nazwę wyjątku i numer linii</span></label></li></ul></section>
+<section class="sec" id="test"><h2><span class="sec-num">9.</span> Mini-test</h2><div class="quiz" data-quiz="b03"><script type="application/json">[{"q": "<p>Co zwraca <code>etKwota.getText()<\/code>?<\/p>", "o": ["<code>String<\/code>", "<code>int<\/code>", "<code>Editable<\/code> — trzeba wywołać <code>.toString()<\/code>", "<code>CharSequence[]<\/code>"], "a": 2, "e": "<p><code>Editable<\/code> to tekst edytowalny; do porównań i konwersji potrzebny jest <code>String<\/code>.<\/p>"}, {"q": "<p>Który <code>inputType<\/code> realizuje „pole edycyjne umożliwiające wpisywanie jedynie liczb” (Arkusz_13)?<\/p>", "o": ["<code>text<\/code>", "<code>number<\/code>", "<code>phone<\/code>", "<code>textPassword<\/code>"], "a": 1, "e": "<p><code>number<\/code> pokazuje klawiaturę numeryczną i przyjmuje tylko cyfry.<\/p>"}, {"q": "<p>Co się stanie po <code>Integer.parseInt(\"\")<\/code>?<\/p>", "o": ["zwróci 0", "zwróci -1", "rzuci <code>NumberFormatException<\/code>", "zwróci <code>null<\/code>"], "a": 2, "e": "<p>Pusty tekst nie jest liczbą. Bez <code>try/catch<\/code> aplikacja się zamknie.<\/p>"}, {"q": "<p><code>int a = 7, b = 2; double w = a / b;<\/code> — ile wynosi <code>w<\/code>?<\/p>", "o": ["3.5", "3.0", "4.0", "błąd kompilacji"], "a": 1, "e": "<p>Dzielenie dwóch <code>int<\/code> daje 3, dopiero potem następuje zamiana na <code>double<\/code>. Poprawnie: <code>(double) a / b<\/code> lub <code>a / 2.0<\/code>.<\/p>"}, {"q": "<p>Która linia wyświetli „Cena: 5,00 zł” dla <code>double cena = 5;<\/code> (polskie ustawienia)?<\/p>", "o": ["<code>setText(\"Cena: \" + cena + \" zł\")<\/code>", "<code>setText(String.format(\"Cena: %.2f zł\", cena))<\/code>", "<code>setText(\"Cena: %.2f zł\")<\/code>", "<code>setText(cena)<\/code>"], "a": 1, "e": "<p>Pierwszy wariant da „Cena: 5.0 zł”. Trzeci wyświetli dosłownie „%.2f”. Czwarty zamknie aplikację.<\/p>"}, {"q": "<p>Gdzie szukasz przyczyny zamknięcia się aplikacji w emulatorze?<\/p>", "o": ["w oknie Build", "w Logcat — linia <code>FATAL EXCEPTION<\/code>", "w pliku <code>AndroidManifest.xml<\/code>", "w Device Manager"], "a": 1, "e": "<p>Logcat pokazuje wyjątek i ścieżkę wywołań z numerem linii w Twoim kodzie.<\/p>"}]</script></div></section>
+<section class="sec" id="dodatkowe"><h2><span class="sec-num">10.</span> Skończyłeś wcześniej?</h2><div class="micro"><h4>Wynik w Toast</h4><p>Dodaj do kalkulatora spalania drugi przycisk „PODSUMUJ”, który wyświetla w <code>Toast</code> tekst „Na 640 km zużyto 42,5 l za 275,83 zł” (koszt całkowity = litry · cena).</p></div><div class="micro"><h4>Kalkulator BMI</h4><p>Zbuduj w 15 minut: wzrost w cm (<code>number</code>), masa w kg (<code>numberDecimal</code>), przycisk, wynik „BMI: 22,49”. BMI = masa / (wzrost_m²).</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p>Wzrost w metrach: <code>wzrostCm / 100.0</code>. Kwadrat: <code>w * w</code>.</p></div></details></div><div class="micro"><h4>Czyszczenie pól</h4><p>Dodaj przycisk „WYCZYŚĆ”, który opróżnia wszystkie pola i przywraca napisy początkowe. Kursor ustaw w pierwszym polu.</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p><code>etDystans.setText("");</code> oraz <code>etDystans.requestFocus();</code></p></div></details></div></section>
+<div class="nav-bottom"><a class="btn secondary" href="blok02.html">← Blok 2</a><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button><a class="btn secondary" href="blok04.html">Blok 4 →</a></div></article></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
