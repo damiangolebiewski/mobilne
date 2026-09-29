@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blok 2 — Przycisk → zmiana stanu → interfejs</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../" data-page="block" data-block="b02">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html" class="active">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="block-layout"><aside class="toc no-print"><strong>Blok 2</strong><ol><li><a href="#cel">Cel</a></li><li><a href="#przypomnienie">Krótkie przypomnienie</a></li><li><a href="#przyklad">Przykład</a></li><li><a href="#mikro">Mikroćwiczenia</a></li><li><a href="#prowadzone">Zadanie prowadzone</a></li><li><a href="#samodzielne">Zadanie samodzielne</a></li><li><a href="#inf04">Zadanie w stylu INF.04</a></li><li><a href="#checklista">Checklista</a></li><li><a href="#test">Mini-test</a></li><li><a href="#dodatkowe">Skończyłeś wcześniej?</a></li></ol><a class="skip" href="#samodzielne">Silniejszy? Przejdź od razu do zadania samodzielnego →</a><p class="small muted" style="margin-top:.8rem">Słabszy? Przypomnienie → Przykład → Mikroćwiczenia → Zadanie prowadzone (z podpowiedziami).</p></aside><article class="page"><div class="block-head"><div><div class="muted small"><a href="../index.html">Bloki</a> › Blok 2</div><h1>Blok 2. Przycisk → zmiana stanu → interfejs</h1><span class="badge p1">Faza I — wyrównanie</span> <span id="block-status" class="badge">W trakcie</span></div><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button></div>
+<p>Obsługujesz kliknięcie przycisku, przechowujesz stan aplikacji w polu klasy (licznik, suma) i odświeżasz napisy. Budujesz rząd przycisków o równej szerokości.</p>
+<section class="sec" id="cel"><h2><span class="sec-num">1.</span> Cel</h2><p><strong>Po wykonaniu tego bloku będziesz potrafił:</strong></p><ul><li>pobrać kontrolkę z XML do Javy przez <code>findViewById</code> i obsłużyć kliknięcie <code>setOnClickListener</code>,</li><li>przechowywać stan aplikacji w polu klasy (licznik, suma) i ograniczać go (np. „nie mniej niż 0”),</li><li>składać napis z tekstu i liczby i wyświetlać go przez <code>setText</code>,</li><li>ułożyć przyciski obok siebie w poziomym <code>LinearLayout</code> z <code>layout_weight</code> i ustawić ich kolor (<code>backgroundTint</code>).</li></ul><details class="hint"><summary>Plan czasu (4 × 45 min = 180 min)</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>Przypomnienie</td><td>15 min</td></tr><tr><td>Przykład</td><td>10 min</td></tr><tr><td>Mikroćwiczenia</td><td>25 min</td></tr><tr><td>Zadanie prowadzone</td><td>40 min</td></tr><tr><td>Zadanie samodzielne</td><td>35 min</td></tr><tr><td>Zadanie INF.04</td><td>45 min</td></tr><tr><td>Checklista + mini-test</td><td>10 min</td></tr><tr><th>Razem</th><th>180 min</th></tr></tbody></table></div></div></details><p class="small muted">Powiązanie z arkuszami: wzorzec W1 (zdarzenie → stan → interfejs) występuje w 7/7 zadań mobilnych; licznik z dolną granicą 0 — Arkusz_02; suma kumulowana i reset — Arkusz_12; przyciski obok siebie — Arkusz_02.</p></section>
+<section class="sec" id="przypomnienie"><h2><span class="sec-num">2.</span> Krótkie przypomnienie</h2><h4>Schemat, który powtarza się w każdym arkuszu</h4>
+<div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">kliknięcie przycisku  →  zmiana pola klasy (stanu)  →  setText(...) na ekranie</code></pre></div>
+<h4>Trzy kroki w Javie</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">int</span> licznik = <span class="t-n">0</span>;          <span class="t-c">// 1. stan: POLE klasy, nie zmienna w onCreate</span>
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvLicznik;       <span class="t-c">//    kontrolki, których używasz w wielu miejscach</span>
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        tvLicznik = findViewById(<span class="t-t">R</span>.id.tvLicznik);        <span class="t-c">// 2. połączenie z XML (to samo id!)</span>
+        <span class="t-t">Button</span> btnPolub = findViewById(<span class="t-t">R</span>.id.btnPolub);
+
+        btnPolub.setOnClickListener(v -&gt; {               <span class="t-c">// 3. obsługa zdarzenia</span>
+            licznik++;
+            tvLicznik.setText(licznik + <span class="t-s">" polubień"</span>);    <span class="t-c">//    liczba + tekst = tekst</span>
+        });
+    }
+}</code></pre></div>
+<p>Importy dopisze Android Studio: kliknij czerwoną nazwę klasy i naciśnij <strong>Alt+Enter</strong> (<code>android.widget.Button</code>, <code>android.widget.TextView</code>).</p>
+<div class="box box-err"><p><code>tvLicznik.setText(licznik);</code> — kompiluje się, ale <strong>zamyka aplikację</strong> (<code>Resources$NotFoundException</code>): liczba jest traktowana jak identyfikator zasobu. Zawsze składaj napis: <code>setText(licznik + " polubień")</code> lub <code>setText(String.valueOf(licznik))</code>.</p></div>
+<h4>Ta sama obsługa w stylu z arkuszy (klasa anonimowa)</h4>
+<p>W pomocach z arkuszy spotkasz zapis bez strzałki <code>-&gt;</code>. Działa identycznie:</p>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">btnPolub.setOnClickListener(<span class="t-k">new</span> <span class="t-t">View</span>.<span class="t-t">OnClickListener</span>() {
+    <span class="t-a">@Override</span>
+    <span class="t-k">public</span> <span class="t-k">void</span> onClick(<span class="t-t">View</span> v) {
+        licznik++;
+        tvLicznik.setText(licznik + <span class="t-s">" polubień"</span>);
+    }
+});</code></pre></div>
+<h4>Przyciski obok siebie, równa szerokość</h4>
+<div class="code"><div class="code-bar"><span>XML</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml"><span class="t-k">&lt;LinearLayout</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#008080"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;Button</span> <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnPolub"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span> <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span> <span class="t-a">android:text</span>=<span class="t-s">"POLUB"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#008080"</span> <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span> <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnUsun"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span> <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span> <span class="t-a">android:text</span>=<span class="t-s">"USUŃ"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#008080"</span> <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div>
+<div class="box box-warn"><p>W nowych projektach (motyw Material 3) atrybut <code>android:background</code> na przycisku <strong>nie zmienia koloru</strong>. Używaj <code>android:backgroundTint="#…"</code>. Na napisach (<code>TextView</code>) i rozkładach <code>background</code> działa normalnie.</p></div>
+<p><strong>Ćwiczenie natychmiastowe:</strong> w przykładzie poniżej dopisz drugi przycisk „ZERUJ”, który ustawia licznik na 0.</p></section>
+<section class="sec" id="przyklad"><h2><span class="sec-num">3.</span> Przykład</h2><p>Najmniejsza aplikacja ze zdarzeniem: licznik kliknięć. Zwróć uwagę na komentarze 1 i 2 w kodzie — ta kolejność (stan → ekran) będzie się powtarzać we wszystkich blokach.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:0px"><div class="m-t" style="font-size:25.6px;margin:16px 0px 0px 0px;text-align:center;align-self:stretch">Kliknięcia: 3</div><div class="m-b" style="background:#6750A4;color:#ffffff;margin:16px 0px 0px 0px;align-self:center">KLIKNIJ</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po trzech kliknięciach</figcaption></figure></div><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"20dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvLicznik"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Kliknięcia: 0"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"32sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnKliknij"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"20dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"KLIKNIJ"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-c">// stan aplikacji — pole klasy (żyje tak długo jak ekran)</span>
+    <span class="t-k">private</span> <span class="t-k">int</span> licznik = <span class="t-n">0</span>;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvLicznik;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        tvLicznik = findViewById(<span class="t-t">R</span>.id.tvLicznik);
+        <span class="t-t">Button</span> btnKliknij = findViewById(<span class="t-t">R</span>.id.btnKliknij);
+
+        btnKliknij.setOnClickListener(v -&gt; {
+            licznik++;                                   <span class="t-c">// 1. zmiana stanu</span>
+            tvLicznik.setText(<span class="t-s">"Kliknięcia: "</span> + licznik); <span class="t-c">// 2. aktualizacja interfejsu</span>
+        });
+    }
+}</code></pre></div></section>
+<section class="sec" id="mikro"><h2><span class="sec-num">4.</span> Mikroćwiczenia</h2><div class="micro"><h4>Ćwiczenie 2.1 — Połącz XML z Javą</h4><p>W XML jest <code>&lt;TextView android:id="@+id/tvWynik" … /&gt;</code>. Zadeklaruj pole klasy i przypisz je w <code>onCreate</code>.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-t">TextView</span> tvWynik;          <span class="t-c">// pole klasy (nad onCreate)</span>
+...
+tvWynik = findViewById(<span class="t-t">R</span>.id.tvWynik);   <span class="t-c">// w onCreate, PO setContentView</span></code></pre></div>
+<p><code>findViewById</code> przed <code>setContentView</code> zwraca <code>null</code> — aplikacja się zamknie przy pierwszym <code>setText</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 2.2 — Co się stanie?</h4><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">int</span> punkty = <span class="t-n">5</span>;
+tvPunkty.setText(punkty);</code></pre></div>
+<p>Aplikacja się kompiluje. Co się dzieje po kliknięciu? Jak to poprawić?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Awaria <code>android.content.res.Resources$NotFoundException: String resource ID #0x5</code>. Poprawnie: <code>tvPunkty.setText("Punkty: " + punkty);</code> albo <code>tvPunkty.setText(String.valueOf(punkty));</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 2.3 — Licznik nie może być ujemny</h4><p>Uzupełnij obsługę przycisku USUŃ tak, aby licznik malał, ale nigdy nie spadł poniżej 0 (wymaganie z Arkusza_02). Napis ma postać „&lt;x&gt; polubień”.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">btnUsun.setOnClickListener(v -&gt; {
+    <span class="t-k">if</span> (licznik &gt; <span class="t-n">0</span>) {
+        licznik--;
+    }
+    tvLicznik.setText(licznik + <span class="t-s">" polubień"</span>);
+});</code></pre></div></div></details></div><div class="micro"><h4>Ćwiczenie 2.4 — Przewidź wynik</h4><p>Licznik startuje od 0. Przyciski: POLUB (+1), USUŃ (−1, nie poniżej 0). Kolejność kliknięć: POLUB, POLUB, USUŃ, USUŃ, USUŃ, POLUB. Co pokazuje napis?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>„1 polubień”. Trzecie USUŃ nie zmienia licznika (już 0), ostatnie POLUB daje 1.</p></div></details></div><div class="micro"><h4>Ćwiczenie 2.5 — Trzy przyciski — równa szerokość</h4><p>Napisz XML rzędu z trzema przyciskami „POLUB”, „USUŃ”, „ZAPISZ”, które razem wypełniają szerokość ekranu po równo.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Poziomy <code>LinearLayout</code> (<code>match_parent</code>), a w nim trzy przyciski z <code>layout_width="0dp"</code> i <code>layout_weight="1"</code>. Szerokość <code>0dp</code> mówi: „nie licz szerokości z treści, podziel wolne miejsce według wag”.</p></div></details></div><div class="micro"><h4>Ćwiczenie 2.6 — Z lambdy na klasę anonimową</h4><p>Przepisz <code>btnReset.setOnClickListener(v -&gt; { licznik = 0; pokaz(); });</code> na zapis z <code>new View.OnClickListener()</code>.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">btnReset.setOnClickListener(<span class="t-k">new</span> <span class="t-t">View</span>.<span class="t-t">OnClickListener</span>() {
+    <span class="t-a">@Override</span>
+    <span class="t-k">public</span> <span class="t-k">void</span> onClick(<span class="t-t">View</span> v) {
+        licznik = <span class="t-n">0</span>;
+        pokaz();
+    }
+});</code></pre></div>
+<p>Potrzebny import <code>android.view.View</code>.</p></div></details></div></section>
+<section class="sec" id="prowadzone"><h2><span class="sec-num">5.</span> Zadanie prowadzone</h2><div class="task" id="b02-prowadzone">
+<div class="task-head"><h3>Rozmiar tekstu: A− / A+</h3><span class="meta">⏱ ok. 40 min</span></div>
+<p>Przyciski zmieniają rozmiar czcionki tekstu w krokach co 2 (w zakresie 12–40). Stan to jedna liczba, ale od niej zależą dwie rzeczy: napis „Rozmiar: …” i wygląd innej kontrolki. Kod budujesz krok po kroku; każdy krok kończ uruchomieniem.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:0px"><div class="m-t" style="background:#1D4F91;color:#fff;font-size:22.4px;padding:9.6px;align-self:stretch">Czytnik</div><div class="m-row" style="margin:12.8px;align-self:stretch"><div class="m-b" style="background:#1D4F91;color:#ffffff;margin:0px 6.4px 0px 0px;flex:1 1 0;min-width:0">A−</div><div class="m-b" style="background:#1D4F91;color:#ffffff;margin:0px 0px 0px 6.4px;flex:1 1 0;min-width:0">A+</div></div><div class="m-t" style="font-size:14.4px;text-align:center;align-self:stretch">Rozmiar: 26</div><div class="m-b" style="background:#808080;color:#ffffff;align-self:center">DOMYŚLNY</div><div class="m-t" style="font-size:20.8px;margin:12.8px">Litwo! Ojczyzno moja! ty jesteś jak zdrowie.</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po trzech kliknięciach „A+”</figcaption></figure></div>
+<p><strong>Działanie:</strong></p>
+<ul><li>„A+” zwiększa rozmiar o 2, ale nie powyżej 40.</li><li>„A−” zmniejsza rozmiar o 2, ale nie poniżej 12.</li><li>„DOMYŚLNY” ustawia 20.</li><li>Po każdej zmianie: napis „Rozmiar: &lt;liczba&gt;” oraz rozmiar czcionki tekstu na dole ekranu (<code>setTextSize(rozmiar)</code>).</li></ul>
+<p><strong>Kroki:</strong></p>
+<ol><li>XML: tytuł (tło <code>#1D4F91</code>, biały, 28sp), poziomy rozkład z przyciskami „A−” i „A+” (wagi 1:1, <code>backgroundTint="#1D4F91"</code>), napis rozmiaru (wyśrodkowany), przycisk DOMYŚLNY (szary <code>#808080</code>, wyśrodkowany), tekst próbny 20sp.</li><li>Java: pola <code>rozmiar</code>, <code>tvRozmiar</code>, <code>tvTekst</code>; stałe <code>MINIMUM = 12</code>, <code>MAKSIMUM = 40</code>, <code>DOMYSLNY = 20</code>, <code>KROK = 2</code>.</li><li>Trzy obsługi kliknięcia.</li><li>Wspólna metoda <code>aktualizujEkran()</code> — wywołuj ją na końcu każdej obsługi, żeby nie powtarzać kodu.</li></ol>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Najpierw ustal, który element jest w którym rozkładzie. Przyciski A− i A+ muszą być w zagnieżdżonym poziomym rozkładzie, DOMYŚLNY — już nie.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Warunki: przy A+ <code>if (rozmiar + KROK &lt;= MAKSIMUM) rozmiar += KROK;</code>, przy A− <code>if (rozmiar - KROK &gt;= MINIMUM) rozmiar -= KROK;</code>. Zmiana czcionki: <code>tvTekst.setTextSize(rozmiar);</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">pola: rozmiar = 20, tvRozmiar, tvTekst; stałe 12, 40, 20, 2
+onCreate:
+    znajdź kontrolki
+    A+  → jeśli rozmiar + 2 &lt;= 40: rozmiar += 2; aktualizujEkran()
+    A−  → jeśli rozmiar − 2 &gt;= 12: rozmiar −= 2; aktualizujEkran()
+    DOMYŚLNY → rozmiar = 20; aktualizujEkran()
+aktualizujEkran():
+    tvRozmiar ← "Rozmiar: " + rozmiar
+    tvTekst.setTextSize(rozmiar)</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">void</span> aktualizujEkran() {
+    tvRozmiar.setText(<span class="t-s">"Rozmiar: "</span> + rozmiar);
+    tvTekst.setTextSize(rozmiar);
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#1D4F91"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"12dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Czytnik"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnMniejsza"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginEnd</span>=<span class="t-s">"8dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#1D4F91"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"A−"</span>
+            <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnWieksza"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"8dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#1D4F91"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"A+"</span>
+            <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvRozmiar"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Rozmiar: 20"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnDomyslny"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#808080"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"DOMYŚLNY"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTekst"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Litwo! Ojczyzno moja! ty jesteś jak zdrowie."</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">MINIMUM</span> = <span class="t-n">12</span>;
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">MAKSIMUM</span> = <span class="t-n">40</span>;
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">DOMYSLNY</span> = <span class="t-n">20</span>;
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">KROK</span> = <span class="t-n">2</span>;
+
+    <span class="t-k">private</span> <span class="t-k">int</span> rozmiar = <span class="t-t">DOMYSLNY</span>;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvRozmiar;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvTekst;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        tvRozmiar = findViewById(<span class="t-t">R</span>.id.tvRozmiar);
+        tvTekst = findViewById(<span class="t-t">R</span>.id.tvTekst);
+        <span class="t-t">Button</span> btnMniejsza = findViewById(<span class="t-t">R</span>.id.btnMniejsza);
+        <span class="t-t">Button</span> btnWieksza = findViewById(<span class="t-t">R</span>.id.btnWieksza);
+        <span class="t-t">Button</span> btnDomyslny = findViewById(<span class="t-t">R</span>.id.btnDomyslny);
+
+        btnWieksza.setOnClickListener(v -&gt; {
+            <span class="t-k">if</span> (rozmiar + <span class="t-t">KROK</span> &lt;= <span class="t-t">MAKSIMUM</span>) {
+                rozmiar += <span class="t-t">KROK</span>;
+            }
+            aktualizujEkran();
+        });
+
+        btnMniejsza.setOnClickListener(v -&gt; {
+            <span class="t-k">if</span> (rozmiar - <span class="t-t">KROK</span> &gt;= <span class="t-t">MINIMUM</span>) {
+                rozmiar -= <span class="t-t">KROK</span>;
+            }
+            aktualizujEkran();
+        });
+
+        btnDomyslny.setOnClickListener(v -&gt; {
+            rozmiar = <span class="t-t">DOMYSLNY</span>;
+            aktualizujEkran();
+        });
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> aktualizujEkran() {
+        tvRozmiar.setText(<span class="t-s">"Rozmiar: "</span> + rozmiar);
+        tvTekst.setTextSize(rozmiar);   <span class="t-c">// stan zmienia nie tylko napis, ale też wygląd innej kontrolki</span>
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b02_prowadzone/">rozwiazania/b02_prowadzone/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b02-prowadzone">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="samodzielne"><h2><span class="sec-num">6.</span> Zadanie samodzielne</h2><div class="task" id="b02-samodzielne">
+<div class="task-head"><h3>Kalorie przekąsek</h3><span class="meta">⏱ ok. 35 min</span></div>
+<p>Ten sam mechanizm (zdarzenie → stan → interfejs), ale inny problem: kilka przycisków dodaje <strong>różne wartości</strong> do jednej sumy.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#FFFDE7;padding:12.8px"><div class="m-t" style="font-size:22.4px;font-weight:700;text-align:center;align-self:stretch">Kalorie przekąsek</div><div class="m-row" style="margin:16px 0px 0px 0px;align-self:stretch"><div class="m-b" style="background:#2E7D32;color:#ffffff;margin:3.2px;flex:1 1 0;min-width:0">JABŁKO</div><div class="m-b" style="background:#6D4C41;color:#ffffff;margin:3.2px;flex:1 1 0;min-width:0">BATON</div><div class="m-b" style="background:#EF6C00;color:#ffffff;margin:3.2px;flex:1 1 0;min-width:0">SOK</div></div><div class="m-t" style="font-size:24px;margin:16px 0px 0px 0px;text-align:center;align-self:stretch">Suma: 412 kcal</div><div class="m-t" style="font-size:14.4px;text-align:center;align-self:stretch">Zjedzone przekąski: 3</div><div class="m-b" style="background:#6750A4;color:#ffffff;margin:16px 0px 0px 0px;align-self:center">WYZERUJ</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po kliknięciu: JABŁKO, BATON, SOK</figcaption></figure></div>
+<ul><li>JABŁKO dodaje 52 kcal, BATON 250 kcal, SOK 110 kcal. Każde kliknięcie zwiększa też liczbę zjedzonych przekąsek o 1.</li><li>Napisy: „Suma: &lt;kcal&gt; kcal” oraz „Zjedzone przekąski: &lt;n&gt;”.</li><li>WYZERUJ ustawia obie wartości na 0.</li><li>Tło ekranu <code>#FFFDE7</code>, przyciski w jednym rzędzie o równej szerokości z marginesem 4dp, każdy w innym kolorze (dowolnym).</li><li>Nie powtarzaj kodu trzy razy — napisz metodę <code>dodaj(int kcal)</code>.</li></ul>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Wszystkie trzy przyciski robią to samo, różni się tylko liczba kalorii. To sygnał, że potrzebna jest metoda z parametrem.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p><code>btnJablko.setOnClickListener(v -&gt; dodaj(52));</code> — lambda może wywołać metodę w jednej linii.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">pola: sumaKcal = 0, liczbaPrzekasek = 0
+dodaj(kcal): sumaKcal += kcal; liczbaPrzekasek++; pokaz()
+pokaz(): ustaw oba napisy
+WYZERUJ: oba pola = 0; pokaz()</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">void</span> dodaj(<span class="t-k">int</span> kcal) {
+    sumaKcal += kcal;
+    liczbaPrzekasek++;
+    pokaz();
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#FFFDE7"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Kalorie przekąsek"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"20dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnJablko"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"4dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#2E7D32"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"JABŁKO"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnBaton"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"4dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#6D4C41"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"BATON"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnSok"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"4dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#EF6C00"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"SOK"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvSuma"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"20dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Suma: 0 kcal"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"30sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvIle"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Zjedzone przekąski: 0"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnWyzeruj"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"20dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"WYZERUJ"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">int</span> sumaKcal = <span class="t-n">0</span>;
+    <span class="t-k">private</span> <span class="t-k">int</span> liczbaPrzekasek = <span class="t-n">0</span>;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvSuma;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvIle;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        tvSuma = findViewById(<span class="t-t">R</span>.id.tvSuma);
+        tvIle = findViewById(<span class="t-t">R</span>.id.tvIle);
+        <span class="t-t">Button</span> btnJablko = findViewById(<span class="t-t">R</span>.id.btnJablko);
+        <span class="t-t">Button</span> btnBaton = findViewById(<span class="t-t">R</span>.id.btnBaton);
+        <span class="t-t">Button</span> btnSok = findViewById(<span class="t-t">R</span>.id.btnSok);
+        <span class="t-t">Button</span> btnWyzeruj = findViewById(<span class="t-t">R</span>.id.btnWyzeruj);
+
+        btnJablko.setOnClickListener(v -&gt; dodaj(<span class="t-n">52</span>));
+        btnBaton.setOnClickListener(v -&gt; dodaj(<span class="t-n">250</span>));
+        btnSok.setOnClickListener(v -&gt; dodaj(<span class="t-n">110</span>));
+        btnWyzeruj.setOnClickListener(v -&gt; {
+            sumaKcal = <span class="t-n">0</span>;
+            liczbaPrzekasek = <span class="t-n">0</span>;
+            pokaz();
+        });
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> dodaj(<span class="t-k">int</span> kcal) {
+        sumaKcal += kcal;
+        liczbaPrzekasek++;
+        pokaz();
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> pokaz() {
+        tvSuma.setText(<span class="t-s">"Suma: "</span> + sumaKcal + <span class="t-s">" kcal"</span>);
+        tvIle.setText(<span class="t-s">"Zjedzone przekąski: "</span> + liczbaPrzekasek);
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b02_samodzielne/">rozwiazania/b02_samodzielne/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b02-samodzielne">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="inf04"><h2><span class="sec-num">7.</span> Zadanie w stylu INF.04</h2><div class="task exam" id="b02-inf">
+<div class="task-head"><h3>Licznik szklanek wody</h3><span class="meta">⏱ ok. 45 min</span></div>
+<p>Wykonaj aplikację mobilną pomagającą kontrolować liczbę wypitych szklanek wody i uruchom ją w emulatorze.</p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>tytuł, napis celu, napis licznika, 2 przyciski w rzędzie, przycisk RESET, obszar komunikatów</td></tr><tr><td>DANE</td><td>brak pól — tylko przyciski</td></tr><tr><td>ZDARZENIA</td><td>kliknięcie „+ SZKLANKA”, „− SZKLANKA”, „RESET”</td></tr><tr><td>LOGIKA</td><td>licznik 0..12 (nie mniej niż 0, nie więcej niż 12); porównanie z celem 8</td></tr><tr><td>WYNIK</td><td>„&lt;x&gt; / 8 szklanek”; komunikat: „Zostało: &lt;n&gt;” / „Cel osiągnięty!” / „Licznik wyzerowany”; na starcie „Autor: &lt;numer&gt;”</td></tr><tr><td>WYGLĄD</td><td>tło #E1F5FE; tytuł #0277BD biały, największy; licznik pogrubiony; przyciski #0277BD w rzędzie po równo; RESET #9E9E9E wyśrodkowany</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#E1F5FE;padding:0px"><div class="m-t" style="background:#0277BD;color:#fff;font-size:24px;padding:8px;align-self:stretch">Nawodnienie</div><div class="m-t" style="font-size:14.4px;margin:8px">Cel: 8 szklanek dziennie</div><div class="m-t" style="font-size:22.4px;font-weight:700;text-align:center;align-self:stretch">0 / 8 szklanek</div><div class="m-row" style="margin:8px;align-self:stretch"><div class="m-b" style="background:#0277BD;color:#ffffff;margin:0px 4px 0px 0px;flex:1 1 0;min-width:0">+ SZKLANKA</div><div class="m-b" style="background:#0277BD;color:#ffffff;margin:0px 0px 0px 4px;flex:1 1 0;min-width:0">− SZKLANKA</div></div><div class="m-b" style="background:#9E9E9E;color:#ffffff;align-self:center">RESET</div><div class="m-t" style="font-size:14.4px;margin:12.8px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Stan początkowy</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#E1F5FE;padding:0px"><div class="m-t" style="background:#0277BD;color:#fff;font-size:24px;padding:8px;align-self:stretch">Nawodnienie</div><div class="m-t" style="font-size:14.4px;margin:8px">Cel: 8 szklanek dziennie</div><div class="m-t" style="font-size:22.4px;font-weight:700;text-align:center;align-self:stretch">8 / 8 szklanek</div><div class="m-row" style="margin:8px;align-self:stretch"><div class="m-b" style="background:#0277BD;color:#ffffff;margin:0px 4px 0px 0px;flex:1 1 0;min-width:0">+ SZKLANKA</div><div class="m-b" style="background:#0277BD;color:#ffffff;margin:0px 0px 0px 4px;flex:1 1 0;min-width:0">− SZKLANKA</div></div><div class="m-b" style="background:#9E9E9E;color:#ffffff;align-self:center">RESET</div><div class="m-t" style="font-size:14.4px;margin:12.8px 0px 0px 0px;text-align:center;align-self:stretch">Cel osiągnięty!</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 2. Po 8 kliknięciach „+ SZKLANKA”</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Nawodnienie”.</li><li>Napis „Cel: 8 szklanek dziennie”.</li><li>Napis licznika w postaci „&lt;x&gt; / 8 szklanek”, w stanie początkowym „0 / 8 szklanek”.</li><li>Dwa przyciski obok siebie: „+ SZKLANKA” i „− SZKLANKA”.</li><li>Przycisk „RESET”.</li><li>Obszar komunikatów; na początku działania aplikacji wyświetla „Autor: ”, dalej numer zdającego.</li></ul>
+<p><strong>Działanie aplikacji:</strong></p>
+<ul><li>„+ SZKLANKA” zwiększa licznik o 1; licznik nie może przekroczyć 12.</li><li>„− SZKLANKA” zmniejsza licznik o 1; licznik nie może być niższy niż 0.</li><li>Po każdej zmianie licznika w obszarze komunikatów wyświetla się „Zostało: &lt;n&gt;”, gdzie n = 8 − licznik, albo „Cel osiągnięty!”, gdy licznik wynosi co najmniej 8.</li><li>„RESET” ustawia licznik na 0, a w obszarze komunikatów wyświetla „Licznik wyzerowany”.</li></ul>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs w XML; rozkład liniowy pionowy z zagnieżdżonym rozkładem poziomym dla przycisków „+” i „−”.</li><li>Tło strony LightCyan (#E1F5FE). Tytuł: tło #0277BD, biała czcionka, rozmiar największy w aplikacji, marginesy wewnętrzne 10.</li><li>Przyciski „+” i „−” mają kolor tła #0277BD, białą czcionkę i razem wypełniają szerokość rozkładu. Przycisk RESET: tło #9E9E9E, wyśrodkowany.</li><li>Napis licznika pogrubiony i wyśrodkowany. Obszar komunikatów wyśrodkowany.</li><li>Wartości 8 i 12 zapisz w kodzie jako stałe o znaczących nazwach.</li></ul>
+
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b02-inf"><li><label><input type="checkbox"> <span>aplikacja uruchamia się, stan początkowy zgodny z obrazem 1 (w tym „Autor: …”)</span></label></li><li><label><input type="checkbox"> <span>przyciski „+” i „−” są obok siebie w zagnieżdżonym poziomym <code>LinearLayout</code> i wypełniają szerokość</span></label></li><li><label><input type="checkbox"> <span>kolory: tło #E1F5FE, tytuł #0277BD, przyciski #0277BD, RESET #9E9E9E; tytuł największy</span></label></li><li><label><input type="checkbox"> <span>12 kliknięć „+” i kolejne → licznik zatrzymuje się na 12</span></label></li><li><label><input type="checkbox"> <span>kliknięcie „−” przy 0 → licznik zostaje 0</span></label></li><li><label><input type="checkbox"> <span>komunikat „Zostało: n” / „Cel osiągnięty!” zmienia się poprawnie (sprawdź 7 i 8)</span></label></li><li><label><input type="checkbox"> <span>RESET → „0 / 8 szklanek” i „Licznik wyzerowany”</span></label></li><li><label><input type="checkbox"> <span>stałe <code>CEL</code> i <code>MAKSIMUM</code> zamiast „magicznych liczb”</span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Stan aplikacji to jedna liczba całkowita. Każdy przycisk zmienia ją inaczej, ale ekran odświeża się zawsze tak samo — przyda się wspólna metoda.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Stałe: <code>private static final int CEL = 8; private static final int MAKSIMUM = 12;</code>. „Zostało” liczysz jako <code>CEL - liczbaSzklanek</code> — pamiętaj o nawiasach przy sklejaniu z tekstem.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">+   : jeśli licznik &lt; MAKSIMUM → licznik++ ; pokazStan()
+−   : jeśli licznik &gt; 0        → licznik-- ; pokazStan()
+RESET: licznik = 0; napis licznika; komunikat "Licznik wyzerowany"
+pokazStan(): napis licznika; jeśli licznik &gt;= CEL → "Cel osiągnięty!" inaczej "Zostało: " + (CEL - licznik)</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">void</span> pokazStan() {
+    tvLicznik.setText(liczbaSzklanek + <span class="t-s">" / "</span> + <span class="t-t">CEL</span> + <span class="t-s">" szklanek"</span>);
+    <span class="t-k">if</span> (liczbaSzklanek &gt;= <span class="t-t">CEL</span>) {
+        tvKomunikat.setText(<span class="t-s">"Cel osiągnięty!"</span>);
+    } <span class="t-k">else</span> {
+        tvKomunikat.setText(<span class="t-s">"Zostało: "</span> + (<span class="t-t">CEL</span> - liczbaSzklanek));
+    }
+}</code></pre></div>
+<p>Bez nawiasów <code>"Zostało: " + CEL - liczbaSzklanek</code> to błąd kompilacji (tekst minus liczba).</p></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#E1F5FE"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#0277BD"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Nawodnienie"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"30sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvCel"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Cel: 8 szklanek dziennie"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvLicznik"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"0 / 8 szklanek"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnDodaj"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginEnd</span>=<span class="t-s">"5dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#0277BD"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"+ SZKLANKA"</span>
+            <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnOdejmij"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"5dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#0277BD"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"− SZKLANKA"</span>
+            <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnReset"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#9E9E9E"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"RESET"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvKomunikat"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">CEL</span> = <span class="t-n">8</span>;
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">MAKSIMUM</span> = <span class="t-n">12</span>;
+
+    <span class="t-k">private</span> <span class="t-k">int</span> liczbaSzklanek = <span class="t-n">0</span>;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvLicznik;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvKomunikat;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        tvLicznik = findViewById(<span class="t-t">R</span>.id.tvLicznik);
+        tvKomunikat = findViewById(<span class="t-t">R</span>.id.tvKomunikat);
+        <span class="t-t">Button</span> btnDodaj = findViewById(<span class="t-t">R</span>.id.btnDodaj);
+        <span class="t-t">Button</span> btnOdejmij = findViewById(<span class="t-t">R</span>.id.btnOdejmij);
+        <span class="t-t">Button</span> btnReset = findViewById(<span class="t-t">R</span>.id.btnReset);
+
+        btnDodaj.setOnClickListener(v -&gt; {
+            <span class="t-k">if</span> (liczbaSzklanek &lt; <span class="t-t">MAKSIMUM</span>) {
+                liczbaSzklanek++;
+            }
+            pokazStan();
+        });
+
+        btnOdejmij.setOnClickListener(v -&gt; {
+            <span class="t-k">if</span> (liczbaSzklanek &gt; <span class="t-n">0</span>) {
+                liczbaSzklanek--;
+            }
+            pokazStan();
+        });
+
+        btnReset.setOnClickListener(v -&gt; {
+            liczbaSzklanek = <span class="t-n">0</span>;
+            tvLicznik.setText(<span class="t-s">"0 / "</span> + <span class="t-t">CEL</span> + <span class="t-s">" szklanek"</span>);
+            tvKomunikat.setText(<span class="t-s">"Licznik wyzerowany"</span>);
+        });
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> pokazStan() {
+        tvLicznik.setText(liczbaSzklanek + <span class="t-s">" / "</span> + <span class="t-t">CEL</span> + <span class="t-s">" szklanek"</span>);
+        <span class="t-k">if</span> (liczbaSzklanek &gt;= <span class="t-t">CEL</span>) {
+            tvKomunikat.setText(<span class="t-s">"Cel osiągnięty!"</span>);
+        } <span class="t-k">else</span> {
+            tvKomunikat.setText(<span class="t-s">"Zostało: "</span> + (<span class="t-t">CEL</span> - liczbaSzklanek));
+        }
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b02_inf/">rozwiazania/b02_inf/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b02-inf">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="checklista"><h2><span class="sec-num">8.</span> Checklista</h2><p class="small muted">Sprawdź swoją aplikację z zadania INF.04 punkt po punkcie (krok 10 procedury).</p><ul class="checklist" data-key="b02-check"><li><label><input type="checkbox"> <span>każde <code>findViewById</code> jest <strong>po</strong> <code>setContentView</code> i używa id istniejącego w XML</span></label></li><li><label><input type="checkbox"> <span>stan (licznik, suma) jest polem klasy, a nie zmienną lokalną w <code>onCreate</code></span></label></li><li><label><input type="checkbox"> <span><code>setText</code> zawsze dostaje tekst (np. <code>x + " polubień"</code>), nigdy samą liczbę</span></label></li><li><label><input type="checkbox"> <span>granice licznika działają (nie mniej niż 0 / nie więcej niż maksimum)</span></label></li><li><label><input type="checkbox"> <span>przyciski w rzędzie mają <code>layout_width="0dp"</code> i <code>layout_weight</code></span></label></li><li><label><input type="checkbox"> <span>kolor przycisków ustawiony przez <code>backgroundTint</code>, tekst przez <code>textColor</code></span></label></li><li><label><input type="checkbox"> <span>odświeżanie ekranu jest w jednej metodzie, a nie skopiowane do każdego przycisku</span></label></li></ul></section>
+<section class="sec" id="test"><h2><span class="sec-num">9.</span> Mini-test</h2><div class="quiz" data-quiz="b02"><script type="application/json">[{"q": "<p>Gdzie zadeklarować zmienną <code>licznik<\/code>, aby zachowywała wartość między kliknięciami?<\/p>", "o": ["wewnątrz lambdy przycisku", "jako zmienną lokalną w <code>onCreate<\/code>", "jako pole klasy <code>MainActivity<\/code>", "w pliku XML"], "a": 2, "e": "<p>Zmienna lokalna znika po zakończeniu metody, a w lambdzie nie można jej modyfikować. Stan trzymamy w polu klasy.<\/p>"}, {"q": "<p>Co zrobi <code>tvWynik.setText(7);<\/code>?<\/p>", "o": ["wyświetli „7”", "błąd kompilacji", "zamknie aplikację (szuka zasobu tekstowego o id 7)", "wyświetli pusty napis"], "a": 2, "e": "<p><code>setText(int)<\/code> przyjmuje identyfikator zasobu <code>R.string…<\/code>. Liczbę trzeba zamienić na tekst.<\/p>"}, {"q": "<p>Przyciski w poziomym rzędzie mają dzielić szerokość po równo. Które ustawienie jest poprawne?<\/p>", "o": ["<code>layout_width=\"wrap_content\"<\/code> + <code>layout_weight=\"1\"<\/code>", "<code>layout_width=\"0dp\"<\/code> + <code>layout_weight=\"1\"<\/code>", "<code>layout_width=\"match_parent\"<\/code> dla każdego", "<code>gravity=\"fill\"<\/code>"], "a": 1, "e": "<p>Przy wagach w poziomym rozkładzie szerokość ustawiamy na <code>0dp<\/code> — całe miejsce dzielą wagi.<\/p>"}, {"q": "<p>Przycisk w projekcie Material 3 ma <code>android:background=\"#008080\"<\/code>, ale w emulatorze nadal jest fioletowy. Dlaczego?<\/p>", "o": ["zły kod koloru", "motyw nadpisuje <code>background<\/code>; trzeba użyć <code>backgroundTint<\/code>", "trzeba dodać <code>textColor<\/code>", "emulator nie obsługuje kolorów"], "a": 1, "e": "<p>MaterialButton ignoruje <code>android:background<\/code>. <code>android:backgroundTint<\/code> działa w każdym motywie.<\/p>"}, {"q": "<p>Który kod poprawnie realizuje „licznik nie może być niższy niż 0”?<\/p>", "o": ["<code>licznik--; if (licznik &lt; 0) licznik = 1;<\/code>", "<code>if (licznik &gt; 0) licznik--;<\/code>", "<code>if (licznik &gt;= 0) licznik--;<\/code>", "<code>licznik = licznik - 1;<\/code>"], "a": 1, "e": "<p>Zmniejszamy tylko wtedy, gdy licznik jest dodatni. Wariant <code>&gt;= 0<\/code> pozwala zejść do −1.<\/p>"}, {"q": "<p><code>\"Wynik: \" + 2 + 3<\/code> daje:<\/p>", "o": ["„Wynik: 5”", "„Wynik: 23”", "błąd", "„5”"], "a": 1, "e": "<p>Łączenie od lewej: tekst + 2 = „Wynik: 2”, potem + 3 = „Wynik: 23”. Aby dodać: <code>\"Wynik: \" + (2 + 3)<\/code>.<\/p>"}]</script></div></section>
+<section class="sec" id="dodatkowe"><h2><span class="sec-num">10.</span> Skończyłeś wcześniej?</h2><div class="micro"><h4>Kolor licznika</h4><p>W „Liczniku szklanek” zmieniaj kolor napisu licznika: czerwony (<code>#C62828</code>) gdy &lt; 4, pomarańczowy (<code>#EF6C00</code>) gdy 4–7, zielony (<code>#2E7D32</code>) gdy ≥ 8.</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p><code>tvLicznik.setTextColor(Color.parseColor("#C62828"));</code> — import <code>android.graphics.Color</code>. Ten mechanizm poznasz dokładniej w bloku 7.</p></div></details></div><div class="micro"><h4>Długie przytrzymanie</h4><p>Dodaj do przycisku „+ SZKLANKA” obsługę długiego przytrzymania, która od razu ustawia licznik na 8.</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p><code>btnDodaj.setOnLongClickListener(v -&gt; { …; return true; });</code> — metoda musi zwrócić <code>true</code>.</p></div></details></div><div class="micro"><h4>Licznik polubień z ograniczeniem</h4><p>Zbuduj od zera w 10 minut: tytuł, trzy przyciski obok siebie (POLUB, USUŃ, ZAPISZ), napis „&lt;x&gt; polubień” wyrównany do prawej. ZAPISZ nie ma akcji. Zmierz czas.</p></div></section>
+<div class="nav-bottom"><a class="btn secondary" href="blok01.html">← Blok 1</a><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button><a class="btn secondary" href="blok03.html">Blok 3 →</a></div></article></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
