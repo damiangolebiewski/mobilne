@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blok 7 — Stan aplikacji: przełączniki, cykle i widoczność</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../" data-page="block" data-block="b07">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html" class="active">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="block-layout"><aside class="toc no-print"><strong>Blok 7</strong><ol><li><a href="#cel">Cel</a></li><li><a href="#przypomnienie">Krótkie przypomnienie</a></li><li><a href="#przyklad">Przykład</a></li><li><a href="#mikro">Mikroćwiczenia</a></li><li><a href="#prowadzone">Zadanie prowadzone</a></li><li><a href="#samodzielne">Zadanie samodzielne</a></li><li><a href="#inf04">Zadanie w stylu INF.04</a></li><li><a href="#checklista">Checklista</a></li><li><a href="#test">Mini-test</a></li><li><a href="#dodatkowe">Skończyłeś wcześniej?</a></li></ol><a class="skip" href="#samodzielne">Silniejszy? Przejdź od razu do zadania samodzielnego →</a><p class="small muted" style="margin-top:.8rem">Słabszy? Przypomnienie → Przykład → Mikroćwiczenia → Zadanie prowadzone (z podpowiedziami).</p></aside><article class="page"><div class="block-head"><div><div class="muted small"><a href="../index.html">Bloki</a> › Blok 7</div><h1>Blok 7. Stan aplikacji: przełączniki, cykle i widoczność</h1><span class="badge p2">Faza II — łączenie umiejętności</span> <span id="block-status" class="badge">W trakcie</span></div><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button></div>
+<p>Przechowujesz stan typu włączone/wyłączone i numer fazy, zmieniasz tekst samego przycisku, kolory z kodu, widoczność i dostępność kontrolek. Wszystko, co zależy od stanu, odświeżasz w jednej metodzie.</p>
+<section class="sec" id="cel"><h2><span class="sec-num">1.</span> Cel</h2><p><strong>Po wykonaniu tego bloku będziesz potrafił:</strong></p><ul><li>przełączać stan <code>boolean</code> (<code>stan = !stan</code>) i od niego uzależniać tekst przycisku, obraz i napisy,</li><li>przechodzić cyklicznie po fazach zapisanych w tablicach (<code>(faza + 1) % długość</code>),</li><li>zmieniać z kodu kolor tekstu i tła (<code>Color.parseColor</code>, <code>setTextColor</code>, <code>setBackgroundColor</code>),</li><li>ukrywać/pokazywać elementy (<code>setVisibility</code>) i blokować przyciski (<code>setEnabled</code>),</li><li>zbierać całe odświeżanie ekranu w jednej metodzie zależnej od stanu.</li></ul><details class="hint"><summary>Plan czasu (4 × 45 min = 180 min)</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>Przypomnienie</td><td>15 min</td></tr><tr><td>Przykład</td><td>10 min</td></tr><tr><td>Mikroćwiczenia</td><td>25 min</td></tr><tr><td>Zadanie prowadzone</td><td>35 min</td></tr><tr><td>Zadanie samodzielne</td><td>35 min</td></tr><tr><td>Zadanie INF.04</td><td>50 min</td></tr><tr><td>Checklista + mini-test</td><td>10 min</td></tr><tr><th>Razem</th><th>180 min</th></tr></tbody></table></div></div></details><p class="small muted">Powiązanie z arkuszami: przełącznik Włącz/Wyłącz ze zmianą tekstu przycisku — Arkusz_13; cykl po 3 tekstach z tablicy — Arkusz_07; wzorzec W1 w wariancie „flaga” i „indeks cykliczny”.</p></section>
+<section class="sec" id="przypomnienie"><h2><span class="sec-num">2.</span> Krótkie przypomnienie</h2><h4>Przełącznik (Arkusz_13: „Włącz” ↔ „Wyłącz”)</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">boolean</span> wlaczony = <span class="t-k">false</span>;
+...
+btnOdkurzacz.setOnClickListener(v -&gt; {
+    wlaczony = !wlaczony;                                   <span class="t-c">// zamiana na przeciwny</span>
+    btnOdkurzacz.setText(wlaczony ? <span class="t-s">"Wyłącz"</span> : <span class="t-s">"Włącz"</span>);   <span class="t-c">// tekst SAMEGO przycisku</span>
+    tvStan.setText(wlaczony ? <span class="t-s">"Odkurzacz włączony"</span> : <span class="t-s">"Odkurzacz wyłączony"</span>);
+});</code></pre></div>
+<p><code>warunek ? A : B</code> — operator warunkowy: jeśli warunek prawdziwy → A, inaczej → B. Zastępuje krótkie <code>if/else</code>.</p>
+<h4>Cykl faz (Arkusz_07: „Dzień dobry” → „Good morning” → „Buenos dias” → …)</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">String</span>[] teksty = {<span class="t-s">"Dzień dobry"</span>, <span class="t-s">"Good morning"</span>, <span class="t-s">"Buenos dias"</span>};
+<span class="t-k">private</span> <span class="t-k">int</span> indeks = <span class="t-n">0</span>;
+...
+indeks = (indeks + <span class="t-n">1</span>) % teksty.length;
+tvCytat.setText(teksty[indeks]);</code></pre></div>
+<h4>Kolor, widoczność, dostępność</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">tvNapis.setTextColor(<span class="t-t">Color</span>.parseColor(<span class="t-s">"#2E7D32"</span>));   <span class="t-c">// import android.graphics.Color</span>
+ukladGlowny.setBackgroundColor(<span class="t-t">Color</span>.parseColor(<span class="t-s">"#121212"</span>));
+tvNapis.setTextColor(<span class="t-t">Color</span>.<span class="t-t">WHITE</span>);                    <span class="t-c">// gotowe stałe: WHITE, BLACK, RED…</span>
+
+tvSzczegoly.setVisibility(<span class="t-t">View</span>.<span class="t-t">GONE</span>);      <span class="t-c">// znika i nie zajmuje miejsca</span>
+tvSzczegoly.setVisibility(<span class="t-t">View</span>.<span class="t-t">INVISIBLE</span>); <span class="t-c">// niewidoczny, ale miejsce zostaje</span>
+tvSzczegoly.setVisibility(<span class="t-t">View</span>.<span class="t-t">VISIBLE</span>);   <span class="t-c">// import android.view.View</span>
+
+btnKolor.setEnabled(<span class="t-k">false</span>);                <span class="t-c">// przycisk nie reaguje, jest wyszarzony</span></code></pre></div>
+<p>W XML odpowiedniki: <code>android:visibility="gone"</code>, <code>android:enabled="false"</code>.</p>
+<div class="box box-tip"><p>Gdy kilka przycisków zmienia ten sam stan, nie powielaj kodu ustawiania obrazów i napisów. Każdy przycisk zmienia <strong>tylko pola</strong>, a potem wywołuje wspólne <code>odswiez()</code>, które na podstawie pól ustawia cały ekran.</p></div>
+<p><strong>Ćwiczenie natychmiastowe:</strong> w przykładzie zamień <code>if/else</code> na trzy linie z operatorem <code>? :</code>.</p></section>
+<section class="sec" id="przyklad"><h2><span class="sec-num">3.</span> Przykład</h2><p>Przełącznik z obrazem: jedna flaga <code>wlaczone</code> steruje obrazem, napisem i tekstem przycisku.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:12.8px"><div class="m-img" style="height:176px;align-self:stretch"><img src="../assets/zasoby/zarowka_wyl.png" alt="" style="object-fit:contain"></div><div class="m-t" style="font-size:17.6px;text-align:center;align-self:stretch">Światło wyłączone</div><div class="m-b" style="background:#6750A4;color:#ffffff;align-self:center">WŁĄCZ</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Stan początkowy</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:12.8px"><div class="m-img" style="height:176px;align-self:stretch"><img src="../assets/zasoby/zarowka_wl.png" alt="" style="object-fit:contain"></div><div class="m-t" style="font-size:17.6px;text-align:center;align-self:stretch">Światło włączone</div><div class="m-b" style="background:#6750A4;color:#ffffff;align-self:center">WYŁĄCZ</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po kliknięciu</figcaption></figure></div><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;ImageView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivZarowka"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"220dp"</span>
+        <span class="t-a">android:contentDescription</span>=<span class="t-s">"Żarówka"</span>
+        <span class="t-a">android:src</span>=<span class="t-s">"@drawable/zarowka_wyl"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvStan"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Światło wyłączone"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"22sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnPrzelacz"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"WŁĄCZ"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ImageView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">boolean</span> wlaczone = <span class="t-k">false</span>;   <span class="t-c">// stan przełącznika</span>
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        <span class="t-t">ImageView</span> ivZarowka = findViewById(<span class="t-t">R</span>.id.ivZarowka);
+        <span class="t-t">TextView</span> tvStan = findViewById(<span class="t-t">R</span>.id.tvStan);
+        <span class="t-t">Button</span> btnPrzelacz = findViewById(<span class="t-t">R</span>.id.btnPrzelacz);
+
+        btnPrzelacz.setOnClickListener(v -&gt; {
+            wlaczone = !wlaczone;           <span class="t-c">// zmiana stanu na przeciwny</span>
+            <span class="t-k">if</span> (wlaczone) {
+                ivZarowka.setImageResource(<span class="t-t">R</span>.drawable.zarowka_wl);
+                tvStan.setText(<span class="t-s">"Światło włączone"</span>);
+                btnPrzelacz.setText(<span class="t-s">"WYŁĄCZ"</span>);
+            } <span class="t-k">else</span> {
+                ivZarowka.setImageResource(<span class="t-t">R</span>.drawable.zarowka_wyl);
+                tvStan.setText(<span class="t-s">"Światło wyłączone"</span>);
+                btnPrzelacz.setText(<span class="t-s">"WŁĄCZ"</span>);
+            }
+        });
+    }
+}</code></pre></div></section>
+<section class="sec" id="mikro"><h2><span class="sec-num">4.</span> Mikroćwiczenia</h2><div class="micro"><h4>Ćwiczenie 7.1 — Operator warunkowy</h4><p>Zapisz jedną linią: jeśli <code>glosno</code> jest prawdą, napis „Głośno”, inaczej „Cicho”.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>tvGlosnosc.setText(glosno ? "Głośno" : "Cicho");</code></p></div></details></div><div class="micro"><h4>Ćwiczenie 7.2 — Co się stanie?</h4><p><code>boolean stan = false;</code> Kliknięcie wykonuje <code>stan = !stan;</code>. Jaki jest stan po 5 kliknięciach? A po 6?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Po 5 → <code>true</code> (nieparzysta liczba zmian), po 6 → <code>false</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 7.3 — GONE czy INVISIBLE?</h4><p>Pod ukrywanym napisem jest przycisk. Chcesz, aby po ukryciu napisu przycisk „podjechał” do góry. Której stałej użyjesz?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>View.GONE</code> — element nie zajmuje miejsca. <code>INVISIBLE</code> zostawia pustą przestrzeń.</p></div></details></div><div class="micro"><h4>Ćwiczenie 7.4 — Kolor z tablicy</h4><p>Masz <code>String[] kolory = {"#C62828", "#2E7D32"};</code> i <code>int i</code>. Ustaw kolor tekstu napisu <code>tvInfo</code> na <code>kolory[i]</code>.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>tvInfo.setTextColor(Color.parseColor(kolory[i]));</code> — sam napis „#C62828” to jeszcze nie kolor; <code>parseColor</code> zamienia go na <code>int</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 7.5 — Zablokuj przycisk</h4><p>Przycisk „KOLOR” ma działać tylko wtedy, gdy światło jest włączone. Napisz jedną linię wywoływaną po każdej zmianie flagi <code>wlaczone</code>.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>btnKolor.setEnabled(wlaczone);</code> — wartość flagi przekazana wprost.</p></div></details></div></section>
+<section class="sec" id="prowadzone"><h2><span class="sec-num">5.</span> Zadanie prowadzone</h2><div class="task" id="b07-prowadzone">
+<div class="task-head"><h3>Sygnalizator świetlny</h3><span class="meta">⏱ ok. 35 min</span></div>
+<p>Trzy fazy światła w pętli. Każda faza ma swój obraz, komunikat i kolor napisu — trzy tablice równoległe i jeden indeks.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ECEFF1;padding:12.8px"><div class="m-t" style="font-size:22.4px;font-weight:700;text-align:center;align-self:stretch">Skrzyżowanie</div><div class="m-img" style="margin:8px 0px 8px 0px;height:208px;align-self:stretch"><img src="../assets/zasoby/sygnal_czerwone.png" alt="" style="object-fit:contain"></div><div class="m-t" style="color:#C62828;font-size:27.2px;font-weight:700;text-align:center;align-self:stretch">STÓJ</div><div class="m-b" style="background:#37474F;color:#ffffff;margin:12.8px 0px 0px 0px;align-self:stretch">ZMIEŃ ŚWIATŁO</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Faza 0</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ECEFF1;padding:12.8px"><div class="m-t" style="font-size:22.4px;font-weight:700;text-align:center;align-self:stretch">Skrzyżowanie</div><div class="m-img" style="margin:8px 0px 8px 0px;height:208px;align-self:stretch"><img src="../assets/zasoby/sygnal_zielone.png" alt="" style="object-fit:contain"></div><div class="m-t" style="color:#2E7D32;font-size:27.2px;font-weight:700;text-align:center;align-self:stretch">JEDŹ</div><div class="m-b" style="background:#37474F;color:#ffffff;margin:12.8px 0px 0px 0px;align-self:stretch">ZMIEŃ ŚWIATŁO</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po 1 kliknięciu</figcaption></figure></div>
+<p><strong>Fazy:</strong> 0 — <code>sygnal_czerwone</code>, „STÓJ”, <code>#C62828</code>; 1 — <code>sygnal_zielone</code>, „JEDŹ”, <code>#2E7D32</code>; 2 — <code>sygnal_zolte</code>, „UWAGA”, <code>#F9A825</code>. Po fazie 2 wraca faza 0.</p>
+<p><strong>Kroki:</strong></p>
+<ol><li>XML: tytuł, <code>ImageView</code> 260dp (obraz startowy czerwony), napis komunikatu 34sp pogrubiony w kolorze <code>#C62828</code>, przycisk na całą szerokość (<code>#37474F</code>).</li><li>Java: trzy tablice (<code>int[]</code>, <code>String[]</code>, <code>String[]</code>) i pole <code>faza</code>.</li><li>Kliknięcie: nowa faza modulo, potem obraz, tekst i kolor z tablic.</li></ol>
+<h4>Zasoby do zadania</h4><div class="res-list"><figure><a href="../assets/zasoby/sygnal_czerwone.png" download><img src="../assets/zasoby/sygnal_czerwone.png" alt="sygnal_czerwone.png"></a><figcaption>sygnal_czerwone.png</figcaption></figure><figure><a href="../assets/zasoby/sygnal_zielone.png" download><img src="../assets/zasoby/sygnal_zielone.png" alt="sygnal_zielone.png"></a><figcaption>sygnal_zielone.png</figcaption></figure><figure><a href="../assets/zasoby/sygnal_zolte.png" download><img src="../assets/zasoby/sygnal_zolte.png" alt="sygnal_zolte.png"></a><figcaption>sygnal_zolte.png</figcaption></figure></div><p class="small">Pobierz wszystkie: <a href="../materialy/zasoby_b07-prowadzone.zip" download>zasoby_b07-prowadzone.zip</a>. Obrazy skopiuj do <code>app/src/main/res/drawable</code> (nazwy: małe litery, bez spacji i myślników).</p>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Stan to tylko jedna liczba: numer fazy. Wszystko inne odczytujesz z tablic pod tym numerem.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p><code>tvKomunikat.setTextColor(Color.parseColor(kolory[faza]));</code> — import <code>android.graphics.Color</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">tablice: obrazy[3], komunikaty[3], kolory[3]; faza = 0
+ZMIEŃ: faza = (faza + 1) % 3
+       obraz ← obrazy[faza]; tekst ← komunikaty[faza]; kolor ← kolory[faza]</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">btnZmien.setOnClickListener(v -&gt; {
+    faza = (faza + <span class="t-n">1</span>) % obrazy.length;
+    ivSygnal.setImageResource(obrazy[faza]);
+    tvKomunikat.setText(komunikaty[faza]);
+    tvKomunikat.setTextColor(<span class="t-t">Color</span>.parseColor(kolory[faza]));
+});</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#ECEFF1"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Skrzyżowanie"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ImageView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivSygnal"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"260dp"</span>
+        <span class="t-a">android:layout_marginVertical</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:contentDescription</span>=<span class="t-s">"Sygnalizator"</span>
+        <span class="t-a">android:src</span>=<span class="t-s">"@drawable/sygnal_czerwone"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvKomunikat"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"STÓJ"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#C62828"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"34sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnZmien"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#37474F"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"ZMIEŃ ŚWIATŁO"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.graphics.<span class="t-t">Color</span>;
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ImageView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-c">// kolejność faz: czerwone -&gt; zielone -&gt; żółte -&gt; czerwone ...</span>
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] obrazy = {<span class="t-t">R</span>.drawable.sygnal_czerwone, <span class="t-t">R</span>.drawable.sygnal_zielone, <span class="t-t">R</span>.drawable.sygnal_zolte};
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">String</span>[] komunikaty = {<span class="t-s">"STÓJ"</span>, <span class="t-s">"JEDŹ"</span>, <span class="t-s">"UWAGA"</span>};
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">String</span>[] kolory = {<span class="t-s">"#C62828"</span>, <span class="t-s">"#2E7D32"</span>, <span class="t-s">"#F9A825"</span>};
+    <span class="t-k">private</span> <span class="t-k">int</span> faza = <span class="t-n">0</span>;
+
+    <span class="t-k">private</span> <span class="t-t">ImageView</span> ivSygnal;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvKomunikat;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        ivSygnal = findViewById(<span class="t-t">R</span>.id.ivSygnal);
+        tvKomunikat = findViewById(<span class="t-t">R</span>.id.tvKomunikat);
+        <span class="t-t">Button</span> btnZmien = findViewById(<span class="t-t">R</span>.id.btnZmien);
+
+        btnZmien.setOnClickListener(v -&gt; {
+            faza = (faza + <span class="t-n">1</span>) % obrazy.length;
+            ivSygnal.setImageResource(obrazy[faza]);
+            tvKomunikat.setText(komunikaty[faza]);
+            tvKomunikat.setTextColor(<span class="t-t">Color</span>.parseColor(kolory[faza]));
+        });
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b07_prowadzone/">rozwiazania/b07_prowadzone/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b07-prowadzone">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="samodzielne"><h2><span class="sec-num">6.</span> Zadanie samodzielne</h2><div class="task" id="b07-samodzielne">
+<div class="task-head"><h3>Czytnik wiadomości: tryb nocny i szczegóły</h3><span class="meta">⏱ ok. 35 min</span></div>
+<p>Dwa niezależne przełączniki: jeden zmienia kolory całego ekranu, drugi pokazuje i ukrywa szczegóły.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:12.8px"><div class="m-t" style="font-size:22.4px;font-weight:700">Czytnik wiadomości</div><div class="m-t" style="font-size:14.4px;margin:8px 0px 0px 0px">Jutro zajęcia w pracowni 14 zaczynają się o 8:00. Zabierz pendrive z projektem.</div><div class="m-row" style="margin:16px 0px 0px 0px;align-self:stretch"><div class="m-b" style="background:#6750A4;color:#ffffff;margin:0px 4px 0px 0px;flex:1 1 0;min-width:0">TRYB NOCNY</div><div class="m-b" style="background:#6750A4;color:#ffffff;margin:0px 0px 0px 4px;flex:1 1 0;min-width:0">POKAŻ SZCZEGÓŁY</div></div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Stan początkowy</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#121212;padding:12.8px"><div class="m-t" style="color:#E0E0E0;font-size:22.4px;font-weight:700">Czytnik wiadomości</div><div class="m-t" style="color:#E0E0E0;font-size:14.4px;margin:8px 0px 0px 0px">Jutro zajęcia w pracowni 14 zaczynają się o 8:00. Zabierz pendrive z projektem.</div><div class="m-t" style="color:#808080;margin:8px 0px 0px 0px">Nadawca: wychowawca · wysłano 7:15 · priorytet: wysoki</div><div class="m-row" style="margin:16px 0px 0px 0px;align-self:stretch"><div class="m-b" style="background:#6750A4;color:#ffffff;margin:0px 4px 0px 0px;flex:1 1 0;min-width:0">TRYB DZIENNY</div><div class="m-b" style="background:#6750A4;color:#ffffff;margin:0px 0px 0px 4px;flex:1 1 0;min-width:0">UKRYJ SZCZEGÓŁY</div></div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Oba przełączniki włączone</figcaption></figure></div>
+<ul><li>„TRYB NOCNY”: tło całego rozkładu <code>#121212</code>, tytuł i treść <code>#E0E0E0</code>, tekst przycisku zmienia się na „TRYB DZIENNY”. Ponowne kliknięcie przywraca biel, czerń i napis „TRYB NOCNY”.</li><li>„POKAŻ SZCZEGÓŁY”: napis szczegółów (szary) pojawia się pod treścią, przycisk zmienia tekst na „UKRYJ SZCZEGÓŁY”. Na starcie szczegóły są ukryte i <strong>nie zajmują miejsca</strong>.</li><li>Rozkład główny pobierz w Javie jego identyfikatorem (<code>R.id.main</code>).</li></ul>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Dwie flagi <code>boolean</code>, dwa przyciski. Dla koloru przygotuj dwie zmienne pomocnicze (<code>int tlo</code>, <code>int tekst</code>) wybierane operatorem <code>? :</code>.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Na starcie w XML: <code>android:visibility="gone"</code> dla szczegółów. W kodzie: <code>tvSzczegoly.setVisibility(szczegolyWidoczne ? View.VISIBLE : View.GONE);</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">TRYB: nocny = !nocny
+      tlo   = nocny ? #121212 : biały
+      tekst = nocny ? #E0E0E0 : czarny
+      ustaw tło rozkładu, kolory dwóch napisów, tekst przycisku
+SZCZEGÓŁY: widoczne = !widoczne; widoczność; tekst przycisku</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">int</span> tlo = trybNocny ? <span class="t-t">Color</span>.parseColor(<span class="t-s">"#121212"</span>) : <span class="t-t">Color</span>.<span class="t-t">WHITE</span>;
+<span class="t-k">int</span> tekst = trybNocny ? <span class="t-t">Color</span>.parseColor(<span class="t-s">"#E0E0E0"</span>) : <span class="t-t">Color</span>.<span class="t-t">BLACK</span>;
+ukladGlowny.setBackgroundColor(tlo);
+tvTytul.setTextColor(tekst);
+tvTresc.setTextColor(tekst);
+btnTryb.setText(trybNocny ? <span class="t-s">"TRYB DZIENNY"</span> : <span class="t-s">"TRYB NOCNY"</span>);</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#FFFFFF"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Czytnik wiadomości"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#000000"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTresc"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Jutro zajęcia w pracowni 14 zaczynają się o 8:00. Zabierz pendrive z projektem."</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#000000"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvSzczegoly"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Nadawca: wychowawca · wysłano 7:15 · priorytet: wysoki"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span>
+        <span class="t-a">android:visibility</span>=<span class="t-s">"gone"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"20dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnTryb"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginEnd</span>=<span class="t-s">"5dp"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"TRYB NOCNY"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnSzczegoly"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"5dp"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"POKAŻ SZCZEGÓŁY"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.graphics.<span class="t-t">Color</span>;
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.view.<span class="t-t">View</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">LinearLayout</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">boolean</span> trybNocny = <span class="t-k">false</span>;
+    <span class="t-k">private</span> <span class="t-k">boolean</span> szczegolyWidoczne = <span class="t-k">false</span>;
+
+    <span class="t-k">private</span> <span class="t-t">LinearLayout</span> ukladGlowny;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvTytul, tvTresc, tvSzczegoly;
+    <span class="t-k">private</span> <span class="t-t">Button</span> btnTryb, btnSzczegoly;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        ukladGlowny = findViewById(<span class="t-t">R</span>.id.main);
+        tvTytul = findViewById(<span class="t-t">R</span>.id.tvTytul);
+        tvTresc = findViewById(<span class="t-t">R</span>.id.tvTresc);
+        tvSzczegoly = findViewById(<span class="t-t">R</span>.id.tvSzczegoly);
+        btnTryb = findViewById(<span class="t-t">R</span>.id.btnTryb);
+        btnSzczegoly = findViewById(<span class="t-t">R</span>.id.btnSzczegoly);
+
+        btnTryb.setOnClickListener(v -&gt; {
+            trybNocny = !trybNocny;
+            <span class="t-k">int</span> tlo = trybNocny ? <span class="t-t">Color</span>.parseColor(<span class="t-s">"#121212"</span>) : <span class="t-t">Color</span>.<span class="t-t">WHITE</span>;
+            <span class="t-k">int</span> tekst = trybNocny ? <span class="t-t">Color</span>.parseColor(<span class="t-s">"#E0E0E0"</span>) : <span class="t-t">Color</span>.<span class="t-t">BLACK</span>;
+            ukladGlowny.setBackgroundColor(tlo);
+            tvTytul.setTextColor(tekst);
+            tvTresc.setTextColor(tekst);
+            btnTryb.setText(trybNocny ? <span class="t-s">"TRYB DZIENNY"</span> : <span class="t-s">"TRYB NOCNY"</span>);
+        });
+
+        btnSzczegoly.setOnClickListener(v -&gt; {
+            szczegolyWidoczne = !szczegolyWidoczne;
+            tvSzczegoly.setVisibility(szczegolyWidoczne ? <span class="t-t">View</span>.<span class="t-t">VISIBLE</span> : <span class="t-t">View</span>.<span class="t-t">GONE</span>);
+            btnSzczegoly.setText(szczegolyWidoczne ? <span class="t-s">"UKRYJ SZCZEGÓŁY"</span> : <span class="t-s">"POKAŻ SZCZEGÓŁY"</span>);
+        });
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b07_samodzielne/">rozwiazania/b07_samodzielne/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b07-samodzielne">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="inf04"><h2><span class="sec-num">7.</span> Zadanie w stylu INF.04</h2><div class="task exam" id="b07-inf">
+<div class="task-head"><h3>Sterowanie oświetleniem sceny</h3><span class="meta">⏱ ok. 50 min</span></div>
+<p>Wykonaj aplikację mobilną do sterowania oświetleniem sceny. Do wykonania zadania wykorzystaj obrazy z archiwum <code>zasoby_b07-inf.zip</code>.</p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>tytuł, obraz sceny, 2 przyciski w rzędzie, napis stanu, napis koloru, autor</td></tr><tr><td>DANE</td><td>brak pól</td></tr><tr><td>ZDARZENIA</td><td>WŁĄCZ/WYŁĄCZ, KOLOR</td></tr><tr><td>LOGIKA</td><td>flaga włączenia; indeks koloru 0..2 cyklicznie; przycisk KOLOR aktywny tylko przy włączonym świetle; kolor zapamiętany po wyłączeniu</td></tr><tr><td>WYNIK</td><td>obraz zależny od flagi i koloru; tekst przycisku; „Stan: …”; „Kolor: …” w danym kolorze</td></tr><tr><td>WYGLĄD</td><td>tło #EEEEEE; tytuł #212121 biały; obraz 180dp przycięty; przyciski #FF6F00 białe pogrubione po równo; napisy 20sp; kolor pogrubiony</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#EEEEEE;padding:0px"><div class="m-t" style="background:#212121;color:#fff;font-size:22.4px;padding:8px;align-self:stretch">Scena — oświetlenie</div><div class="m-img" style="height:144px;align-self:stretch"><img src="../assets/zasoby/scena_ciemna.png" alt="" style="object-fit:cover"></div><div class="m-row" style="margin:8px;align-self:stretch"><div class="m-b" style="background:#FF6F00;color:#ffffff;font-weight:700;margin:0px 4px 0px 0px;flex:1 1 0;min-width:0">WŁĄCZ</div><div class="m-b" style="background:#FFCC80;color:#ffffff;font-weight:700;margin:0px 0px 0px 4px;flex:1 1 0;min-width:0">KOLOR</div></div><div class="m-t" style="font-size:16px;margin:0px 0px 0px 8px">Stan: wyłączone</div><div class="m-t" style="color:#E63232;font-size:16px;font-weight:700;margin:0px 0px 0px 8px">Kolor: czerwony</div><div class="m-t" style="color:#808080;margin:16px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Stan początkowy (KOLOR nieaktywny)</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#EEEEEE;padding:0px"><div class="m-t" style="background:#212121;color:#fff;font-size:22.4px;padding:8px;align-self:stretch">Scena — oświetlenie</div><div class="m-img" style="height:144px;align-self:stretch"><img src="../assets/zasoby/scena_zielona.png" alt="" style="object-fit:cover"></div><div class="m-row" style="margin:8px;align-self:stretch"><div class="m-b" style="background:#FF6F00;color:#ffffff;font-weight:700;margin:0px 4px 0px 0px;flex:1 1 0;min-width:0">WYŁĄCZ</div><div class="m-b" style="background:#FF6F00;color:#ffffff;font-weight:700;margin:0px 0px 0px 4px;flex:1 1 0;min-width:0">KOLOR</div></div><div class="m-t" style="font-size:16px;margin:0px 0px 0px 8px">Stan: włączone</div><div class="m-t" style="color:#32C85A;font-size:16px;font-weight:700;margin:0px 0px 0px 8px">Kolor: zielony</div><div class="m-t" style="color:#808080;margin:16px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 2. WŁĄCZ, potem 1 × KOLOR</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Scena — oświetlenie”.</li><li>Obraz sceny (w stanie początkowym <code>scena_ciemna</code>).</li><li>Przyciski „WŁĄCZ” i „KOLOR” umiejscowione obok siebie.</li><li>Napis „Stan: wyłączone”.</li><li>Napis „Kolor: czerwony”.</li><li>Napis „Autor: ”, dalej numer zdającego.</li></ul>
+<p><strong>Działanie aplikacji:</strong></p>
+<ul><li>Przycisk „WŁĄCZ” działa jak przełącznik: po wybraniu jego treść zmienia się na „WYŁĄCZ”, napis stanu na „Stan: włączone”, a obraz na scenę w aktualnym kolorze. Ponowne wybranie przywraca „WŁĄCZ”, „Stan: wyłączone” i obraz <code>scena_ciemna</code>.</li><li>Przycisk „KOLOR” zmienia kolor oświetlenia cyklicznie: czerwony → zielony → niebieski → czerwony … (obrazy <code>scena_czerwona</code>, <code>scena_zielona</code>, <code>scena_niebieska</code>) i aktualizuje napis „Kolor: &lt;nazwa&gt;”.</li><li>Przycisk „KOLOR” jest nieaktywny, gdy oświetlenie jest wyłączone.</li><li>Po wyłączeniu i ponownym włączeniu scena ma ostatnio wybrany kolor.</li><li>Napis z nazwą koloru ma kolor czcionki odpowiadający kolorowi światła: #E63232, #32C85A, #3C6EF0.</li></ul>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs w XML; rozkład liniowy pionowy z zagnieżdżonym rozkładem poziomym dla przycisków.</li><li>Tło strony #EEEEEE. Tytuł: tło #212121, biała czcionka, największa, marginesy wewnętrzne 10.</li><li>Obraz: wysokość 180, na całą szerokość, może być przycięty. Obrazy zapisane w zasobach aplikacji.</li><li>Przyciski: tło #FF6F00, biała pogrubiona czcionka, razem wypełniają szerokość (marginesy 10).</li><li>Nazwy kolorów, obrazy i kody kolorów przechowywane w tablicach. Ustawianie wyglądu na podstawie stanu zrealizuj w jednej metodzie.</li></ul>
+<h4>Zasoby do zadania</h4><div class="res-list"><figure><a href="../assets/zasoby/scena_ciemna.png" download><img src="../assets/zasoby/scena_ciemna.png" alt="scena_ciemna.png"></a><figcaption>scena_ciemna.png</figcaption></figure><figure><a href="../assets/zasoby/scena_czerwona.png" download><img src="../assets/zasoby/scena_czerwona.png" alt="scena_czerwona.png"></a><figcaption>scena_czerwona.png</figcaption></figure><figure><a href="../assets/zasoby/scena_zielona.png" download><img src="../assets/zasoby/scena_zielona.png" alt="scena_zielona.png"></a><figcaption>scena_zielona.png</figcaption></figure><figure><a href="../assets/zasoby/scena_niebieska.png" download><img src="../assets/zasoby/scena_niebieska.png" alt="scena_niebieska.png"></a><figcaption>scena_niebieska.png</figcaption></figure></div><p class="small">Pobierz wszystkie: <a href="../materialy/zasoby_b07-inf.zip" download>zasoby_b07-inf.zip</a>. Obrazy skopiuj do <code>app/src/main/res/drawable</code> (nazwy: małe litery, bez spacji i myślników).</p>
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b07-inf"><li><label><input type="checkbox"> <span>na starcie: ciemna scena, „WŁĄCZ”, „Stan: wyłączone”, „Kolor: czerwony” w kolorze #E63232, KOLOR nieaktywny</span></label></li><li><label><input type="checkbox"> <span>WŁĄCZ → czerwona scena, „WYŁĄCZ”, „Stan: włączone”, KOLOR aktywny</span></label></li><li><label><input type="checkbox"> <span>KOLOR ×3 wraca do czerwonego (cykl), napis i jego kolor się zmieniają</span></label></li><li><label><input type="checkbox"> <span>wyłączenie przy niebieskim i ponowne włączenie → scena niebieska</span></label></li><li><label><input type="checkbox"> <span>tablice: obrazy, nazwy, kody kolorów; jedna metoda odświeżająca</span></label></li><li><label><input type="checkbox"> <span>wygląd: kolory, obraz 180dp, przyciski po równo, pogrubione</span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Stan aplikacji to dwa pola: <code>boolean wlaczone</code> i <code>int kolor</code>. Przyciski tylko zmieniają te pola i wywołują <code>odswiez()</code>.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Przycisk nieaktywny na starcie: <code>android:enabled="false"</code> w XML; w <code>odswiez()</code>: <code>btnKolor.setEnabled(wlaczone);</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">WŁĄCZ : wlaczone = !wlaczone ; odswiez()
+KOLOR : kolor = (kolor + 1) % 3 ; odswiez()
+odswiez():
+    jeśli wlaczone: obraz = obrazyKolorow[kolor]; "Stan: włączone"; przycisk "WYŁĄCZ"
+    inaczej: obraz = scena_ciemna; "Stan: wyłączone"; przycisk "WŁĄCZ"
+    KOLOR aktywny = wlaczone
+    "Kolor: " + nazwyKolorow[kolor], kolor czcionki = kodyKolorow[kolor]</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">void</span> odswiez() {
+    <span class="t-k">if</span> (wlaczone) {
+        ivScena.setImageResource(obrazyKolorow[kolor]);
+        tvStan.setText(<span class="t-s">"Stan: włączone"</span>);
+        btnZasilanie.setText(<span class="t-s">"WYŁĄCZ"</span>);
+    } <span class="t-k">else</span> {
+        ivScena.setImageResource(<span class="t-t">R</span>.drawable.scena_ciemna);
+        tvStan.setText(<span class="t-s">"Stan: wyłączone"</span>);
+        btnZasilanie.setText(<span class="t-s">"WŁĄCZ"</span>);
+    }
+    btnKolor.setEnabled(wlaczone);
+    tvKolor.setText(<span class="t-s">"Kolor: "</span> + nazwyKolorow[kolor]);
+    tvKolor.setTextColor(<span class="t-t">Color</span>.parseColor(kodyKolorow[kolor]));
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#EEEEEE"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#212121"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Scena — oświetlenie"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ImageView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivScena"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"180dp"</span>
+        <span class="t-a">android:contentDescription</span>=<span class="t-s">"Scena"</span>
+        <span class="t-a">android:scaleType</span>=<span class="t-s">"centerCrop"</span>
+        <span class="t-a">android:src</span>=<span class="t-s">"@drawable/scena_ciemna"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnZasilanie"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginEnd</span>=<span class="t-s">"5dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#FF6F00"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"WŁĄCZ"</span>
+            <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+            <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnKolor"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"5dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#FF6F00"</span>
+            <span class="t-a">android:enabled</span>=<span class="t-s">"false"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"KOLOR"</span>
+            <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+            <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvStan"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Stan: wyłączone"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvKolor"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Kolor: czerwony"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#E63232"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvAutor"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"20dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.graphics.<span class="t-t">Color</span>;
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ImageView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] obrazyKolorow = {<span class="t-t">R</span>.drawable.scena_czerwona, <span class="t-t">R</span>.drawable.scena_zielona, <span class="t-t">R</span>.drawable.scena_niebieska};
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">String</span>[] nazwyKolorow = {<span class="t-s">"czerwony"</span>, <span class="t-s">"zielony"</span>, <span class="t-s">"niebieski"</span>};
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">String</span>[] kodyKolorow = {<span class="t-s">"#E63232"</span>, <span class="t-s">"#32C85A"</span>, <span class="t-s">"#3C6EF0"</span>};
+
+    <span class="t-k">private</span> <span class="t-k">boolean</span> wlaczone = <span class="t-k">false</span>;
+    <span class="t-k">private</span> <span class="t-k">int</span> kolor = <span class="t-n">0</span>;
+
+    <span class="t-k">private</span> <span class="t-t">ImageView</span> ivScena;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvStan, tvKolor;
+    <span class="t-k">private</span> <span class="t-t">Button</span> btnZasilanie, btnKolor;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        ivScena = findViewById(<span class="t-t">R</span>.id.ivScena);
+        tvStan = findViewById(<span class="t-t">R</span>.id.tvStan);
+        tvKolor = findViewById(<span class="t-t">R</span>.id.tvKolor);
+        btnZasilanie = findViewById(<span class="t-t">R</span>.id.btnZasilanie);
+        btnKolor = findViewById(<span class="t-t">R</span>.id.btnKolor);
+
+        btnZasilanie.setOnClickListener(v -&gt; {
+            wlaczone = !wlaczone;
+            odswiez();
+        });
+
+        btnKolor.setOnClickListener(v -&gt; {
+            kolor = (kolor + <span class="t-n">1</span>) % nazwyKolorow.length;
+            odswiez();
+        });
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> odswiez() {
+        <span class="t-k">if</span> (wlaczone) {
+            ivScena.setImageResource(obrazyKolorow[kolor]);
+            tvStan.setText(<span class="t-s">"Stan: włączone"</span>);
+            btnZasilanie.setText(<span class="t-s">"WYŁĄCZ"</span>);
+        } <span class="t-k">else</span> {
+            ivScena.setImageResource(<span class="t-t">R</span>.drawable.scena_ciemna);
+            tvStan.setText(<span class="t-s">"Stan: wyłączone"</span>);
+            btnZasilanie.setText(<span class="t-s">"WŁĄCZ"</span>);
+        }
+        btnKolor.setEnabled(wlaczone);
+        tvKolor.setText(<span class="t-s">"Kolor: "</span> + nazwyKolorow[kolor]);
+        tvKolor.setTextColor(<span class="t-t">Color</span>.parseColor(kodyKolorow[kolor]));
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b07_inf/">rozwiazania/b07_inf/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b07-inf">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="checklista"><h2><span class="sec-num">8.</span> Checklista</h2><p class="small muted">Sprawdź swoją aplikację z zadania INF.04 punkt po punkcie (krok 10 procedury).</p><ul class="checklist" data-key="b07-check"><li><label><input type="checkbox"> <span>stan jest w polach (<code>boolean</code>, <code>int</code>), a nie odczytywany z tekstów na ekranie</span></label></li><li><label><input type="checkbox"> <span>przełącznik zmienia <strong>tekst samego przycisku</strong>, jeśli wymaga tego polecenie</span></label></li><li><label><input type="checkbox"> <span>cykl po tablicy wraca na początek (<code>% długość</code>)</span></label></li><li><label><input type="checkbox"> <span>kolory z kodu ustawiam przez <code>Color.parseColor("#RRGGBB")</code></span></label></li><li><label><input type="checkbox"> <span><code>GONE</code> / <code>INVISIBLE</code> dobrane do tego, czy element ma zajmować miejsce</span></label></li><li><label><input type="checkbox"> <span>jedna metoda odświeża cały ekran na podstawie stanu</span></label></li></ul></section>
+<section class="sec" id="test"><h2><span class="sec-num">9.</span> Mini-test</h2><div class="quiz" data-quiz="b07"><script type="application/json">[{"q": "<p>Arkusz_13: po wciśnięciu „Włącz” podpis przycisku zmienia się na „Wyłącz”. Co ustawiasz?<\/p>", "o": ["<code>tvStan.setText(\"Wyłącz\")<\/code>", "<code>btnWlacz.setText(\"Wyłącz\")<\/code>", "<code>btnWlacz.setEnabled(false)<\/code>", "nowy przycisk w XML"], "a": 1, "e": "<p>Przycisk jest kontrolką z tekstem (<code>Button<\/code> dziedziczy po <code>TextView<\/code>), więc ma <code>setText<\/code>.<\/p>"}, {"q": "<p><code>String[] t = {\"A\", \"B\", \"C\"}; int i = 2;<\/code> Jaki tekst po <code>i = (i + 1) % t.length;<\/code> i odczycie <code>t[i]<\/code>?<\/p>", "o": ["„C”", "„A”", "wyjątek", "„B”"], "a": 1, "e": "<p>(2 + 1) % 3 = 0 → „A”.<\/p>"}, {"q": "<p>Który zapis ustawi kolor czcionki na #2E8B57?<\/p>", "o": ["<code>tv.setTextColor(\"#2E8B57\")<\/code>", "<code>tv.setTextColor(Color.parseColor(\"#2E8B57\"))<\/code>", "<code>tv.setColor(#2E8B57)<\/code>", "<code>tv.setBackgroundColor(\"#2E8B57\")<\/code>"], "a": 1, "e": "<p><code>setTextColor<\/code> przyjmuje <code>int<\/code>; <code>parseColor<\/code> zamienia tekst HEX na kolor.<\/p>"}, {"q": "<p>Element ma zniknąć i <strong>nie zajmować miejsca<\/strong>:<\/p>", "o": ["<code>View.INVISIBLE<\/code>", "<code>View.GONE<\/code>", "<code>setEnabled(false)<\/code>", "<code>setAlpha(0)<\/code>"], "a": 1, "e": "<p>INVISIBLE i przezroczystość zostawiają puste miejsce.<\/p>"}, {"q": "<p><code>wlaczony = !wlaczony;<\/code> gdy <code>wlaczony == true<\/code> ustawia:<\/p>", "o": ["<code>true<\/code>", "<code>false<\/code>", "<code>null<\/code>", "błąd"], "a": 1, "e": "<p>Negacja logiczna zmienia wartość na przeciwną.<\/p>"}, {"q": "<p>Po co wspólna metoda <code>odswiez()<\/code>?<\/p>", "o": ["bo tak wymaga Android", "żeby każdy przycisk nie powielał ustawiania całego ekranu — mniej błędów", "żeby aplikacja działała szybciej", "nie jest potrzebna"], "a": 1, "e": "<p>Jedno miejsce, w którym stan zamienia się na wygląd, eliminuje niespójności.<\/p>"}]</script></div></section>
+<section class="sec" id="dodatkowe"><h2><span class="sec-num">10.</span> Skończyłeś wcześniej?</h2><div class="micro"><h4>Tryb stroboskopu</h4><p>Dodaj trzeci przycisk „PULS”, który przy każdym kliknięciu ustawia <strong>losowy</strong> kolor (inny niż obecny). Losowanie: <code>new Random().nextInt(3)</code> — dokładniej w bloku 10.</p></div><div class="micro"><h4>Pralka i odkurzacz</h4><p>Zbuduj w 20 minut ekran z Arkusza_13 bez obrazów: pole numeru prania (tylko liczby), „Zatwierdź”, „Numer prania: nie podano”; przycisk „Włącz”, „Odkurzacz wyłączony”, „Status: naładowany”. Logika: numer 1–12 ustawia napis; przełącznik Włącz/Wyłącz.</p></div><div class="micro"><h4>Kolor tła przycisku z kodu</h4><p>Zmieniaj też kolor przycisku KOLOR na kolor aktualnego światła.</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p><code>btnKolor.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(kod)));</code> — import <code>android.content.res.ColorStateList</code>.</p></div></details></div></section>
+<div class="nav-bottom"><a class="btn secondary" href="blok06.html">← Blok 6</a><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button><a class="btn secondary" href="blok08.html">Blok 8 →</a></div></article></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
