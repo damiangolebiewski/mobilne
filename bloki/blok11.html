@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blok 11 — Formularz złożony: wiele kontrolek i zbiorczy wynik</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../" data-page="block" data-block="b11">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html" class="active">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="block-layout"><aside class="toc no-print"><strong>Blok 11</strong><ol><li><a href="#cel">Cel</a></li><li><a href="#przypomnienie">Krótkie przypomnienie</a></li><li><a href="#przyklad">Przykład</a></li><li><a href="#mikro">Mikroćwiczenia</a></li><li><a href="#prowadzone">Zadanie prowadzone</a></li><li><a href="#samodzielne">Zadanie samodzielne</a></li><li><a href="#inf04">Zadanie w stylu INF.04 (tryb egzaminacyjny)</a></li><li><a href="#checklista">Checklista</a></li><li><a href="#test">Mini-test</a></li><li><a href="#dodatkowe">Skończyłeś wcześniej?</a></li></ol><a class="skip" href="#samodzielne">Silniejszy? Przejdź od razu do zadania samodzielnego →</a><p class="small muted" style="margin-top:.8rem">Słabszy? Przypomnienie → Przykład → Mikroćwiczenia → Zadanie prowadzone (z podpowiedziami).</p></aside><article class="page"><div class="block-head"><div><div class="muted small"><a href="../index.html">Bloki</a> › Blok 11</div><h1>Blok 11. Formularz złożony: wiele kontrolek i zbiorczy wynik</h1><span class="badge p3">Faza III — tryb egzaminacyjny</span> <span id="block-status" class="badge">W trakcie</span></div><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button></div>
+<p>Łączysz listę, suwak zależny od wyboru, pole czasu, pola radio i pola wyboru w jednym formularzu i składasz z nich wynik w napisie lub oknie dialogowym. Pierwszy blok trybu egzaminacyjnego: podpowiedzi są, ale ukryte.</p>
+<section class="sec" id="cel"><h2><span class="sec-num">1.</span> Cel</h2><p><strong>Po wykonaniu tego bloku będziesz potrafił:</strong></p><ul><li>odczytać wybór z <code>RadioGroup</code> (<code>getCheckedRadioButtonId</code>) i stan <code>CheckBox</code> (<code>isChecked</code>),</li><li>użyć pola czasu (<code>TimePicker</code> w trybie 24 h) i sformatować godzinę „HH:MM”,</li><li>zmieniać maksimum suwaka po wybraniu elementu listy i pilnować spójności napisu obok,</li><li>złożyć wynik z wielu pól (oddzielonych przecinkami) i pokazać go w <code>TextView</code> lub <code>AlertDialog</code>,</li><li>samodzielnie rozplanować zadanie według workflow egzaminacyjnego.</li></ul><details class="hint"><summary>Plan czasu (4 × 45 min = 180 min)</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>Przypomnienie</td><td>15 min</td></tr><tr><td>Przykład</td><td>10 min</td></tr><tr><td>Mikroćwiczenia</td><td>20 min</td></tr><tr><td>Zadanie prowadzone</td><td>35 min</td></tr><tr><td>Zadanie samodzielne</td><td>40 min</td></tr><tr><td>Zadanie INF.04</td><td>50 min</td></tr><tr><td>Checklista + mini-test</td><td>10 min</td></tr><tr><th>Razem</th><th>180 min</th></tr></tbody></table></div></div></details><p class="small muted">Powiązanie z arkuszami: Arkusz_10 (lista → maksimum suwaka, wiek obok suwaka, pole czasu 16:00, wynik po przecinkach w napisie albo oknie komunikatu); pola radio i pola wyboru z desktopowych Arkuszy 04, 06, 09 — kompetencja C, ćwiczona pomocniczo.</p></section>
+<section class="sec" id="przypomnienie"><h2><span class="sec-num">2.</span> Krótkie przypomnienie</h2><h4>Pola radio — jeden wybór z grupy</h4>
+<div class="code"><div class="code-bar"><span>XML</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml"><span class="t-k">&lt;RadioGroup</span> <span class="t-a">android:id</span>=<span class="t-s">"@+id/rgRodzaj"</span> <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span> <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+    <span class="t-k">&lt;RadioButton</span> <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbNormalny"</span> <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span> <span class="t-a">android:text</span>=<span class="t-s">"Normalny"</span> <span class="t-a">android:checked</span>=<span class="t-s">"true"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;RadioButton</span> <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbUlgowy"</span> <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span> <span class="t-a">android:text</span>=<span class="t-s">"Ulgowy"</span> <span class="t-k">/&gt;</span>
+<span class="t-k">&lt;/RadioGroup</span><span class="t-k">&gt;</span></code></pre></div>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">int</span> id = rgRodzaj.getCheckedRadioButtonId();   <span class="t-c">// -1, gdy nic nie zaznaczono</span>
+<span class="t-k">if</span> (id == <span class="t-t">R</span>.id.rbUlgowy) { … }</code></pre></div>
+<p><code>RadioGroup</code> sam pilnuje, aby zaznaczone było tylko jedno pole („w grupie może być jednocześnie zaznaczone jedno pole”).</p>
+<h4>Pole wyboru</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">if</span> (cbTort.isChecked()) { cena += <span class="t-n">50</span>; }</code></pre></div>
+<h4>Pole czasu (Arkusz_10: „pole dedykowane do zapisu czasu z wartością początkową 16:00”)</h4>
+<div class="code"><div class="code-bar"><span>XML</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml"><span class="t-k">&lt;TimePicker</span> <span class="t-a">android:id</span>=<span class="t-s">"@+id/tpGodzina"</span> <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span> <span class="t-a">android:timePickerMode</span>=<span class="t-s">"spinner"</span> <span class="t-k">/&gt;</span></code></pre></div>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">tpGodzina.setIs24HourView(<span class="t-k">true</span>);
+tpGodzina.setHour(<span class="t-n">16</span>);
+tpGodzina.setMinute(<span class="t-n">0</span>);
+...
+<span class="t-t">String</span> godzina = <span class="t-t">String</span>.format(<span class="t-s">"%02d:%02d"</span>, tpGodzina.getHour(), tpGodzina.getMinute());</code></pre></div>
+<p>Prostsza alternatywa: <code>EditText</code> z <code>inputType="time"</code> i tekstem „16:00”.</p>
+<h4>Okno komunikatu</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">new</span> <span class="t-t">AlertDialog</span>.<span class="t-t">Builder</span>(<span class="t-k">this</span>)            <span class="t-c">// import androidx.appcompat.app.AlertDialog</span>
+        .setTitle(<span class="t-s">"Zapisana wizyta"</span>)
+        .setMessage(tresc)
+        .setPositiveButton(<span class="t-s">"OK"</span>, <span class="t-k">null</span>)   <span class="t-c">// null = tylko zamknij okno</span>
+        .show();</code></pre></div>
+<h4>Wynik z wielu pól, „rozdzielone przecinkiem”</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-t">String</span> tresc = imie + <span class="t-s">", "</span> + gatunek + <span class="t-s">", "</span> + wiek + <span class="t-s">", "</span> + cel + <span class="t-s">", "</span> + godzina;</code></pre></div>
+<div class="box box-tip"><p>Wybór z listy zapamiętuj w polu klasy (np. <code>int wybrany = -1</code>). Przy zatwierdzaniu sprawdź <code>-1</code>, zanim użyjesz go jako indeksu.</p></div></section>
+<section class="sec" id="przyklad"><h2><span class="sec-num">3.</span> Przykład</h2><p>Pola radio, pole wyboru i <code>TimePicker</code> w jednym formularzu. Cena liczona z wyboru, godzina sformatowana z zerami wiodącymi.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:12.8px"><div class="m-t" style="font-weight:700">Rozmiar pizzy:</div><div class="m-row" style="align-self:stretch"><div class="m-col" style="align-self:stretch"><div class="m-radio"><span class="m-rb on"></span>Mała</div></div><div class="m-col" style="align-self:stretch"><div class="m-radio"><span class="m-rb"></span>Średnia</div></div><div class="m-col" style="align-self:stretch"><div class="m-radio"><span class="m-rb"></span>Duża</div></div></div><div class="m-check" style=""><span class="m-cb on"></span>Dodatkowy ser (+4 zł)</div><div class="m-t" style="font-size:24px;margin:8px 0px 8px 0px;text-align:center;align-self:stretch">18 : 30</div><div class="m-b" style="background:#6750A4;color:#ffffff;align-self:stretch">PODSUMUJ</div><div class="m-t" style="font-size:14.4px">Pizza mała z serem, dostawa 18:30, do zapłaty 24 zł</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po kliknięciu PODSUMUJ</figcaption></figure></div><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvRozmiar"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Rozmiar pizzy:"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;RadioGroup</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/rgRozmiar"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbMala"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:checked</span>=<span class="t-s">"true"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Mała"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbSrednia"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Średnia"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbDuza"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Duża"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/RadioGroup</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;CheckBox</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/cbSer"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Dodatkowy ser (+4 zł)"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TimePicker</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tpDostawa"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:timePickerMode</span>=<span class="t-s">"spinner"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnPodsumuj"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"PODSUMUJ"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvPodsumowanie"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">CheckBox</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">RadioGroup</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TimePicker</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        <span class="t-t">RadioGroup</span> rgRozmiar = findViewById(<span class="t-t">R</span>.id.rgRozmiar);
+        <span class="t-t">CheckBox</span> cbSer = findViewById(<span class="t-t">R</span>.id.cbSer);
+        <span class="t-t">TimePicker</span> tpDostawa = findViewById(<span class="t-t">R</span>.id.tpDostawa);
+        <span class="t-t">TextView</span> tvPodsumowanie = findViewById(<span class="t-t">R</span>.id.tvPodsumowanie);
+        <span class="t-t">Button</span> btnPodsumuj = findViewById(<span class="t-t">R</span>.id.btnPodsumuj);
+
+        tpDostawa.setIs24HourView(<span class="t-k">true</span>);
+        tpDostawa.setHour(<span class="t-n">18</span>);
+        tpDostawa.setMinute(<span class="t-n">0</span>);
+
+        btnPodsumuj.setOnClickListener(v -&gt; {
+            <span class="t-c">// które pole radio jest zaznaczone? -&gt; porównujemy identyfikatory</span>
+            <span class="t-k">int</span> zaznaczone = rgRozmiar.getCheckedRadioButtonId();
+            <span class="t-t">String</span> rozmiar;
+            <span class="t-k">int</span> cena;
+            <span class="t-k">if</span> (zaznaczone == <span class="t-t">R</span>.id.rbMala) {
+                rozmiar = <span class="t-s">"mała"</span>;
+                cena = <span class="t-n">20</span>;
+            } <span class="t-k">else</span> <span class="t-k">if</span> (zaznaczone == <span class="t-t">R</span>.id.rbSrednia) {
+                rozmiar = <span class="t-s">"średnia"</span>;
+                cena = <span class="t-n">28</span>;
+            } <span class="t-k">else</span> {
+                rozmiar = <span class="t-s">"duża"</span>;
+                cena = <span class="t-n">36</span>;
+            }
+            <span class="t-k">if</span> (cbSer.isChecked()) {
+                cena += <span class="t-n">4</span>;
+            }
+            <span class="t-t">String</span> godzina = <span class="t-t">String</span>.format(<span class="t-s">"%02d:%02d"</span>, tpDostawa.getHour(), tpDostawa.getMinute());
+            tvPodsumowanie.setText(<span class="t-s">"Pizza "</span> + rozmiar + (cbSer.isChecked() ? <span class="t-s">" z serem"</span> : <span class="t-s">""</span>)
+                    + <span class="t-s">", dostawa "</span> + godzina + <span class="t-s">", do zapłaty "</span> + cena + <span class="t-s">" zł"</span>);
+        });
+    }
+}</code></pre></div></section>
+<section class="sec" id="mikro"><h2><span class="sec-num">4.</span> Mikroćwiczenia</h2><div class="micro"><h4>Ćwiczenie 11.1 — Które radio?</h4><p>Grupa <code>rgStrefa</code> z polami <code>rbStrefaA</code> (5 zł/h) i <code>rbStrefaB</code> (3 zł/h). Zapisz w jednej linii stawkę zależną od zaznaczenia.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>int stawka = rgStrefa.getCheckedRadioButtonId() == R.id.rbStrefaA ? 5 : 3;</code></p></div></details></div><div class="micro"><h4>Ćwiczenie 11.2 — Format godziny</h4><p>Godzina 9, minuta 5. Co wyświetli <code>tp.getHour() + ":" + tp.getMinute()</code>, a co <code>String.format("%02d:%02d", …)</code>?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Pierwsze: „9:5”, drugie: „09:05”.</p></div></details></div><div class="micro"><h4>Ćwiczenie 11.3 — Lista → maksimum</h4><p>Lista sal „Główna”, „Ogród”, „Loża VIP”, maksymalnie 8, 6, 4 osoby. Suwak pokazuje liczbę osób 1..max. Napisz obsługę kliknięcia listy.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">lvSale.setOnItemClickListener((parent, view, position, id) -&gt; {
+    wybranaSala = position;
+    sbOsoby.setMax(maksOsob[position] - <span class="t-n">1</span>);
+    tvOsoby.setText(<span class="t-t">String</span>.valueOf(sbOsoby.getProgress() + <span class="t-n">1</span>));
+});</code></pre></div></div></details></div><div class="micro"><h4>Ćwiczenie 11.4 — Okno czy napis?</h4><p>Arkusz_10 pozwala pokazać wynik „w postaci napisu pod przyciskiem albo w postaci okna z komunikatem”. Co jest szybsze do napisania na egzaminie, a co trzeba zrobić w obu przypadkach?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Napis (<code>setText</code>) jest najszybszy. W obu przypadkach trzeba złożyć ten sam tekst z wartościami oddzielonymi przecinkami — zbuduj go raz w zmiennej <code>tresc</code>.</p></div></details></div></section>
+<section class="sec" id="prowadzone"><h2><span class="sec-num">5.</span> Zadanie prowadzone</h2><div class="task" id="b11-prowadzone">
+<div class="task-head"><h3>Bilety do kina</h3><span class="meta">⏱ ok. 35 min</span></div>
+<p>Wybór filmu z listy ustala maksymalną liczbę biletów (wolne miejsca), pola radio — rodzaj biletu. Potwierdzenie w oknie dialogowym.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ECEFF1;padding:9.6px"><div class="m-t" style="background:#263238;color:#fff;font-size:20.8px;padding:8px;align-self:stretch">Kino Pod Lipami</div><div class="m-list" style="align-self:stretch"><div class="m-li" style="border-bottom:1px solid #dddddd;">Kosmiczna podróż (sala 1)</div><div class="m-li" style="border-bottom:1px solid #dddddd;">Leśna przygoda (sala 2)</div><div class="m-li" style="border-bottom:1px solid #dddddd;">Szybcy kurierzy (sala 3)</div></div><div class="m-t" style="font-weight:700">Film: Leśna przygoda (sala 2)</div><div class="m-row" style="align-self:stretch;align-items:center"><div class="m-t" style="">Liczba biletów:</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:33%;background:#6750A4"></div><div class="m-seek-thumb" style="left:33%;background:#6750A4"></div></div></div><div class="m-t" style="">4</div></div><div class="m-row" style="align-self:stretch"><div class="m-col" style="align-self:stretch"><div class="m-radio"><span class="m-rb on"></span>Normalny (25 zł)</div></div><div class="m-col" style="align-self:stretch"><div class="m-radio"><span class="m-rb"></span>Ulgowy (18 zł)</div></div></div><div class="m-b" style="background:#263238;color:#ffffff;align-self:stretch">KUP BILETY</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Wybrano film 2, 4 bilety normalne</figcaption></figure></div>
+<p><strong>Działanie:</strong></p>
+<ul><li>Filmy i wolne miejsca: sala 1 — 4, sala 2 — 10, sala 3 — 6. Kliknięcie filmu: „Film: &lt;nazwa&gt;”, suwak biletów 1..wolne miejsca.</li><li>Suwak: napis obok pokazuje liczbę biletów (od 1).</li><li>KUP BILETY: gdy nie wybrano filmu — <code>Toast</code> „Wybierz film z listy”; inaczej <code>AlertDialog</code> „Twoje bilety” z treścią „&lt;film&gt;, &lt;n&gt; szt., &lt;normalny/ulgowy&gt;, razem &lt;kwota&gt; zł” (normalny 25 zł, ulgowy 18 zł).</li></ul>
+<p><strong>Kroki:</strong></p>
+<ol><li>XML wg makiety (lista <code>wrap_content</code>, rząd z suwakiem, <code>RadioGroup</code> poziomy z zaznaczonym „Normalny”).</li><li>Pola klasy: <code>wybranyFilm = -1</code>, tablice filmów i miejsc.</li><li>Obsługa listy, suwaka, przycisku; metoda <code>liczbaBiletow()</code>.</li></ol>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Najpierw lista i napis „Film: …”, potem suwak z przesunięciem o 1, na końcu przycisk i okno.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Maksimum: <code>sbBilety.setMax(wolneMiejsca[position] - 1);</code>. Ulgowy: <code>rgRodzaj.getCheckedRadioButtonId() == R.id.rbUlgowy</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">klik filmu(p): wybranyFilm ← p; napis filmu; setMax(miejsca[p] − 1); napis liczby
+suwak: napis liczby ← progress + 1
+KUP: jeśli wybranyFilm == −1 → Toast; koniec
+     cena ← ulgowy ? 18 : 25; razem ← cena · liczba
+     AlertDialog z treścią</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">new</span> <span class="t-t">AlertDialog</span>.<span class="t-t">Builder</span>(<span class="t-k">this</span>)
+        .setTitle(<span class="t-s">"Twoje bilety"</span>)
+        .setMessage(tresc)
+        .setPositiveButton(<span class="t-s">"OK"</span>, <span class="t-k">null</span>)
+        .show();</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#ECEFF1"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"12dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#263238"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Kino Pod Lipami"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"26sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ListView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/lvFilmy"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvFilm"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Film: nie wybrano"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center_vertical"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvBiletyEtykieta"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Liczba biletów:"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;SeekBar</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbBilety"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:max</span>=<span class="t-s">"9"</span>
+            <span class="t-a">android:progress</span>=<span class="t-s">"0"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvBilety"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"1"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;RadioGroup</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/rgRodzaj"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbNormalny"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:checked</span>=<span class="t-s">"true"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Normalny (25 zł)"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbUlgowy"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Ulgowy (18 zł)"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/RadioGroup</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnKup"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#263238"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"KUP BILETY"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ArrayAdapter</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ListView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">RadioGroup</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">SeekBar</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Toast</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AlertDialog</span>;
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">String</span>[] filmy = {<span class="t-s">"Kosmiczna podróż (sala 1)"</span>, <span class="t-s">"Leśna przygoda (sala 2)"</span>, <span class="t-s">"Szybcy kurierzy (sala 3)"</span>};
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] wolneMiejsca = {<span class="t-n">4</span>, <span class="t-n">10</span>, <span class="t-n">6</span>};
+    <span class="t-k">private</span> <span class="t-k">int</span> wybranyFilm = -<span class="t-n">1</span>;   <span class="t-c">// -1 = nic nie wybrano</span>
+
+    <span class="t-k">private</span> <span class="t-t">SeekBar</span> sbBilety;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvFilm, tvBilety;
+    <span class="t-k">private</span> <span class="t-t">RadioGroup</span> rgRodzaj;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        <span class="t-t">ListView</span> lvFilmy = findViewById(<span class="t-t">R</span>.id.lvFilmy);
+        sbBilety = findViewById(<span class="t-t">R</span>.id.sbBilety);
+        tvFilm = findViewById(<span class="t-t">R</span>.id.tvFilm);
+        tvBilety = findViewById(<span class="t-t">R</span>.id.tvBilety);
+        rgRodzaj = findViewById(<span class="t-t">R</span>.id.rgRodzaj);
+        <span class="t-t">Button</span> btnKup = findViewById(<span class="t-t">R</span>.id.btnKup);
+
+        lvFilmy.setAdapter(<span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, android.<span class="t-t">R</span>.layout.simple_list_item_1, filmy));
+
+        lvFilmy.setOnItemClickListener((parent, view, position, id) -&gt; {
+            wybranyFilm = position;
+            tvFilm.setText(<span class="t-s">"Film: "</span> + filmy[position]);
+            sbBilety.setMax(wolneMiejsca[position] - <span class="t-n">1</span>);    <span class="t-c">// zakres 1..wolne miejsca</span>
+            tvBilety.setText(<span class="t-t">String</span>.valueOf(liczbaBiletow()));
+        });
+
+        sbBilety.setOnSeekBarChangeListener(<span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+                tvBilety.setText(<span class="t-t">String</span>.valueOf(liczbaBiletow()));
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+        });
+
+        btnKup.setOnClickListener(v -&gt; kup());
+    }
+
+    <span class="t-k">private</span> <span class="t-k">int</span> liczbaBiletow() {
+        <span class="t-k">return</span> sbBilety.getProgress() + <span class="t-n">1</span>;
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> kup() {
+        <span class="t-k">if</span> (wybranyFilm == -<span class="t-n">1</span>) {
+            <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Wybierz film z listy"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+            <span class="t-k">return</span>;
+        }
+        <span class="t-k">boolean</span> ulgowy = rgRodzaj.getCheckedRadioButtonId() == <span class="t-t">R</span>.id.rbUlgowy;
+        <span class="t-k">int</span> cena = ulgowy ? <span class="t-n">18</span> : <span class="t-n">25</span>;
+        <span class="t-k">int</span> razem = cena * liczbaBiletow();
+        <span class="t-t">String</span> tresc = filmy[wybranyFilm] + <span class="t-s">", "</span> + liczbaBiletow() + <span class="t-s">" szt., "</span>
+                + (ulgowy ? <span class="t-s">"ulgowy"</span> : <span class="t-s">"normalny"</span>) + <span class="t-s">", razem "</span> + razem + <span class="t-s">" zł"</span>;
+        <span class="t-k">new</span> <span class="t-t">AlertDialog</span>.<span class="t-t">Builder</span>(<span class="t-k">this</span>)
+                .setTitle(<span class="t-s">"Twoje bilety"</span>)
+                .setMessage(tresc)
+                .setPositiveButton(<span class="t-s">"OK"</span>, <span class="t-k">null</span>)
+                .show();
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b11_prowadzone/">rozwiazania/b11_prowadzone/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b11-prowadzone">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="samodzielne"><h2><span class="sec-num">6.</span> Zadanie samodzielne</h2><div class="task" id="b11-samodzielne">
+<div class="task-head"><h3>Wypożyczalnia rowerów</h3><span class="meta">⏱ ok. 40 min</span></div>
+<p>Formularz z sześcioma rodzajami kontrolek. Tylko opis i makieta — zaplanuj rozwiązanie sam.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#F1F8E9;padding:9.6px"><div class="m-t" style="font-size:20.8px;font-weight:700;text-align:center;align-self:stretch">Wypożyczalnia rowerów</div><div class="m-e" style="align-self:stretch"><span>Ola Nowak</span></div><div class="m-col" style="align-self:stretch"><div class="m-radio"><span class="m-rb"></span>Miejski (10 zł/h)</div><div class="m-radio"><span class="m-rb on"></span>Górski (15 zł/h)</div><div class="m-radio"><span class="m-rb"></span>Elektryczny (25 zł/h)</div></div><div class="m-row" style="align-self:stretch;align-items:center"><div class="m-t" style="">Godziny:</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:28%;background:#6750A4"></div><div class="m-seek-thumb" style="left:28%;background:#6750A4"></div></div></div><div class="m-t" style="">3 h</div></div><div class="m-check" style=""><span class="m-cb on"></span>Kask (+5 zł)</div><div class="m-check" style=""><span class="m-cb"></span>Koszyk (+3 zł)</div><div class="m-t" style="font-size:20.8px;margin:4.8px 0px 4.8px 0px;text-align:center;align-self:stretch">10 : 00</div><div class="m-b" style="background:#558B2F;color:#ffffff;align-self:stretch">PODSUMUJ</div><div class="m-t" style="font-size:12.8px">Ola Nowak, rower górski + kask, 3 h od 10:00, koszt 50 zł</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po kliknięciu PODSUMUJ</figcaption></figure></div>
+<ul><li>Pole „Imię i nazwisko”; grupa radio: Miejski 10 zł/h (domyślnie), Górski 15 zł/h, Elektryczny 25 zł/h.</li><li>Suwak godzin 1..8 z napisem „&lt;n&gt; h”.</li><li>Pola wyboru: Kask +5 zł, Koszyk +3 zł (dopłaty jednorazowe).</li><li><code>TimePicker</code> 24 h, start 10:00.</li><li>PODSUMUJ: przy pustym nazwisku „Podaj imię i nazwisko”, inaczej „&lt;imię&gt;, rower &lt;typ&gt;[ + kask][ + koszyk], &lt;n&gt; h od &lt;GG:MM&gt;, koszt &lt;kwota&gt; zł”.</li><li>Koszt = stawka · godziny + dopłaty.</li></ul>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Rozbij <code>podsumuj()</code> na etapy: walidacja → godziny → rower i stawka → dodatki → godzina startu → tekst.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Dodatki zbieraj w zmiennej <code>String dodatki = "";</code> i dopisuj <code>" + kask"</code>, <code>" + koszyk"</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">podsumuj():
+    imię puste → komunikat; koniec
+    godziny ← progress + 1
+    (rower, stawka) ← wg zaznaczonego radio
+    koszt ← stawka · godziny; dodatki ← ""
+    kask → koszt += 5, dodatki += " + kask"; koszyk → +3, " + koszyk"
+    start ← format(HH:MM); napis wyniku</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">int</span> wybrany = rgRower.getCheckedRadioButtonId();
+<span class="t-k">if</span> (wybrany == <span class="t-t">R</span>.id.rbGorski) {
+    rower = <span class="t-s">"górski"</span>; stawka = <span class="t-n">15</span>;
+} <span class="t-k">else</span> <span class="t-k">if</span> (wybrany == <span class="t-t">R</span>.id.rbElektryczny) {
+    rower = <span class="t-s">"elektryczny"</span>; stawka = <span class="t-n">25</span>;
+} <span class="t-k">else</span> {
+    rower = <span class="t-s">"miejski"</span>; stawka = <span class="t-n">10</span>;
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#F1F8E9"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"12dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Wypożyczalnia rowerów"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"26sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etImie"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Imię i nazwisko"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"textPersonName"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;RadioGroup</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/rgRower"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbMiejski"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:checked</span>=<span class="t-s">"true"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Miejski (10 zł/h)"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbGorski"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Górski (15 zł/h)"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbElektryczny"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Elektryczny (25 zł/h)"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/RadioGroup</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center_vertical"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvGodzinyEtykieta"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Godziny:"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;SeekBar</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbGodziny"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:max</span>=<span class="t-s">"7"</span>
+            <span class="t-a">android:progress</span>=<span class="t-s">"0"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvGodziny"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"1 h"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;CheckBox</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/cbKask"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Kask (+5 zł)"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;CheckBox</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/cbKoszyk"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Koszyk (+3 zł)"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TimePicker</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tpStart"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:timePickerMode</span>=<span class="t-s">"spinner"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnPodsumuj"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#558B2F"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"PODSUMUJ"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvPodsumowanie"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"16sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">CheckBox</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">RadioGroup</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">SeekBar</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TimePicker</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etImie;
+    <span class="t-k">private</span> <span class="t-t">RadioGroup</span> rgRower;
+    <span class="t-k">private</span> <span class="t-t">SeekBar</span> sbGodziny;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvGodziny, tvPodsumowanie;
+    <span class="t-k">private</span> <span class="t-t">CheckBox</span> cbKask, cbKoszyk;
+    <span class="t-k">private</span> <span class="t-t">TimePicker</span> tpStart;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etImie = findViewById(<span class="t-t">R</span>.id.etImie);
+        rgRower = findViewById(<span class="t-t">R</span>.id.rgRower);
+        sbGodziny = findViewById(<span class="t-t">R</span>.id.sbGodziny);
+        tvGodziny = findViewById(<span class="t-t">R</span>.id.tvGodziny);
+        tvPodsumowanie = findViewById(<span class="t-t">R</span>.id.tvPodsumowanie);
+        cbKask = findViewById(<span class="t-t">R</span>.id.cbKask);
+        cbKoszyk = findViewById(<span class="t-t">R</span>.id.cbKoszyk);
+        tpStart = findViewById(<span class="t-t">R</span>.id.tpStart);
+        <span class="t-t">Button</span> btnPodsumuj = findViewById(<span class="t-t">R</span>.id.btnPodsumuj);
+
+        tpStart.setIs24HourView(<span class="t-k">true</span>);
+        tpStart.setHour(<span class="t-n">10</span>);
+        tpStart.setMinute(<span class="t-n">0</span>);
+
+        sbGodziny.setOnSeekBarChangeListener(<span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+                tvGodziny.setText((progress + <span class="t-n">1</span>) + <span class="t-s">" h"</span>);
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+        });
+
+        btnPodsumuj.setOnClickListener(v -&gt; podsumuj());
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> podsumuj() {
+        <span class="t-t">String</span> imie = etImie.getText().toString().trim();
+        <span class="t-k">if</span> (imie.isEmpty()) {
+            tvPodsumowanie.setText(<span class="t-s">"Podaj imię i nazwisko"</span>);
+            <span class="t-k">return</span>;
+        }
+        <span class="t-k">int</span> godziny = sbGodziny.getProgress() + <span class="t-n">1</span>;
+        <span class="t-k">int</span> wybrany = rgRower.getCheckedRadioButtonId();
+        <span class="t-t">String</span> rower;
+        <span class="t-k">int</span> stawka;
+        <span class="t-k">if</span> (wybrany == <span class="t-t">R</span>.id.rbGorski) {
+            rower = <span class="t-s">"górski"</span>;
+            stawka = <span class="t-n">15</span>;
+        } <span class="t-k">else</span> <span class="t-k">if</span> (wybrany == <span class="t-t">R</span>.id.rbElektryczny) {
+            rower = <span class="t-s">"elektryczny"</span>;
+            stawka = <span class="t-n">25</span>;
+        } <span class="t-k">else</span> {
+            rower = <span class="t-s">"miejski"</span>;
+            stawka = <span class="t-n">10</span>;
+        }
+        <span class="t-k">int</span> koszt = stawka * godziny;
+        <span class="t-t">String</span> dodatki = <span class="t-s">""</span>;
+        <span class="t-k">if</span> (cbKask.isChecked()) {
+            koszt += <span class="t-n">5</span>;
+            dodatki += <span class="t-s">" + kask"</span>;
+        }
+        <span class="t-k">if</span> (cbKoszyk.isChecked()) {
+            koszt += <span class="t-n">3</span>;
+            dodatki += <span class="t-s">" + koszyk"</span>;
+        }
+        <span class="t-t">String</span> start = <span class="t-t">String</span>.format(<span class="t-s">"%02d:%02d"</span>, tpStart.getHour(), tpStart.getMinute());
+        tvPodsumowanie.setText(imie + <span class="t-s">", rower "</span> + rower + dodatki + <span class="t-s">", "</span> + godziny + <span class="t-s">" h od "</span> + start + <span class="t-s">", koszt "</span> + koszt + <span class="t-s">" zł"</span>);
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b11_samodzielne/">rozwiazania/b11_samodzielne/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b11-samodzielne">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="inf04"><h2><span class="sec-num">7.</span> Zadanie w stylu INF.04 (tryb egzaminacyjny)</h2><div class="task exam" id="b11-inf">
+<div class="task-head"><h3>Rezerwacja stolika</h3><span class="meta">⏱ ok. 50 min</span></div>
+<p>Za pomocą środowiska programistycznego wykonaj aplikację mobilną obsługującą rezerwację stolika w restauracji.</p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>tytuł, pole nazwiska, „Sala”, lista 3 sal, rząd: „Liczba osób:” + wartość + suwak, pole czasu, pole wyboru „Tort”, przycisk, napis wyniku</td></tr><tr><td>DANE</td><td>tekst, wybór z listy, suwak 1..max, czas, pole wyboru</td></tr><tr><td>ZDARZENIA</td><td>kliknięcie elementu listy, zmiana suwaka, kliknięcie ZAREZERWUJ</td></tr><tr><td>LOGIKA</td><td>sala → max osób (8/6/4) przez setMax(max−1) i przesunięcie +1; brak wyboru sali → komunikat</td></tr><tr><td>WYNIK</td><td>wartości rozdzielone przecinkami w napisie i w oknie „Rezerwacja”; na starcie napis „Autor: …”</td></tr><tr><td>WYGLĄD</td><td>tło #EFEBE9; tytuł #5D4037 biały, większy, padding 10; lista wg liczby elementów; przycisk #5D4037 wyśrodkowany</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#EFEBE9;padding:0px"><div class="m-t" style="background:#5D4037;color:#fff;font-size:20.8px;padding:8px;align-self:stretch">Rezerwacja stolika</div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span class="m-hint" style="">Imię i nazwisko...</span></div><div class="m-t" style="margin:0px 0px 0px 8px">Sala</div><div class="m-list" style="margin:0px 8px 0px 8px;align-self:stretch"><div class="m-li" style="border-bottom:1px solid #dddddd;">Główna</div><div class="m-li" style="border-bottom:1px solid #dddddd;">Ogród</div><div class="m-li" style="border-bottom:1px solid #dddddd;">Loża VIP</div></div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch;align-items:center"><div class="m-t" style="">Liczba osób:</div><div class="m-t" style="font-weight:700;margin:0px 0px 0px 4.8px">1</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:0%;background:#6750A4"></div><div class="m-seek-thumb" style="left:0%;background:#6750A4"></div></div></div></div><div class="m-t" style="font-size:22.4px;margin:4.8px 0px 4.8px 0px;text-align:center;align-self:stretch">18 : 00</div><div class="m-check" style="margin:0px 0px 0px 8px"><span class="m-cb"></span>Tort urodzinowy</div><div class="m-b" style="background:#5D4037;color:#ffffff;align-self:center">ZAREZERWUJ</div><div class="m-t" style="margin:0px 8px 0px 8px">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Stan początkowy</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#EFEBE9;padding:0px"><div class="m-t" style="background:#5D4037;color:#fff;font-size:20.8px;padding:8px;align-self:stretch">Rezerwacja stolika</div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span>Jan Kowalski</span></div><div class="m-t" style="margin:0px 0px 0px 8px">Sala</div><div class="m-list" style="margin:0px 8px 0px 8px;align-self:stretch"><div class="m-li" style="border-bottom:1px solid #dddddd;">Główna</div><div class="m-li" style="border-bottom:1px solid #dddddd;">Ogród</div><div class="m-li" style="border-bottom:1px solid #dddddd;">Loża VIP</div></div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch;align-items:center"><div class="m-t" style="">Liczba osób:</div><div class="m-t" style="font-weight:700;margin:0px 0px 0px 4.8px">4</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:100%;background:#6750A4"></div><div class="m-seek-thumb" style="left:100%;background:#6750A4"></div></div></div></div><div class="m-t" style="font-size:22.4px;margin:4.8px 0px 4.8px 0px;text-align:center;align-self:stretch">19 : 30</div><div class="m-check" style="margin:0px 0px 0px 8px"><span class="m-cb on"></span>Tort urodzinowy</div><div class="m-b" style="background:#5D4037;color:#ffffff;align-self:center">ZAREZERWUJ</div><div class="m-t" style="margin:0px 8px 0px 8px">Jan Kowalski, Loża VIP, 4, 19:30, z tortem</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 2. Wybrano „Loża VIP”, suwak do końca, po zatwierdzeniu</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Rezerwacja stolika”.</li><li>Pole edycyjne z podpowiedzią „Imię i nazwisko...”.</li><li>Napis „Sala” i lista z elementami: „Główna”, „Ogród”, „Loża VIP”.</li><li>Rząd: napis „Liczba osób:”, napis z wartością (początkowo „1”) i suwak.</li><li>Pole dedykowane do zapisu czasu z wartością początkową 18:00 (format 24-godzinny).</li><li>Pole wyboru „Tort urodzinowy”.</li><li>Przycisk „ZAREZERWUJ”.</li><li>Napis na wynik; w stanie początkowym „Autor: ”, dalej numer zdającego.</li></ul>
+<p><strong>Działanie aplikacji:</strong></p>
+<ul><li>Po kliknięciu sali z listy zakres suwaka zmienia się na 1..8 (Główna), 1..6 (Ogród), 1..4 (Loża VIP). Napis obok suwaka zawsze pokazuje aktualną liczbę osób (liczba całkowita).</li><li>Po kliknięciu „ZAREZERWUJ”: jeśli nie wybrano sali — w napisie wyniku „Wybierz salę”; w przeciwnym razie wartości: imię i nazwisko, sala, liczba osób, godzina (GG:MM), „z tortem” / „bez tortu” są wyświetlane w napisie pod przyciskiem <strong>oraz</strong> w oknie z komunikatem o tytule „Rezerwacja”. Wartości rozdzielone przecinkami.</li><li>Formularz nie musi być walidowany w innym zakresie.</li></ul>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs w XML; rozkład liniowy pionowy z zagnieżdżonym rozkładem poziomym dla kontrolek liczby osób.</li><li>Kolor tła strony #EFEBE9. Tytuł: czcionka większa niż pozostałe, tło #5D4037, biała czcionka, marginesy wewnętrzne 10.</li><li>Lista: wysokość dopasowana do liczby elementów.</li><li>Przycisk wyśrodkowany, tło #5D4037, biała czcionka.</li><li>Nazwy sal i limity osób przechowywane w tablicach.</li></ul>
+
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b11-inf"><li><label><input type="checkbox"> <span>stan początkowy zgodny z obrazem 1 (godzina 18:00, „1”, „Autor: …”)</span></label></li><li><label><input type="checkbox"> <span>ZAREZERWUJ bez wybranej sali → „Wybierz salę”</span></label></li><li><label><input type="checkbox"> <span>Loża VIP → suwak do końca pokazuje 4; Główna → 8</span></label></li><li><label><input type="checkbox"> <span>wybór Głównej, suwak na 8, potem Loża VIP → napis pokazuje 4 (spójny z suwakiem)</span></label></li><li><label><input type="checkbox"> <span>wynik: 5 wartości rozdzielonych przecinkami, godzina z zerami (np. 09:05)</span></label></li><li><label><input type="checkbox"> <span>okno „Rezerwacja” z tą samą treścią</span></label></li><li><label><input type="checkbox"> <span>lista <code>wrap_content</code>, rząd liczby osób w zagnieżdżonym poziomym rozkładzie</span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Ten sam schemat co w zadaniu prowadzonym (lista → maksimum suwaka → przycisk), zmieniają się tylko dane i sposób prezentacji wyniku.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Przy zmianie maksimum SeekBar sam obetnie zbyt dużą wartość; po <code>setMax</code> odśwież napis z <code>getProgress() + 1</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">pola: sale[], maksOsob[] = {8, 6, 4}, wybranaSala = −1
+onCreate: adapter listy; TimePicker 24 h, 18:00; obsługi
+klik sali(p): wybranaSala ← p; setMax(maksOsob[p] − 1); napis ← progress + 1
+suwak: napis ← progress + 1
+ZAREZERWUJ: sala −1 → „Wybierz salę”; inaczej treść → napis + AlertDialog</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-t">String</span> godzina = <span class="t-t">String</span>.format(<span class="t-s">"%02d:%02d"</span>, tpGodzina.getHour(), tpGodzina.getMinute());
+<span class="t-t">String</span> tresc = etNazwisko.getText().toString().trim() + <span class="t-s">", "</span>
+        + sale[wybranaSala] + <span class="t-s">", "</span>
+        + liczbaOsob() + <span class="t-s">", "</span>
+        + godzina + <span class="t-s">", "</span>
+        + (cbTort.isChecked() ? <span class="t-s">"z tortem"</span> : <span class="t-s">"bez tortu"</span>);</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#EFEBE9"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#5D4037"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Rezerwacja stolika"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"26sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etNazwisko"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Imię i nazwisko..."</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"textPersonName"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvSalaEtykieta"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Sala"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ListView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/lvSale"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center_vertical"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvOsobyEtykieta"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Liczba osób:"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvOsoby"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"6dp"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;SeekBar</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbOsoby"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:max</span>=<span class="t-s">"7"</span>
+            <span class="t-a">android:progress</span>=<span class="t-s">"0"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TimePicker</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tpGodzina"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:timePickerMode</span>=<span class="t-s">"spinner"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;CheckBox</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/cbTort"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Tort urodzinowy"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnZarezerwuj"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#5D4037"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"ZAREZERWUJ"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvPodsumowanie"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ArrayAdapter</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">CheckBox</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ListView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">SeekBar</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TimePicker</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AlertDialog</span>;
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">String</span>[] sale = {<span class="t-s">"Główna"</span>, <span class="t-s">"Ogród"</span>, <span class="t-s">"Loża VIP"</span>};
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] maksOsob = {<span class="t-n">8</span>, <span class="t-n">6</span>, <span class="t-n">4</span>};
+    <span class="t-k">private</span> <span class="t-k">int</span> wybranaSala = -<span class="t-n">1</span>;
+
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etNazwisko;
+    <span class="t-k">private</span> <span class="t-t">SeekBar</span> sbOsoby;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvOsoby, tvPodsumowanie;
+    <span class="t-k">private</span> <span class="t-t">TimePicker</span> tpGodzina;
+    <span class="t-k">private</span> <span class="t-t">CheckBox</span> cbTort;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etNazwisko = findViewById(<span class="t-t">R</span>.id.etNazwisko);
+        <span class="t-t">ListView</span> lvSale = findViewById(<span class="t-t">R</span>.id.lvSale);
+        sbOsoby = findViewById(<span class="t-t">R</span>.id.sbOsoby);
+        tvOsoby = findViewById(<span class="t-t">R</span>.id.tvOsoby);
+        tvPodsumowanie = findViewById(<span class="t-t">R</span>.id.tvPodsumowanie);
+        tpGodzina = findViewById(<span class="t-t">R</span>.id.tpGodzina);
+        cbTort = findViewById(<span class="t-t">R</span>.id.cbTort);
+        <span class="t-t">Button</span> btnZarezerwuj = findViewById(<span class="t-t">R</span>.id.btnZarezerwuj);
+
+        lvSale.setAdapter(<span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, android.<span class="t-t">R</span>.layout.simple_list_item_1, sale));
+        tpGodzina.setIs24HourView(<span class="t-k">true</span>);
+        tpGodzina.setHour(<span class="t-n">18</span>);
+        tpGodzina.setMinute(<span class="t-n">0</span>);
+
+        lvSale.setOnItemClickListener((parent, view, position, id) -&gt; {
+            wybranaSala = position;
+            sbOsoby.setMax(maksOsob[position] - <span class="t-n">1</span>);   <span class="t-c">// SeekBar sam obetnie za dużą wartość</span>
+            tvOsoby.setText(<span class="t-t">String</span>.valueOf(liczbaOsob()));
+        });
+
+        sbOsoby.setOnSeekBarChangeListener(<span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+                tvOsoby.setText(<span class="t-t">String</span>.valueOf(progress + <span class="t-n">1</span>));
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+        });
+
+        btnZarezerwuj.setOnClickListener(v -&gt; zarezerwuj());
+    }
+
+    <span class="t-k">private</span> <span class="t-k">int</span> liczbaOsob() {
+        <span class="t-k">return</span> sbOsoby.getProgress() + <span class="t-n">1</span>;
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> zarezerwuj() {
+        <span class="t-k">if</span> (wybranaSala == -<span class="t-n">1</span>) {
+            tvPodsumowanie.setText(<span class="t-s">"Wybierz salę"</span>);
+            <span class="t-k">return</span>;
+        }
+        <span class="t-t">String</span> godzina = <span class="t-t">String</span>.format(<span class="t-s">"%02d:%02d"</span>, tpGodzina.getHour(), tpGodzina.getMinute());
+        <span class="t-t">String</span> tresc = etNazwisko.getText().toString().trim() + <span class="t-s">", "</span>
+                + sale[wybranaSala] + <span class="t-s">", "</span>
+                + liczbaOsob() + <span class="t-s">", "</span>
+                + godzina + <span class="t-s">", "</span>
+                + (cbTort.isChecked() ? <span class="t-s">"z tortem"</span> : <span class="t-s">"bez tortu"</span>);
+        tvPodsumowanie.setText(tresc);
+        <span class="t-k">new</span> <span class="t-t">AlertDialog</span>.<span class="t-t">Builder</span>(<span class="t-k">this</span>)
+                .setTitle(<span class="t-s">"Rezerwacja"</span>)
+                .setMessage(tresc)
+                .setPositiveButton(<span class="t-s">"OK"</span>, <span class="t-k">null</span>)
+                .show();
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b11_inf/">rozwiazania/b11_inf/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b11-inf">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="checklista"><h2><span class="sec-num">8.</span> Checklista</h2><p class="small muted">Sprawdź swoją aplikację z zadania INF.04 punkt po punkcie (krok 10 procedury).</p><ul class="checklist" data-key="b11-check"><li><label><input type="checkbox"> <span>każda kontrolka z polecenia istnieje i ma podpowiedź / tekst zgodny z treścią</span></label></li><li><label><input type="checkbox"> <span>zaznaczenie domyślne pól radio ustawione (<code>android:checked="true"</code>)</span></label></li><li><label><input type="checkbox"> <span>wybór z listy zapamiętany w polu; sprawdzam brak wyboru (−1)</span></label></li><li><label><input type="checkbox"> <span>po zmianie maksimum suwaka napis obok jest aktualny</span></label></li><li><label><input type="checkbox"> <span>godzina sformatowana „GG:MM”</span></label></li><li><label><input type="checkbox"> <span>wynik złożony z wartości w kolejności z polecenia, rozdzielonych przecinkami</span></label></li><li><label><input type="checkbox"> <span>okno <code>AlertDialog</code> z tytułem, treścią i przyciskiem OK (jeśli wymagane)</span></label></li></ul></section>
+<section class="sec" id="test"><h2><span class="sec-num">9.</span> Mini-test</h2><div class="quiz" data-quiz="b11"><script type="application/json">[{"q": "<p>Co zwraca <code>rg.getCheckedRadioButtonId()<\/code>, gdy żadne pole nie jest zaznaczone?<\/p>", "o": ["0", "−1", "<code>null<\/code>", "id pierwszego pola"], "a": 1, "e": "<p>Dlatego warto zaznaczyć jedno pole domyślnie w XML.<\/p>"}, {"q": "<p>Jak sprawdzić, czy pole wyboru <code>cbKask<\/code> jest zaznaczone?<\/p>", "o": ["<code>cbKask.getText()<\/code>", "<code>cbKask.isChecked()<\/code>", "<code>cbKask.getCheckedId()<\/code>", "<code>cbKask.checked == 1<\/code>"], "a": 1, "e": "<p><code>isChecked()<\/code> zwraca <code>boolean<\/code>.<\/p>"}, {"q": "<p>Którą metodą ustawisz w <code>TimePicker<\/code> godzinę 16?<\/p>", "o": ["<code>tp.setTime(16)<\/code>", "<code>tp.setHour(16)<\/code>", "<code>tp.setCurrentHour(\"16\")<\/code>", "<code>tp.hour = 16<\/code>"], "a": 1, "e": "<p><code>setHour<\/code> / <code>getHour<\/code> (API 23+). Starsze <code>setCurrentHour<\/code> są przestarzałe.<\/p>"}, {"q": "<p>W <code>AlertDialog.Builder<\/code> przycisk zamykający okno bez dodatkowej akcji to:<\/p>", "o": ["<code>.setPositiveButton(\"OK\", null)<\/code>", "<code>.close()<\/code>", "<code>.setButton(OK)<\/code>", "<code>.dismiss(\"OK\")<\/code>"], "a": 0, "e": "<p>Drugi argument to obsługa kliknięcia; <code>null<\/code> = tylko zamknięcie.<\/p>"}, {"q": "<p>Arkusz_10: wiek 0..20, po wybraniu kota max 20, psa 18, świnki morskiej 9. Suwak wieku ma wartość 15, użytkownik klika „Świnka morska”. Co powinien pokazać napis wieku?<\/p>", "o": ["15", "9", "0", "20"], "a": 1, "e": "<p>SeekBar obetnie wartość do nowego maksimum 9 — napis musi to odzwierciedlać.<\/p>"}]</script></div></section>
+<section class="sec" id="dodatkowe"><h2><span class="sec-num">10.</span> Skończyłeś wcześniej?</h2><div class="micro"><h4>Weterynarz (Arkusz_10) w 25 minut</h4><p>Odtwórz zadanie z Arkusza_10 bez zaglądania do jego treści — tylko z pamięci wymagań: tytuł (SeaGreen, padding 10), właściciel, „Gatunek”, lista Pies/Kot/Świnka morska (max 18/20/9), wiek + suwak, cel wizyty, czas 16:00, OK → wartości po przecinkach. Potem porównaj z arkuszem.</p></div><div class="micro"><h4>Walidacja godziny</h4><p>Restauracja jest czynna 12:00–22:00. Rezerwacja poza tymi godzinami → „Restauracja zamknięta o tej godzinie”.</p></div><div class="micro"><h4>Radio z obrazem</h4><p>Dodaj do rezerwacji <code>ImageView</code>, który zmienia się od razu po zaznaczeniu pola radio (bez przycisku) — wzorzec z desktopowego Arkusza_06.</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p><code>rg.setOnCheckedChangeListener((group, checkedId) -&gt; { … });</code></p></div></details></div></section>
+<div class="nav-bottom"><a class="btn secondary" href="blok10.html">← Blok 10</a><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button><a class="btn secondary" href="blok12.html">Blok 12 →</a></div></article></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
