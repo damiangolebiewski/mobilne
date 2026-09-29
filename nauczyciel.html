@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel nauczyciela — INF.04 — Aplikacje mobilne</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body data-root="" data-page="teacher" data-nosync="1">
+<header class="topbar"><div class="in"><a class="brand" href="index.html">INF.04 — Aplikacje mobilne</a><nav><a href="index.html">Bloki</a><a href="zadania/index.html">Zadania</a><a href="sciaga/android.html">Ściąga Android</a><a href="sciaga/java.html">Ściąga Java</a><a href="sciaga/procedura.html">Procedura egzaminu</a><a href="wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="page">
+<h1>Panel nauczyciela</h1>
+<p class="muted">Postęp uczniów zapisywany online (Google Apps Script → Twój Arkusz Google). Te same dane widzisz w arkuszu, w zakładce <b>Postep</b>.</p>
+<div id="tp-offline" class="card" hidden><p><b>Tryb online nie jest włączony.</b> W pliku <code>js/config.js</code> brakuje adresu <code>syncUrl</code>, więc postęp uczniów zapisuje się tylko w ich przeglądarkach.</p>
+<p>Jak włączyć: <a href="materialy/wdrozenie_online.html">instrukcja wdrożenia online</a>.</p></div>
+<form id="tp-login" class="tp-bar" autocomplete="off">
+<label>Hasło nauczyciela<input id="tp-key" type="password" required></label>
+<button type="submit" class="btn">Pokaż postęp uczniów</button>
+</form>
+<p id="tp-msg" class="sync-msg"></p>
+<div id="tp-main" hidden>
+<div class="tp-bar">
+<label>Klasa<select id="tp-class"><option value="">wszystkie</option></select></label>
+<label>Sortuj<select id="tp-sort"><option value="name">nazwisko</option><option value="progress">postęp</option><option value="last">ostatnia aktywność</option><option value="time">czas pracy</option></select></label>
+<label>Szukaj<input id="tp-search" type="search" placeholder="nazwisko"></label>
+<button type="button" class="btn secondary" id="tp-refresh">Odśwież</button>
+<button type="button" class="btn secondary" id="tp-csv">Pobierz CSV (Excel)</button>
+<button type="button" class="btn secondary print-btn">Drukuj</button>
+<button type="button" class="btn secondary" id="tp-logout">Wyloguj</button>
+</div>
+<div id="tp-summary"></div>
+<p class="small tp-legend">Legenda: <span class="done">✓ ukończony</span><span class="prog">… w trakcie</span>· nierozpoczęty · pod znakiem: najlepszy wynik mini-testu. Nazwisko <b style="color:var(--warn)">na pomarańczowo</b> — brak aktywności od 7 dni. <b>Kliknij wiersz ucznia</b>, aby zobaczyć szczegóły (zadania, testy, czas, reset PIN-u).<br>
+<span class="muted">Czas = aktywna praca na stronach bloków (strona otwarta i uczeń coś robił w ostatnich 3 min). Nie obejmuje pracy w samym Android Studio.</span></p>
+<div id="tp-table"></div>
+</div>
+</div>
+</main>
+<script src="js/config.js"></script>
+<script src="js/data.js"></script>
+<script src="js/progress.js"></script>
+<script src="js/sync.js"></script>
+<script src="js/quiz.js"></script>
+<script src="js/app.js"></script>
+<script src="js/teacher.js"></script>
+</body>
+</html>
