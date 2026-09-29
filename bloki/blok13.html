@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blok 13 — Tryb egzaminacyjny I: pełne zadania na czas</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../" data-page="block" data-block="b13">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html" class="active">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="block-layout"><aside class="toc no-print"><strong>Blok 13</strong><ol><li><a href="#cel">Cel</a></li><li><a href="#przypomnienie">Krótkie przypomnienie: workflow egzaminacyjny</a></li><li><a href="#przyklad">Przykład: analiza specyfikacji krok po kroku</a></li><li><a href="#mikro">Mikroćwiczenia: sprint z pamięci</a></li><li><a href="#prowadzone">Zadanie prowadzone (rozgrzewka)</a></li><li><a href="#samodzielne">Próbny egzamin — zadanie 1</a></li><li><a href="#inf04">Próbny egzamin — zadanie 2</a></li><li><a href="#checklista">Checklista</a></li><li><a href="#test">Mini-test</a></li><li><a href="#dodatkowe">Skończyłeś wcześniej?</a></li></ol><a class="skip" href="#samodzielne">Silniejszy? Przejdź od razu do zadania samodzielnego →</a><p class="small muted" style="margin-top:.8rem">Słabszy? Przypomnienie → Przykład → Mikroćwiczenia → Zadanie prowadzone (z podpowiedziami).</p></aside><article class="page"><div class="block-head"><div><div class="muted small"><a href="../index.html">Bloki</a> › Blok 13</div><h1>Blok 13. Tryb egzaminacyjny I: pełne zadania na czas</h1><span class="badge p3">Faza III — tryb egzaminacyjny</span> <span id="block-status" class="badge">W trakcie</span></div><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button></div>
+<p>Dwa nowe, pełne zadania egzaminacyjne rozwiązywane według workflow 10 kroków: formularz z walidacją i obliczeniami oraz quiz z obrazami, polami radio i cyklem pytań.</p>
+<section class="sec" id="cel"><h2><span class="sec-num">1.</span> Cel</h2><p><strong>Po wykonaniu tego bloku będziesz potrafił:</strong></p><ul><li>zastosować workflow 10 kroków do zadania, którego wcześniej nie widziałeś,</li><li>zaplanować drzewo widoków i zdarzenia przed pisaniem kodu,</li><li>zbudować w limicie czasu aplikację łączącą walidację, suwak, pola radio i obliczenia,</li><li>zbudować quiz: obraz i odpowiedzi z tablic, sprawdzanie, punkty, koniec gry i restart.</li></ul><details class="hint"><summary>Plan czasu (4 × 45 min = 180 min)</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>Przypomnienie (workflow)</td><td>10 min</td></tr><tr><td>Przykład (analiza)</td><td>10 min</td></tr><tr><td>Mikroćwiczenia (sprint)</td><td>20 min</td></tr><tr><td>Rozgrzewka</td><td>20 min</td></tr><tr><td>Próbny egzamin — zadanie 1</td><td>50 min</td></tr><tr><td>Próbny egzamin — zadanie 2</td><td>60 min</td></tr><tr><td>Samoocena + mini-test</td><td>10 min</td></tr><tr><th>Razem</th><th>180 min</th></tr></tbody></table></div></div></details><p class="small muted">Powiązanie z arkuszami: zadanie 1 łączy wzorce W2 (walidacja tekstu jak Arkusze 01/06), W4 (suwak z przesunięciem jak 07/10) i radio + pole wyboru (desktop 04/06); zadanie 2 łączy W6 (obraz z tablicy jak 12), W1 z indeksem cyklicznym (07) i liczenie punktów (12). Żadne nie kopiuje arkusza.</p></section>
+<section class="sec" id="przypomnienie"><h2><span class="sec-num">2.</span> Krótkie przypomnienie: workflow egzaminacyjny</h2><h4>Workflow egzaminacyjny — 10 kroków</h4>
+<div class="table-wrap"><table><thead><tr><th>Krok</th><th>Co robisz</th><th>Czas (z ~60 min)</th></tr></thead><tbody><tr><td>1</td><td>Przeczytaj <strong>całe</strong> zadanie (także założenia i ostatnią stronę)</td><td>3 min</td></tr><tr><td>2</td><td>Wypisz elementy interfejsu (kolejność z góry na dół, rzędy)</td><td>2 min</td></tr><tr><td>3</td><td>Wypisz dane wejściowe</td><td>1 min</td></tr><tr><td>4</td><td>Wypisz zdarzenia (co klika / przesuwa użytkownik)</td><td>1 min</td></tr><tr><td>5</td><td>Wypisz logikę (wzory, warunki, cykle, liczniki)</td><td>2 min</td></tr><tr><td>6</td><td>Wypisz wyniki (co i gdzie się zmienia)</td><td>1 min</td></tr><tr><td>7</td><td>Zbuduj interfejs w XML → uruchom</td><td>15 min</td></tr><tr><td>8</td><td>Dodaj logikę w Javie (zdarzenie po zdarzeniu, uruchamiając po każdym)</td><td>20 min</td></tr><tr><td>9</td><td>Przetestuj każdy punkt „Działanie aplikacji”, zrób zrzuty</td><td>7 min</td></tr><tr><td>10</td><td>Porównaj punkt po punkcie ze specyfikacją; spakuj <code>mobilna.zip</code>, skopiuj pliki</td><td>8 min</td></tr></tbody></table></div>
+<div class="box box-exam"><p>Zasada: <strong>najpierw działający szkielet, potem szczegóły.</strong> Aplikacja, która się uruchamia i realizuje 80% wymagań, daje więcej punktów niż „prawie gotowa”, która się nie kompiluje. Po każdej większej zmianie — uruchom.</p></div></section>
+<section class="sec" id="przyklad"><h2><span class="sec-num">3.</span> Przykład: analiza specyfikacji krok po kroku</h2><p><strong>Specyfikacja (fragment):</strong> <em>„Aplikacja «Pomiar tętna». Pole edycyjne z podpowiedzią «Wiek» (tylko cyfry). Suwak «Tętno» 40–200, wartość obok suwaka. Przycisk «OCEŃ». Po wybraniu przycisku wyświetlany jest napis «Tętno &lt;x&gt;: w normie», jeśli x mieści się w przedziale 60–100, «za niskie» poniżej 60, «za wysokie» powyżej. Dla wieku powyżej 65 górna granica normy wynosi 90. Gdy wiek nie jest podany — «Podaj wiek». Tło tytułu #C62828.”</em></p>
+<p><strong>Krok 2–6 (analiza):</strong></p>
+<div class="table-wrap"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>INTERFEJS</td><td>tytuł, EditText wiek, rząd [„Tętno:” + SeekBar + wartość], przycisk OCEŃ, napis wyniku</td></tr><tr><td>DANE</td><td>wiek (int), tętno z suwaka (40..200 → <code>max=160</code>, wartość = progress + 40)</td></tr><tr><td>ZDARZENIA</td><td>zmiana suwaka (napis obok), kliknięcie OCEŃ</td></tr><tr><td>LOGIKA</td><td>walidacja wieku; górna granica = wiek &gt; 65 ? 90 : 100; trzy przypadki</td></tr><tr><td>WYNIK</td><td>napis „Tętno x: w normie / za niskie / za wysokie” lub „Podaj wiek”</td></tr><tr><td>WYGLĄD</td><td>tło tytułu #C62828 (reszta wg obrazu)</td></tr></tbody></table></div>
+<p><strong>Kolejność pracy (krok 7–8):</strong></p>
+<ol><li>XML: pion → tytuł, pole, <strong>rząd</strong> (napis, suwak 0dp+waga, napis), przycisk, wynik. Uruchom.</li><li>Java: pola kontrolek → listener suwaka (napis <code>progress + 40</code>) → uruchom → obsługa OCEŃ z walidacją → uruchom → trzy przypadki → testy granic: 59, 60, 100, 101 oraz wiek 70 i tętno 95.</li></ol>
+<p>Zauważ: każdy element tej analizy już znasz (blok 3, 4, 8). Egzamin łączy <strong>znane</strong> wzorce w <strong>nowej</strong> kombinacji.</p></section>
+<section class="sec" id="mikro"><h2><span class="sec-num">4.</span> Mikroćwiczenia: sprint z pamięci</h2><div class="micro"><h4>Ćwiczenie 13.1 — Sprint 1 (3 min): rząd pole + przycisk</h4><p>Z pamięci napisz XML poziomego rzędu: <code>EditText</code> zajmuje całą wolną szerokość, obok <code>Button</code> „DODAJ”.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>XML</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml"><span class="t-k">&lt;LinearLayout</span> <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span> <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+    <span class="t-k">&lt;EditText</span> <span class="t-a">android:id</span>=<span class="t-s">"@+id/etNowy"</span> <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span> <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span> <span class="t-a">android:hint</span>=<span class="t-s">"Nowy element"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;Button</span> <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnDodaj"</span> <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span> <span class="t-a">android:text</span>=<span class="t-s">"DODAJ"</span> <span class="t-k">/&gt;</span>
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div></div></details></div><div class="micro"><h4>Ćwiczenie 13.2 — Sprint 2 (3 min): szkielet suwaka</h4><p>Z pamięci: pełny <code>setOnSeekBarChangeListener</code> z trzema metodami; w <code>onProgressChanged</code> ustaw napis „Wiek: &lt;x&gt;”.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">sbWiek.setOnSeekBarChangeListener(<span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+    <span class="t-a">@Override</span> <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+        tvWiek.setText(<span class="t-s">"Wiek: "</span> + progress);
+    }
+    <span class="t-a">@Override</span> <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> seekBar) { }
+    <span class="t-a">@Override</span> <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> seekBar) { }
+});</code></pre></div></div></details></div><div class="micro"><h4>Ćwiczenie 13.3 — Sprint 3 (2 min): cykl</h4><p>Zapisz przejście do następnego i poprzedniego indeksu tablicy <code>t</code>.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>i = (i + 1) % t.length;</code> oraz <code>i = (i - 1 + t.length) % t.length;</code></p></div></details></div><div class="micro"><h4>Ćwiczenie 13.4 — Sprint 4 (3 min): bezpieczna liczba</h4><p>Odczytaj liczbę całkowitą z <code>etIlosc</code>; przy błędzie pokaż <code>Toast</code> „Podaj liczbę”.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">try</span> {
+    <span class="t-k">int</span> ilosc = <span class="t-t">Integer</span>.parseInt(etIlosc.getText().toString().trim());
+} <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) {
+    <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Podaj liczbę"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+}</code></pre></div></div></details></div><div class="micro"><h4>Ćwiczenie 13.5 — Sprint 5 (2 min): indeks zaznaczonego radio</h4><p>Masz <code>RadioButton[] opcje</code> (3 pola w grupie <code>rg</code>). Napisz metodę zwracającą indeks zaznaczonego pola lub −1.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">int</span> zaznaczony() {
+    <span class="t-k">int</span> id = rg.getCheckedRadioButtonId();
+    <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; opcje.length; i++) {
+        <span class="t-k">if</span> (opcje[i].getId() == id) <span class="t-k">return</span> i;
+    }
+    <span class="t-k">return</span> -<span class="t-n">1</span>;
+}</code></pre></div></div></details></div></section>
+<section class="sec" id="prowadzone"><h2><span class="sec-num">5.</span> Zadanie prowadzone (rozgrzewka)</h2><div class="task" id="b13-prowadzone">
+<div class="task-head"><h3>Rozgrzewka: konwerter temperatur (20 min)</h3><span class="meta">⏱ ok. 20 min</span></div>
+<p>Krótka aplikacja na rozgrzewkę — ćwiczy tylko kroki 1–8 w szybkim tempie. Najpierw zapisz analizę (6 wierszy), potem koduj.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:12.8px"><div class="m-t" style="font-size:20.8px;font-weight:700;text-align:center;align-self:stretch">Konwerter temperatur</div><div class="m-e" style="align-self:stretch"><span>25</span></div><div class="m-row" style="align-self:stretch"><div class="m-col" style="align-self:stretch"><div class="m-radio"><span class="m-rb on"></span>na °F</div></div><div class="m-col" style="align-self:stretch"><div class="m-radio"><span class="m-rb"></span>na K</div></div></div><div class="m-b" style="background:#6750A4;color:#ffffff;align-self:stretch">PRZELICZ</div><div class="m-t" style="font-size:17.6px;margin:8px 0px 0px 0px;text-align:center;align-self:stretch">25,0 °C = 77,0 °F</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po przeliczeniu na °F</figcaption></figure></div>
+<ul><li>Pole temperatury w °C (liczby dziesiętne, także ujemne). Pola radio „na °F” (domyślne) i „na K”.</li><li>PRZELICZ: °F = C · 9/5 + 32 (1 miejsce po przecinku), K = C + 273,15 (2 miejsca). Format: „25,0 °C = 77,0 °F”, „25,0 °C = 298,15 K”.</li><li>Puste lub błędne pole → „Podaj temperaturę”.</li></ul>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Liczby ujemne w polu: <code>android:inputType="numberDecimal|numberSigned"</code>.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Rozgałęzienie po <code>rgSkala.getCheckedRadioButtonId() == R.id.rbKelwin</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">PRZELICZ: spróbuj c ← parseDouble; jeśli K → "%.1f °C = %.2f K"; inaczej → "%.1f °C = %.1f °F"; błąd → "Podaj temperaturę"</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><p><code>String.format("%.1f °C = %.1f °F", c, c * 9 / 5 + 32)</code></p></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Konwerter temperatur"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"26sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etCelsjusz"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Temperatura w °C"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"numberDecimal|numberSigned"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;RadioGroup</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/rgSkala"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbFahrenheit"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:checked</span>=<span class="t-s">"true"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"na °F"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbKelwin"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"na K"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/RadioGroup</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnPrzelicz"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"PRZELICZ"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvWynik"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"22sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">RadioGroup</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etCelsjusz;
+    <span class="t-k">private</span> <span class="t-t">RadioGroup</span> rgSkala;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvWynik;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etCelsjusz = findViewById(<span class="t-t">R</span>.id.etCelsjusz);
+        rgSkala = findViewById(<span class="t-t">R</span>.id.rgSkala);
+        tvWynik = findViewById(<span class="t-t">R</span>.id.tvWynik);
+        <span class="t-t">Button</span> btnPrzelicz = findViewById(<span class="t-t">R</span>.id.btnPrzelicz);
+
+        btnPrzelicz.setOnClickListener(v -&gt; przelicz());
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> przelicz() {
+        <span class="t-k">try</span> {
+            <span class="t-k">double</span> c = <span class="t-t">Double</span>.parseDouble(etCelsjusz.getText().toString().trim().replace(<span class="t-s">','</span>, <span class="t-s">'.'</span>));
+            <span class="t-k">if</span> (rgSkala.getCheckedRadioButtonId() == <span class="t-t">R</span>.id.rbKelwin) {
+                tvWynik.setText(<span class="t-t">String</span>.format(<span class="t-s">"%.1f °C = %.2f K"</span>, c, c + <span class="t-n">273.15</span>));
+            } <span class="t-k">else</span> {
+                tvWynik.setText(<span class="t-t">String</span>.format(<span class="t-s">"%.1f °C = %.1f °F"</span>, c, c * <span class="t-n">9</span> / <span class="t-n">5</span> + <span class="t-n">32</span>));
+            }
+        } <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) {
+            tvWynik.setText(<span class="t-s">"Podaj temperaturę"</span>);
+        }
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b13_prowadzone/">rozwiazania/b13_prowadzone/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b13-prowadzone">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="samodzielne"><h2><span class="sec-num">6.</span> Próbny egzamin — zadanie 1</h2><div class="task exam" id="b13-egzA">
+<div class="task-head"><h3>Próbny egzamin 1: Parking miejski (50 min)</h3><span class="meta">⏱ ok. 50 min</span></div>
+<p><strong>Warunki próbnego egzaminu:</strong> pracuj bez zaglądania do wcześniejszych bloków i własnych projektów (wolno: ta treść, zasoby, dokumentacja Android Studio). Zmierz czas. Podpowiedzi otwieraj dopiero po upływie czasu albo gdy zupełnie utkniesz — i zapisz, z których skorzystałeś. Na koniec: zrzuty <code>mobile1.png</code>…, <code>mobilna.zip</code>, kopie plików źródłowych, <code>srodowisko.txt</code>.</p>
+<p>Za pomocą środowiska programistycznego wykonaj aplikację mobilną obliczającą opłatę parkingową i uruchom ją w emulatorze. Do wykonania zadania wykorzystaj obraz z archiwum <code>zasoby_b13-egzA.zip</code>.</p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>tytuł, obraz, pole rejestracji, rząd czasu (napis, suwak, wartość), 2 pola radio, pole wyboru, przycisk, napis wyniku</td></tr><tr><td>DANE</td><td>numer rejestracyjny (tekst), godziny 1..12, strefa, karta mieszkańca</td></tr><tr><td>ZDARZENIA</td><td>zmiana suwaka, OBLICZ OPŁATĘ</td></tr><tr><td>LOGIKA</td><td>walidacja: 4–8 znaków, tylko litery/cyfry; wielkie litery; opłata = h·stawka; karta −50%; maksymalnie 40 zł</td></tr><tr><td>WYNIK</td><td>„&lt;NUMER&gt;, strefa X, n h, do zapłaty: x,xx zł” lub komunikat błędu; start „Autor: …”</td></tr><tr><td>WYGLĄD</td><td>tło #E3F2FD; tytuł #1565C0 biały; obraz 100dp wyśrodkowany; przycisk na szerokość #1565C0; wynik wyśrodkowany</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#E3F2FD;padding:0px"><div class="m-t" style="background:#1565C0;color:#fff;font-size:22.4px;padding:8px;align-self:stretch">Parking miejski</div><div class="m-img" style="margin:8px 0px 8px 0px;align-self:center;width:80px;height:80px"><img src="../assets/zasoby/parking.png" alt="" style="object-fit:cover"></div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span class="m-hint" style="">Numer rejestracyjny</span></div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch;align-items:center"><div class="m-t" style="">Czas postoju:</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:0%;background:#6750A4"></div><div class="m-seek-thumb" style="left:0%;background:#6750A4"></div></div></div><div class="m-t" style="font-weight:700">1 h</div></div><div class="m-col" style="margin:0px 8px 0px 8px;align-self:stretch"><div class="m-radio"><span class="m-rb on"></span>Strefa A (5 zł/h)</div><div class="m-radio"><span class="m-rb"></span>Strefa B (3 zł/h)</div></div><div class="m-check" style="margin:0px 0px 0px 8px"><span class="m-cb"></span>Karta mieszkańca (−50%)</div><div class="m-b" style="background:#1565C0;color:#ffffff;margin:8px;align-self:stretch">OBLICZ OPŁATĘ</div><div class="m-t" style="font-size:14.4px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Stan początkowy</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#E3F2FD;padding:0px"><div class="m-t" style="background:#1565C0;color:#fff;font-size:22.4px;padding:8px;align-self:stretch">Parking miejski</div><div class="m-img" style="margin:8px 0px 8px 0px;align-self:center;width:80px;height:80px"><img src="../assets/zasoby/parking.png" alt="" style="object-fit:cover"></div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span>WPR12345</span></div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch;align-items:center"><div class="m-t" style="">Czas postoju:</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:18%;background:#6750A4"></div><div class="m-seek-thumb" style="left:18%;background:#6750A4"></div></div></div><div class="m-t" style="font-weight:700">3 h</div></div><div class="m-col" style="margin:0px 8px 0px 8px;align-self:stretch"><div class="m-radio"><span class="m-rb on"></span>Strefa A (5 zł/h)</div><div class="m-radio"><span class="m-rb"></span>Strefa B (3 zł/h)</div></div><div class="m-check" style="margin:0px 0px 0px 8px"><span class="m-cb"></span>Karta mieszkańca (−50%)</div><div class="m-b" style="background:#1565C0;color:#ffffff;margin:8px;align-self:stretch">OBLICZ OPŁATĘ</div><div class="m-t" style="font-size:14.4px;text-align:center;align-self:stretch">WPR12345, strefa A, 3 h, do zapłaty: 15,00 zł</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 2. Po obliczeniu</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Parking miejski”.</li><li>Obraz <code>parking</code> (znak parkingu).</li><li>Pole edycyjne z podpowiedzią „Numer rejestracyjny”; wpisywane litery są wielkie, maksymalnie 8 znaków.</li><li>Rząd: napis „Czas postoju:”, suwak, napis z liczbą godzin (początkowo „1 h”). Suwak pozwala wybrać od 1 do 12 godzin.</li><li>Dwa pola radio w grupie: „Strefa A (5 zł/h)” (domyślnie zaznaczone), „Strefa B (3 zł/h)”.</li><li>Pole wyboru „Karta mieszkańca (−50%)”.</li><li>Przycisk „OBLICZ OPŁATĘ”.</li><li>Napis na wynik; w stanie początkowym „Autor: ”, dalej numer zdającego.</li></ul>
+<p><strong>Działanie aplikacji:</strong></p>
+<ul><li>Przesuwanie suwaka aktualizuje napis „&lt;n&gt; h”.</li><li>Po wybraniu „OBLICZ OPŁATĘ” sprawdzany jest numer rejestracyjny: musi mieć od 4 do 8 znaków i składać się wyłącznie z liter i cyfr. W przeciwnym razie wyświetlany jest napis „Nieprawidłowy numer rejestracyjny”.</li><li>Opłata = liczba godzin · stawka strefy. Karta mieszkańca obniża opłatę o 50%. Opłata nie może przekroczyć 40 zł (limit dzienny).</li><li>Wynik: „&lt;NUMER&gt;, strefa &lt;A/B&gt;, &lt;n&gt; h, do zapłaty: &lt;kwota&gt; zł”, numer wielkimi literami, kwota z dwoma miejscami po przecinku.</li></ul>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs w XML; rozkład liniowy pionowy z zagnieżdżonym rozkładem poziomym dla czasu postoju.</li><li>Tło strony #E3F2FD. Tytuł: tło #1565C0, biała czcionka, największa, marginesy wewnętrzne 10.</li><li>Obraz: wysokość 100, wyśrodkowany. Przycisk: na całą szerokość (marginesy 10), tło #1565C0, biała czcionka. Wynik wyśrodkowany.</li><li>Walidacja numeru i obliczenie opłaty w osobnych metodach (metoda licząca przyjmuje liczbę godzin, strefę i informację o karcie i zwraca kwotę).</li></ul>
+<h4>Zasoby do zadania</h4><div class="res-list"><figure><a href="../assets/zasoby/parking.png" download><img src="../assets/zasoby/parking.png" alt="parking.png"></a><figcaption>parking.png</figcaption></figure></div><p class="small">Pobierz wszystkie: <a href="../materialy/zasoby_b13-egzA.zip" download>zasoby_b13-egzA.zip</a>. Obrazy skopiuj do <code>app/src/main/res/drawable</code> (nazwy: małe litery, bez spacji i myślników).</p>
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b13-egzA"><li><label><input type="checkbox"> <span>aplikacja uruchamia się; stan początkowy zgodny z obrazem 1</span></label></li><li><label><input type="checkbox"> <span>suwak: skrajne położenia 1 h i 12 h</span></label></li><li><label><input type="checkbox"> <span>„WP1” i „WPR-1234” → komunikat o nieprawidłowym numerze</span></label></li><li><label><input type="checkbox"> <span>wpr12345 (małe litery) → wynik z „WPR12345”</span></label></li><li><label><input type="checkbox"> <span>A, 3 h → 15,00 zł; B, 3 h, karta → 4,50 zł; A, 12 h → 40,00 zł (limit)</span></label></li><li><label><input type="checkbox"> <span>metody <code>czyPoprawnaRejestracja</code> i <code>policzOplate</code> istnieją</span></label></li><li><label><input type="checkbox"> <span>wygląd: kolory, obraz 100dp wyśrodkowany, przycisk na szerokość</span></label></li><li><label><input type="checkbox"> <span>zrzuty, <code>mobilna.zip</code>, pliki źródłowe, <code>srodowisko.txt</code></span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Rozpisz wzór opłaty na przykładach z checklisty. Limit 40 zł stosujesz na końcu (po zniżce).</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Wielkie litery w klawiaturze: <code>inputType="textCapCharacters"</code>, ale i tak zamień w kodzie: <code>toUpperCase()</code>. Znak: <code>Character.isLetterOrDigit(c)</code>. Limit: <code>Math.min(oplata, 40.0)</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">oblicz(): numer ← pole.trim().toUpperCase()
+          !czyPoprawnaRejestracja(numer) → komunikat; koniec
+          h ← progress + 1; strefaA ← zaznaczone == rbStrefaA
+          kwota ← policzOplate(h, strefaA, karta)
+          wynik ← format("%s, strefa %s, %d h, do zapłaty: %.2f zł")</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">double</span> policzOplate(<span class="t-k">int</span> godziny, <span class="t-k">boolean</span> strefaA, <span class="t-k">boolean</span> karta) {
+    <span class="t-k">double</span> oplata = godziny * (strefaA ? <span class="t-t">STAWKA_A</span> : <span class="t-t">STAWKA_B</span>);
+    <span class="t-k">if</span> (karta) {
+        oplata = oplata / <span class="t-n">2</span>;
+    }
+    <span class="t-k">return</span> <span class="t-t">Math</span>.min(oplata, <span class="t-t">LIMIT_DZIENNY</span>);
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#E3F2FD"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#1565C0"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Parking miejski"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ImageView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivParking"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"100dp"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:layout_marginVertical</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:adjustViewBounds</span>=<span class="t-s">"true"</span>
+        <span class="t-a">android:contentDescription</span>=<span class="t-s">"Znak parkingu"</span>
+        <span class="t-a">android:src</span>=<span class="t-s">"@drawable/parking"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etRejestracja"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Numer rejestracyjny"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"textCapCharacters"</span>
+        <span class="t-a">android:maxLength</span>=<span class="t-s">"8"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center_vertical"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvCzasEtykieta"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Czas postoju:"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;SeekBar</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbCzas"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:max</span>=<span class="t-s">"11"</span>
+            <span class="t-a">android:progress</span>=<span class="t-s">"0"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvCzas"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"1 h"</span>
+            <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;RadioGroup</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/rgStrefa"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbStrefaA"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:checked</span>=<span class="t-s">"true"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Strefa A (5 zł/h)"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbStrefaB"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Strefa B (3 zł/h)"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/RadioGroup</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;CheckBox</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/cbKarta"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Karta mieszkańca (−50%)"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnOblicz"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#1565C0"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"OBLICZ OPŁATĘ"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvWynik"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">CheckBox</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">RadioGroup</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">SeekBar</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">double</span> <span class="t-t">STAWKA_A</span> = <span class="t-n">5.0</span>;
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">double</span> <span class="t-t">STAWKA_B</span> = <span class="t-n">3.0</span>;
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">double</span> <span class="t-t">LIMIT_DZIENNY</span> = <span class="t-n">40.0</span>;
+
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etRejestracja;
+    <span class="t-k">private</span> <span class="t-t">SeekBar</span> sbCzas;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvCzas, tvWynik;
+    <span class="t-k">private</span> <span class="t-t">RadioGroup</span> rgStrefa;
+    <span class="t-k">private</span> <span class="t-t">CheckBox</span> cbKarta;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etRejestracja = findViewById(<span class="t-t">R</span>.id.etRejestracja);
+        sbCzas = findViewById(<span class="t-t">R</span>.id.sbCzas);
+        tvCzas = findViewById(<span class="t-t">R</span>.id.tvCzas);
+        tvWynik = findViewById(<span class="t-t">R</span>.id.tvWynik);
+        rgStrefa = findViewById(<span class="t-t">R</span>.id.rgStrefa);
+        cbKarta = findViewById(<span class="t-t">R</span>.id.cbKarta);
+        <span class="t-t">Button</span> btnOblicz = findViewById(<span class="t-t">R</span>.id.btnOblicz);
+
+        sbCzas.setOnSeekBarChangeListener(<span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+                tvCzas.setText((progress + <span class="t-n">1</span>) + <span class="t-s">" h"</span>);
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+        });
+
+        btnOblicz.setOnClickListener(v -&gt; oblicz());
+    }
+
+    <span class="t-k">private</span> <span class="t-k">boolean</span> czyPoprawnaRejestracja(<span class="t-t">String</span> numer) {
+        <span class="t-k">if</span> (numer.length() &lt; <span class="t-n">4</span> || numer.length() &gt; <span class="t-n">8</span>) {
+            <span class="t-k">return</span> <span class="t-k">false</span>;
+        }
+        <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; numer.length(); i++) {
+            <span class="t-k">if</span> (!<span class="t-t">Character</span>.isLetterOrDigit(numer.charAt(i))) {
+                <span class="t-k">return</span> <span class="t-k">false</span>;
+            }
+        }
+        <span class="t-k">return</span> <span class="t-k">true</span>;
+    }
+
+    <span class="t-k">private</span> <span class="t-k">double</span> policzOplate(<span class="t-k">int</span> godziny, <span class="t-k">boolean</span> strefaA, <span class="t-k">boolean</span> karta) {
+        <span class="t-k">double</span> oplata = godziny * (strefaA ? <span class="t-t">STAWKA_A</span> : <span class="t-t">STAWKA_B</span>);
+        <span class="t-k">if</span> (karta) {
+            oplata = oplata / <span class="t-n">2</span>;
+        }
+        <span class="t-k">return</span> <span class="t-t">Math</span>.min(oplata, <span class="t-t">LIMIT_DZIENNY</span>);
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> oblicz() {
+        <span class="t-t">String</span> numer = etRejestracja.getText().toString().trim().toUpperCase();
+        <span class="t-k">if</span> (!czyPoprawnaRejestracja(numer)) {
+            tvWynik.setText(<span class="t-s">"Nieprawidłowy numer rejestracyjny"</span>);
+            <span class="t-k">return</span>;
+        }
+        <span class="t-k">int</span> godziny = sbCzas.getProgress() + <span class="t-n">1</span>;
+        <span class="t-k">boolean</span> strefaA = rgStrefa.getCheckedRadioButtonId() == <span class="t-t">R</span>.id.rbStrefaA;
+        <span class="t-k">double</span> oplata = policzOplate(godziny, strefaA, cbKarta.isChecked());
+        tvWynik.setText(<span class="t-t">String</span>.format(<span class="t-s">"%s, strefa %s, %d h, do zapłaty: %.2f zł"</span>,
+                numer, strefaA ? <span class="t-s">"A"</span> : <span class="t-s">"B"</span>, godziny, oplata));
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b13_egzA/">rozwiazania/b13_egzA/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b13-egzA">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="inf04"><h2><span class="sec-num">7.</span> Próbny egzamin — zadanie 2</h2><div class="task exam" id="b13-egzB">
+<div class="task-head"><h3>Próbny egzamin 2: Quiz „Stolice Europy” (60 min)</h3><span class="meta">⏱ ok. 60 min</span></div>
+<p><strong>Warunki próbnego egzaminu:</strong> pracuj bez zaglądania do wcześniejszych bloków i własnych projektów (wolno: ta treść, zasoby, dokumentacja Android Studio). Zmierz czas. Podpowiedzi otwieraj dopiero po upływie czasu albo gdy zupełnie utkniesz — i zapisz, z których skorzystałeś. Na koniec: zrzuty <code>mobile1.png</code>…, <code>mobilna.zip</code>, kopie plików źródłowych, <code>srodowisko.txt</code>.</p>
+<p>Za pomocą środowiska programistycznego wykonaj aplikację mobilną — quiz ze znajomości stolic. Do wykonania zadania wykorzystaj obrazy flag z archiwum <code>zasoby_b13-egzB.zip</code>.</p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>tytuł, numer pytania, obraz flagi, napis pytania, grupa 3 pól radio, przycisk, napis punktów, napis informacji</td></tr><tr><td>DANE</td><td>zaznaczona odpowiedź</td></tr><tr><td>ZDARZENIA</td><td>ZATWIERDŹ (w trakcie gry), ZAGRAJ PONOWNIE (po końcu)</td></tr><tr><td>LOGIKA</td><td>tablice: flagi, odpowiedzi [6][3], indeksy poprawnych; brak zaznaczenia → komunikat; punkty; następne pytanie; po 6. — koniec; restart</td></tr><tr><td>WYNIK</td><td>nowa flaga i odpowiedzi, „Pytanie n/6”, „Punkty: x”, „Dobrze!” / „Źle, poprawna odpowiedź: …”, „Koniec! Wynik: x/6”</td></tr><tr><td>WYGLĄD</td><td>tło #F3E5F5; tytuł #6A1B9A biały wyśrodkowany; flaga 150dp; przycisk #6A1B9A wyśrodkowany; punkty pogrubione</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#F3E5F5;padding:0px"><div class="m-t" style="background:#6A1B9A;color:#fff;font-size:20.8px;padding:8px;text-align:center;align-self:stretch">Quiz: stolice Europy</div><div class="m-t" style="font-weight:700;margin:8px">Pytanie 2/6</div><div class="m-img" style="height:120px;align-self:stretch"><img src="../assets/zasoby/flaga_niemcy.png" alt="" style="object-fit:contain"></div><div class="m-t" style="font-size:14.4px;margin:8px">Stolicą tego kraju jest:</div><div class="m-col" style="margin:0px 8px 0px 8px;align-self:stretch"><div class="m-radio"><span class="m-rb"></span>Berlin</div><div class="m-radio"><span class="m-rb"></span>Monachium</div><div class="m-radio"><span class="m-rb"></span>Hamburg</div></div><div class="m-b" style="background:#6A1B9A;color:#ffffff;align-self:center">ZATWIERDŹ</div><div class="m-t" style="font-size:16px;font-weight:700;text-align:center;align-self:stretch">Punkty: 1</div><div class="m-t" style="text-align:center;align-self:stretch">Dobrze!</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Po poprawnej odpowiedzi na pytanie 1</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#F3E5F5;padding:0px"><div class="m-t" style="background:#6A1B9A;color:#fff;font-size:20.8px;padding:8px;text-align:center;align-self:stretch">Quiz: stolice Europy</div><div class="m-t" style="font-weight:700;margin:8px">Koniec! Wynik: 5/6</div><div class="m-img" style="height:120px;align-self:stretch"><img src="../assets/zasoby/flaga_ukraina.png" alt="" style="object-fit:contain"></div><div class="m-b" style="background:#6A1B9A;color:#ffffff;margin:8px 0px 0px 0px;align-self:center">ZAGRAJ PONOWNIE</div><div class="m-t" style="font-size:16px;font-weight:700;text-align:center;align-self:stretch">Punkty: 5</div><div class="m-t" style="text-align:center;align-self:stretch">Źle, poprawna odpowiedź: Kijów</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 2. Po ostatnim pytaniu</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Quiz: stolice Europy”.</li><li>Napis z numerem pytania „Pytanie 1/6”.</li><li>Obraz flagi.</li><li>Napis „Stolicą tego kraju jest:”.</li><li>Grupa trzech pól radio z odpowiedziami (treść ustawiana w kodzie).</li><li>Przycisk „ZATWIERDŹ”.</li><li>Napis „Punkty: 0”.</li><li>Napis informacyjny; w stanie początkowym „Autor: ”, dalej numer zdającego.</li></ul>
+<p><strong>Dane quizu</strong> (flaga — odpowiedzi — poprawna): <code>flaga_polska</code> — Kraków, <strong>Warszawa</strong>, Gdańsk; <code>flaga_niemcy</code> — <strong>Berlin</strong>, Monachium, Hamburg; <code>flaga_francja</code> — Lyon, Marsylia, <strong>Paryż</strong>; <code>flaga_wlochy</code> — <strong>Rzym</strong>, Mediolan, Neapol; <code>flaga_czechy</code> — Brno, <strong>Praga</strong>, Ostrawa; <code>flaga_ukraina</code> — Lwów, Odessa, <strong>Kijów</strong>.</p>
+<p><strong>Działanie aplikacji:</strong></p>
+<ul><li>Po wybraniu „ZATWIERDŹ” bez zaznaczonej odpowiedzi — napis informacyjny „Zaznacz odpowiedź”, pytanie się nie zmienia.</li><li>Gdy odpowiedź jest zaznaczona: poprawna — punkty +1 i „Dobrze!”; błędna — „Źle, poprawna odpowiedź: &lt;stolica&gt;”. Następnie wyświetlane jest kolejne pytanie (flaga, numer, odpowiedzi, brak zaznaczenia).</li><li>Po ostatnim pytaniu: napis numeru zmienia się na „Koniec! Wynik: &lt;x&gt;/6”, napis pytania i pola radio znikają (nie zajmują miejsca), przycisk ma treść „ZAGRAJ PONOWNIE”.</li><li>„ZAGRAJ PONOWNIE” rozpoczyna quiz od pierwszego pytania z zerową liczbą punktów.</li></ul>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs w XML; rozkład liniowy pionowy.</li><li>Tło strony #F3E5F5. Tytuł: tło #6A1B9A, biała czcionka, największa, wyśrodkowana, marginesy wewnętrzne 10.</li><li>Flaga: wysokość 150, na całą szerokość, widoczna w całości. Przycisk wyśrodkowany: tło #6A1B9A, biała czcionka. Napis punktów pogrubiony.</li><li>Flagi, odpowiedzi i numery poprawnych odpowiedzi przechowywane w tablicach (odpowiedzi — tablica dwuwymiarowa). Aplikacja działa dla dowolnej liczby pytań w tablicach.</li></ul>
+<h4>Zasoby do zadania</h4><div class="res-list"><figure><a href="../assets/zasoby/flaga_polska.png" download><img src="../assets/zasoby/flaga_polska.png" alt="flaga_polska.png"></a><figcaption>flaga_polska.png</figcaption></figure><figure><a href="../assets/zasoby/flaga_niemcy.png" download><img src="../assets/zasoby/flaga_niemcy.png" alt="flaga_niemcy.png"></a><figcaption>flaga_niemcy.png</figcaption></figure><figure><a href="../assets/zasoby/flaga_francja.png" download><img src="../assets/zasoby/flaga_francja.png" alt="flaga_francja.png"></a><figcaption>flaga_francja.png</figcaption></figure><figure><a href="../assets/zasoby/flaga_wlochy.png" download><img src="../assets/zasoby/flaga_wlochy.png" alt="flaga_wlochy.png"></a><figcaption>flaga_wlochy.png</figcaption></figure><figure><a href="../assets/zasoby/flaga_czechy.png" download><img src="../assets/zasoby/flaga_czechy.png" alt="flaga_czechy.png"></a><figcaption>flaga_czechy.png</figcaption></figure><figure><a href="../assets/zasoby/flaga_ukraina.png" download><img src="../assets/zasoby/flaga_ukraina.png" alt="flaga_ukraina.png"></a><figcaption>flaga_ukraina.png</figcaption></figure></div><p class="small">Pobierz wszystkie: <a href="../materialy/zasoby_b13-egzB.zip" download>zasoby_b13-egzB.zip</a>. Obrazy skopiuj do <code>app/src/main/res/drawable</code> (nazwy: małe litery, bez spacji i myślników).</p>
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b13-egzB"><li><label><input type="checkbox"> <span>stan początkowy: flaga Polski, „Pytanie 1/6”, odpowiedzi Kraków/Warszawa/Gdańsk, „Autor: …”</span></label></li><li><label><input type="checkbox"> <span>ZATWIERDŹ bez zaznaczenia → „Zaznacz odpowiedź”, to samo pytanie</span></label></li><li><label><input type="checkbox"> <span>poprawna odpowiedź → punkt i „Dobrze!”; błędna → podana poprawna stolica</span></label></li><li><label><input type="checkbox"> <span>każde nowe pytanie ma wyczyszczone zaznaczenie</span></label></li><li><label><input type="checkbox"> <span>po 6. pytaniu: „Koniec! Wynik: x/6”, pola radio i pytanie ukryte (GONE), przycisk „ZAGRAJ PONOWNIE”</span></label></li><li><label><input type="checkbox"> <span>restart działa i przywraca widoczność kontrolek</span></label></li><li><label><input type="checkbox"> <span>liczba pytań brana z <code>length</code> tablicy (nie wpisane „6” na sztywno)</span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Stan quizu: numer pytania, punkty, flaga „koniec”. Jedna metoda <code>pokazPytanie()</code> ustawia flagę, numer, trzy odpowiedzi i czyści zaznaczenie.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p><code>RadioButton[] przyciski = {…3 × findViewById…}</code> — treść: <code>przyciski[i].setText(odpowiedzi[pytanie][i])</code>, indeks zaznaczonego: porównaj <code>przyciski[i].getId()</code> z <code>getCheckedRadioButtonId()</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">ZATWIERDŹ: jeśli koniec → nowaGra() inaczej sprawdzOdpowiedz()
+sprawdzOdpowiedz(): w ← zaznaczona(); w == −1 → "Zaznacz odpowiedź"; koniec
+    w == poprawne[p] → punkty++, "Dobrze!" inaczej "Źle, poprawna odpowiedź: " + …
+    p++ ; p &lt; liczba → pokazPytanie() inaczej koniec = true; napisy; GONE; tekst przycisku
+nowaGra(): p = 0; punkty = 0; koniec = false; VISIBLE; tekst przycisku; pokazPytanie()</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">void</span> pokazPytanie() {
+    tvNumer.setText(<span class="t-s">"Pytanie "</span> + (pytanie + <span class="t-n">1</span>) + <span class="t-s">"/"</span> + flagi.length);
+    ivFlaga.setImageResource(flagi[pytanie]);
+    <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; przyciski.length; i++) {
+        przyciski[i].setText(odpowiedzi[pytanie][i]);
+    }
+    rgOdpowiedzi.clearCheck();
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#F3E5F5"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#6A1B9A"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Quiz: stolice Europy"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"26sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvNumer"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Pytanie 1/6"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ImageView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivFlaga"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"150dp"</span>
+        <span class="t-a">android:contentDescription</span>=<span class="t-s">"Flaga"</span>
+        <span class="t-a">android:src</span>=<span class="t-s">"@drawable/flaga_polska"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvPytanie"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Stolicą tego kraju jest:"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;RadioGroup</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/rgOdpowiedzi"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbOdp1"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbOdp2"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbOdp3"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/RadioGroup</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnZatwierdz"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#6A1B9A"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"ZATWIERDŹ"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvPunkty"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Punkty: 0"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvInfo"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.view.<span class="t-t">View</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ImageView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">RadioButton</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">RadioGroup</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] flagi = {<span class="t-t">R</span>.drawable.flaga_polska, <span class="t-t">R</span>.drawable.flaga_niemcy, <span class="t-t">R</span>.drawable.flaga_francja,
+            <span class="t-t">R</span>.drawable.flaga_wlochy, <span class="t-t">R</span>.drawable.flaga_czechy, <span class="t-t">R</span>.drawable.flaga_ukraina};
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">String</span>[][] odpowiedzi = {
+            {<span class="t-s">"Kraków"</span>, <span class="t-s">"Warszawa"</span>, <span class="t-s">"Gdańsk"</span>},
+            {<span class="t-s">"Berlin"</span>, <span class="t-s">"Monachium"</span>, <span class="t-s">"Hamburg"</span>},
+            {<span class="t-s">"Lyon"</span>, <span class="t-s">"Marsylia"</span>, <span class="t-s">"Paryż"</span>},
+            {<span class="t-s">"Rzym"</span>, <span class="t-s">"Mediolan"</span>, <span class="t-s">"Neapol"</span>},
+            {<span class="t-s">"Brno"</span>, <span class="t-s">"Praga"</span>, <span class="t-s">"Ostrawa"</span>},
+            {<span class="t-s">"Lwów"</span>, <span class="t-s">"Odessa"</span>, <span class="t-s">"Kijów"</span>}
+    };
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] poprawne = {<span class="t-n">1</span>, <span class="t-n">0</span>, <span class="t-n">2</span>, <span class="t-n">0</span>, <span class="t-n">1</span>, <span class="t-n">2</span>};
+
+    <span class="t-k">private</span> <span class="t-k">int</span> pytanie = <span class="t-n">0</span>;
+    <span class="t-k">private</span> <span class="t-k">int</span> punkty = <span class="t-n">0</span>;
+    <span class="t-k">private</span> <span class="t-k">boolean</span> koniec = <span class="t-k">false</span>;
+
+    <span class="t-k">private</span> <span class="t-t">ImageView</span> ivFlaga;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvNumer, tvPunkty, tvInfo, tvPytanie;
+    <span class="t-k">private</span> <span class="t-t">RadioGroup</span> rgOdpowiedzi;
+    <span class="t-k">private</span> <span class="t-t">RadioButton</span>[] przyciski;
+    <span class="t-k">private</span> <span class="t-t">Button</span> btnZatwierdz;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        ivFlaga = findViewById(<span class="t-t">R</span>.id.ivFlaga);
+        tvNumer = findViewById(<span class="t-t">R</span>.id.tvNumer);
+        tvPunkty = findViewById(<span class="t-t">R</span>.id.tvPunkty);
+        tvInfo = findViewById(<span class="t-t">R</span>.id.tvInfo);
+        tvPytanie = findViewById(<span class="t-t">R</span>.id.tvPytanie);
+        rgOdpowiedzi = findViewById(<span class="t-t">R</span>.id.rgOdpowiedzi);
+        przyciski = <span class="t-k">new</span> <span class="t-t">RadioButton</span>[]{findViewById(<span class="t-t">R</span>.id.rbOdp1), findViewById(<span class="t-t">R</span>.id.rbOdp2), findViewById(<span class="t-t">R</span>.id.rbOdp3)};
+        btnZatwierdz = findViewById(<span class="t-t">R</span>.id.btnZatwierdz);
+
+        btnZatwierdz.setOnClickListener(v -&gt; {
+            <span class="t-k">if</span> (koniec) {
+                nowaGra();
+            } <span class="t-k">else</span> {
+                sprawdzOdpowiedz();
+            }
+        });
+        pokazPytanie();
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> pokazPytanie() {
+        tvNumer.setText(<span class="t-s">"Pytanie "</span> + (pytanie + <span class="t-n">1</span>) + <span class="t-s">"/"</span> + flagi.length);
+        ivFlaga.setImageResource(flagi[pytanie]);
+        <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; przyciski.length; i++) {
+            przyciski[i].setText(odpowiedzi[pytanie][i]);
+        }
+        rgOdpowiedzi.clearCheck();
+    }
+
+    <span class="t-k">private</span> <span class="t-k">int</span> zaznaczonaOdpowiedz() {
+        <span class="t-k">int</span> id = rgOdpowiedzi.getCheckedRadioButtonId();
+        <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; przyciski.length; i++) {
+            <span class="t-k">if</span> (przyciski[i].getId() == id) {
+                <span class="t-k">return</span> i;
+            }
+        }
+        <span class="t-k">return</span> -<span class="t-n">1</span>;
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> sprawdzOdpowiedz() {
+        <span class="t-k">int</span> wybrana = zaznaczonaOdpowiedz();
+        <span class="t-k">if</span> (wybrana == -<span class="t-n">1</span>) {
+            tvInfo.setText(<span class="t-s">"Zaznacz odpowiedź"</span>);
+            <span class="t-k">return</span>;
+        }
+        <span class="t-k">int</span> dobra = poprawne[pytanie];
+        <span class="t-k">if</span> (wybrana == dobra) {
+            punkty++;
+            tvInfo.setText(<span class="t-s">"Dobrze!"</span>);
+        } <span class="t-k">else</span> {
+            tvInfo.setText(<span class="t-s">"Źle, poprawna odpowiedź: "</span> + odpowiedzi[pytanie][dobra]);
+        }
+        tvPunkty.setText(<span class="t-s">"Punkty: "</span> + punkty);
+        pytanie++;
+        <span class="t-k">if</span> (pytanie &lt; flagi.length) {
+            pokazPytanie();
+        } <span class="t-k">else</span> {
+            koniec = <span class="t-k">true</span>;
+            tvNumer.setText(<span class="t-s">"Koniec! Wynik: "</span> + punkty + <span class="t-s">"/"</span> + flagi.length);
+            tvPytanie.setVisibility(<span class="t-t">View</span>.<span class="t-t">GONE</span>);
+            rgOdpowiedzi.setVisibility(<span class="t-t">View</span>.<span class="t-t">GONE</span>);
+            btnZatwierdz.setText(<span class="t-s">"ZAGRAJ PONOWNIE"</span>);
+        }
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> nowaGra() {
+        pytanie = <span class="t-n">0</span>;
+        punkty = <span class="t-n">0</span>;
+        koniec = <span class="t-k">false</span>;
+        tvPunkty.setText(<span class="t-s">"Punkty: 0"</span>);
+        tvInfo.setText(<span class="t-s">""</span>);
+        tvPytanie.setVisibility(<span class="t-t">View</span>.<span class="t-t">VISIBLE</span>);
+        rgOdpowiedzi.setVisibility(<span class="t-t">View</span>.<span class="t-t">VISIBLE</span>);
+        btnZatwierdz.setText(<span class="t-s">"ZATWIERDŹ"</span>);
+        pokazPytanie();
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b13_egzB/">rozwiazania/b13_egzB/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b13-egzB">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="checklista"><h2><span class="sec-num">8.</span> Checklista</h2><p class="small muted">Sprawdź swoją aplikację z zadania INF.04 punkt po punkcie (krok 10 procedury).</p><ul class="checklist" data-key="b13-check"><li><label><input type="checkbox"> <span>przed kodowaniem wypełniłem analizę (6 wierszy) dla obu zadań</span></label></li><li><label><input type="checkbox"> <span>zadanie 1 zmieściło się w 50 min, zadanie 2 w 60 min (zapisz faktyczny czas)</span></label></li><li><label><input type="checkbox"> <span>po każdym etapie uruchamiałem aplikację</span></label></li><li><label><input type="checkbox"> <span>przetestowałem wszystkie punkty „Działania aplikacji” i przypadki graniczne</span></label></li><li><label><input type="checkbox"> <span>porównałem wygląd z obrazami punkt po punkcie</span></label></li><li><label><input type="checkbox"> <span>zapisałem, z których podpowiedzi skorzystałem — to moje tematy do powtórki</span></label></li></ul></section>
+<section class="sec" id="test"><h2><span class="sec-num">9.</span> Mini-test</h2><div class="quiz" data-quiz="b13"><script type="application/json">[{"q": "<p>Na egzaminie zostało 10 minut, a jedna funkcja nie działa. Co robisz najpierw?<\/p>", "o": ["przepisuję wszystko od nowa", "upewniam się, że projekt się kompiluje, robię zrzuty, pakuję <code>mobilna.zip<\/code> i kopiuję pliki", "szukam błędu do ostatniej sekundy", "usuwam projekt"], "a": 1, "e": "<p>Działający projekt i komplet plików to pewne punkty; niedziałający fragment często daje częściowe.<\/p>"}, {"q": "<p>Suwak ma dawać 40..200. Ustawienia:<\/p>", "o": ["<code>max=200<\/code>", "<code>max=160<\/code>, wartość = progress + 40", "<code>max=240<\/code>, wartość = progress − 40", "<code>min=40<\/code> zawsze"], "a": 1, "e": "<p>Zakres 0..160 przesunięty o 40.<\/p>"}, {"q": "<p>Jak ukryć grupę pól radio tak, by nie zajmowała miejsca?<\/p>", "o": ["<code>rg.setEnabled(false)<\/code>", "<code>rg.setVisibility(View.GONE)<\/code>", "<code>rg.clearCheck()<\/code>", "<code>rg.setVisibility(View.INVISIBLE)<\/code>"], "a": 1, "e": "<p>GONE usuwa element z układu.<\/p>"}, {"q": "<p><code>String[][] odp = {{\"A\",\"B\",\"C\"},{\"D\",\"E\",\"F\"}};<\/code> — co zwraca <code>odp[1][2]<\/code>?<\/p>", "o": ["„B”", "„F”", "„E”", "wyjątek"], "a": 1, "e": "<p>Wiersz 1 (drugi), kolumna 2 (trzecia).<\/p>"}, {"q": "<p>Który krok workflow najczęściej pomijają zdający, tracąc punkty za wygląd?<\/p>", "o": ["krok 1 — czytanie", "krok 10 — porównanie ze specyfikacją punkt po punkcie", "krok 7 — XML", "krok 8 — Java"], "a": 1, "e": "<p>Kolor, margines czy wyrównanie łatwo przeoczyć, jeśli nie sprawdza się listy założeń.<\/p>"}]</script></div></section>
+<section class="sec" id="dodatkowe"><h2><span class="sec-num">10.</span> Skończyłeś wcześniej?</h2><div class="micro"><h4>Losowa kolejność pytań</h4><p>Zmodyfikuj quiz tak, aby pytania pojawiały się w losowej kolejności (każde raz).</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p>Utwórz <code>ArrayList&lt;Integer&gt;</code> z indeksami 0..5 i użyj <code>Collections.shuffle(lista)</code>.</p></div></details></div><div class="micro"><h4>Tętno — pełna implementacja</h4><p>Zaimplementuj aplikację „Pomiar tętna” z przykładu analizy (30 min).</p></div><div class="micro"><h4>Parking — bilet</h4><p>Dodaj w parkingu <code>AlertDialog</code> „Bilet parkingowy” z numerem, godziną wyjazdu (bieżąca godzina + czas postoju) i kwotą.</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p><code>java.util.Calendar.getInstance()</code> → <code>get(Calendar.HOUR_OF_DAY)</code>.</p></div></details></div></section>
+<div class="nav-bottom"><a class="btn secondary" href="blok12.html">← Blok 12</a><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button><a class="btn secondary" href="blok14.html">Blok 14 →</a></div></article></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
