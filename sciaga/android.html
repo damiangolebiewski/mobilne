@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Szybka ściąga — aplikacje mobilne INF.04 — INF.04 — Aplikacje mobilne</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html" class="active">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="page"><h1>Szybka ściąga — aplikacje mobilne INF.04</h1><p>Konstrukcje potrzebne w zadaniach mobilnych z analizowanych arkuszy (Android Studio · Java · XML). W nawiasach — arkusze, w których wystąpiły. Wszystko działa w projekcie <strong>Empty Views Activity</strong>, język <strong>Java</strong>.</p>
+<div class="box box-exam"><p>Najważniejsze pułapki: <code>backgroundTint</code> zamiast <code>background</code> na przyciskach · <code>setText("" + liczba)</code>, nigdy <code>setText(liczba)</code> · <code>equals</code>, nie <code>==</code> dla napisów · <code>0dp</code> przy <code>layout_weight</code> · nazwy zasobów małymi literami · <code>notifyDataSetChanged()</code> po zmianie listy.</p></div>
+<h3>1. Szkielet</h3>
+<div class="code"><div class="code-bar"><span>MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;          <span class="t-c">// zostaw swoją nazwę pakietu</span>
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.*;                <span class="t-c">// lub pojedyncze importy (Alt+Enter)</span>
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+    <span class="t-k">private</span> <span class="t-k">int</span> licznik = <span class="t-n">0</span>;            <span class="t-c">// stan = pola klasy</span>
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvWynik;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+        tvWynik = findViewById(<span class="t-t">R</span>.id.tvWynik);   <span class="t-c">// PO setContentView</span>
+    }
+}</code></pre></div>
+<div class="code"><div class="code-bar"><span>activity_main.xml — korzeń</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml"><span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#F5F5DC"</span><span class="t-k">&gt;</span>
+    <span class="t-c">&lt;!-- kontrolki --&gt;</span>
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div>
+<p>Jeżeli w <code>onCreate</code> zostały linie <code>EdgeToEdge…</code>/<code>ViewCompat…</code> — korzeń <strong>musi</strong> mieć <code>android:id="@+id/main"</code>. Uwaga: ten kod nadpisuje padding korzenia (odstępy daj wtedy elementom wewnątrz).</p>
+<h3>2. Kontrolki (XML)</h3>
+<div class="table-wrap"><table><thead><tr><th>Kontrolka</th><th>Najważniejsze atrybuty</th><th>Arkusze</th></tr></thead><tbody><tr><td><code>TextView</code></td><td><code>text</code>, <code>textSize</code> (sp), <code>textColor</code>, <code>background</code>, <code>textStyle</code>, <code>gravity</code>, <code>padding</code></td><td>wszystkie</td></tr><tr><td><code>Button</code></td><td><code>text</code>, <code>backgroundTint</code>, <code>textColor</code>, <code>textStyle</code>, <code>layout_gravity</code></td><td>wszystkie</td></tr><tr><td><code>EditText</code></td><td><code>hint</code>, <code>inputType</code>, <code>textColorHint</code>, <code>background</code>, <code>maxLength</code></td><td>01, 05, 10, 13</td></tr><tr><td><code>ImageView</code></td><td><code>src="@drawable/nazwa"</code>, <code>layout_height</code>, <code>scaleType</code>, <code>adjustViewBounds</code></td><td>02, 12, 13</td></tr><tr><td><code>SeekBar</code></td><td><code>max</code>, <code>progress</code></td><td>07, 10</td></tr><tr><td><code>ListView</code></td><td><code>divider</code>, <code>dividerHeight</code>, <code>layout_height</code></td><td>05, 10</td></tr><tr><td><code>View</code> (linia)</td><td><code>layout_height="1dp"</code>, <code>background</code></td><td>02</td></tr><tr><td><code>TimePicker</code></td><td><code>timePickerMode="spinner"</code></td><td>10</td></tr><tr><td><code>RadioGroup</code> / <code>RadioButton</code></td><td><code>orientation</code>, <code>checked="true"</code></td><td>(desktop 06, 09)</td></tr><tr><td><code>CheckBox</code></td><td><code>checked</code></td><td>(desktop 04)</td></tr></tbody></table></div>
+<p><strong>inputType:</strong> <code>text</code>, <code>number</code>, <code>numberDecimal</code>, <code>numberSigned</code>, <code>textPassword</code>, <code>numberPassword</code>, <code>textEmailAddress</code>, <code>time</code>, <code>textCapCharacters</code>.</p>
+<h3>3. Rozkład i wygląd</h3>
+<div class="table-wrap"><table><thead><tr><th>Wymaganie</th><th>XML</th></tr></thead><tbody><tr><td>rozkład pionowy / poziomy</td><td><code>android:orientation="vertical"</code> / <code>"horizontal"</code></td></tr><tr><td>na całą szerokość</td><td><code>layout_width="match_parent"</code></td></tr><tr><td>elementy obok siebie po równo</td><td>rząd <code>horizontal</code>; dzieci <code>layout_width="0dp"</code> + <code>layout_weight="1"</code></td></tr><tr><td>margines wewnętrzny</td><td><code>padding="10dp"</code>, <code>paddingTop="20dp"</code></td></tr><tr><td>margines zewnętrzny</td><td><code>layout_margin="5dp"</code>, <code>layout_marginStart/End/Top/Bottom</code></td></tr><tr><td>wyśrodkuj element (wąski)</td><td><code>layout_gravity="center_horizontal"</code></td></tr><tr><td>wyśrodkuj / do prawej treść (szeroki)</td><td><code>gravity="center"</code> / <code>gravity="end"</code></td></tr><tr><td>pogrubienie / kursywa</td><td><code>textStyle="bold"</code> / <code>"italic"</code></td></tr><tr><td>kolor przycisku</td><td><code>backgroundTint="#008080"</code></td></tr><tr><td>kolor pola edycyjnego</td><td><code>background="#87CEEB"</code>, <code>textColor</code>, <code>textColorHint</code></td></tr><tr><td>linia pozioma</td><td><code>&lt;View android:layout_width="match_parent" android:layout_height="1dp" android:background="#808080" /&gt;</code></td></tr><tr><td>ukryty na starcie</td><td><code>visibility="gone"</code> (bez miejsca) / <code>"invisible"</code> (z miejscem)</td></tr></tbody></table></div>
+<h3>4. Zdarzenia i odczyt</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-t">Button</span> btnOk = findViewById(<span class="t-t">R</span>.id.btnOk);
+btnOk.setOnClickListener(v -&gt; {
+    <span class="t-t">String</span> tekst = etPole.getText().toString().trim();     <span class="t-c">// odczyt tekstu</span>
+    tvWynik.setText(<span class="t-s">"Witaj "</span> + tekst);                       <span class="t-c">// zmiana tekstu</span>
+});
+
+<span class="t-c">// zapis z arkuszy (klasa anonimowa) — działa tak samo</span>
+btnOk.setOnClickListener(<span class="t-k">new</span> <span class="t-t">View</span>.<span class="t-t">OnClickListener</span>() {
+    <span class="t-a">@Override</span>
+    <span class="t-k">public</span> <span class="t-k">void</span> onClick(<span class="t-t">View</span> v) { … }
+});</code></pre></div>
+<h3>5. Konwersje i komunikaty</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">int</span> n = <span class="t-t">Integer</span>.parseInt(tekst);                <span class="t-c">// "12" → 12   (try/catch!)</span>
+<span class="t-k">double</span> x = <span class="t-t">Double</span>.parseDouble(tekst.replace(<span class="t-s">','</span>, <span class="t-s">'.'</span>));
+tv.setText(<span class="t-t">String</span>.valueOf(n));                  <span class="t-c">// liczba → tekst</span>
+tv.setText(<span class="t-t">String</span>.format(<span class="t-s">"%.2f zł"</span>, x));        <span class="t-c">// 2 miejsca po przecinku</span>
+<span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Zapisano"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+<span class="t-k">new</span> <span class="t-t">AlertDialog</span>.<span class="t-t">Builder</span>(<span class="t-k">this</span>).setTitle(<span class="t-s">"Tytuł"</span>).setMessage(tresc)
+        .setPositiveButton(<span class="t-s">"OK"</span>, <span class="t-k">null</span>).show();  <span class="t-c">// androidx.appcompat.app.AlertDialog</span></code></pre></div>
+<h3>6. Obrazy (02, 12, 13)</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">ivObraz.setImageResource(<span class="t-t">R</span>.drawable.kosc3);
+<span class="t-k">int</span>[] kosci = {<span class="t-t">R</span>.drawable.kosc1, <span class="t-t">R</span>.drawable.kosc2, …};   <span class="t-c">// tablica identyfikatorów: int[]</span>
+ivObraz.setImageResource(kosci[wartosc - <span class="t-n">1</span>]);</code></pre></div>
+<p>Pliki w <code>res/drawable</code>: tylko <code>a–z</code>, <code>0–9</code>, <code>_</code>, zaczynają się literą.</p>
+<h3>7. Suwak (07, 10)</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">sb.setOnSeekBarChangeListener(<span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+    <span class="t-a">@Override</span>
+    <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+        tvRozmiar.setText(<span class="t-s">"Rozmiar: "</span> + progress);
+        tvCytat.setTextSize(progress);
+    }
+    <span class="t-a">@Override</span> <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> seekBar) { }
+    <span class="t-a">@Override</span> <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> seekBar) { }
+});
+sb.setMax(<span class="t-n">18</span>);                    <span class="t-c">// zmiana maksimum</span>
+<span class="t-k">int</span> wartosc = sb.getProgress() + <span class="t-n">1</span>;   <span class="t-c">// zakres od 1: max = górna − 1</span></code></pre></div>
+<p>W klasie anonimowej kontekst to <code>MainActivity.this</code> (nie <code>this</code>).</p>
+<h3>8. Lista (05, 10)</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-t">ArrayList</span>&lt;<span class="t-t">String</span>&gt; lista = <span class="t-k">new</span> <span class="t-t">ArrayList</span>&lt;&gt;(<span class="t-t">Arrays</span>.asList(<span class="t-s">"a"</span>, <span class="t-s">"b"</span>, <span class="t-s">"c"</span>));
+<span class="t-t">ArrayAdapter</span>&lt;<span class="t-t">String</span>&gt; adapter = <span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, android.<span class="t-t">R</span>.layout.simple_list_item_1, lista);
+<span class="t-c">// własny układ elementu: new ArrayAdapter&lt;&gt;(this, R.layout.list_item, R.id.tvElement, lista);</span>
+lvLista.setAdapter(adapter);
+
+lista.add(nowy);                  <span class="t-c">// dopisanie na koniec</span>
+adapter.notifyDataSetChanged();   <span class="t-c">// odświeżenie</span>
+
+lvLista.setOnItemClickListener((parent, view, position, id) -&gt; {
+    <span class="t-t">String</span> wybrany = (<span class="t-t">String</span>) parent.getItemAtPosition(position);
+});
+lvLista.setOnItemLongClickListener((parent, view, position, id) -&gt; {
+    lista.remove(position); adapter.notifyDataSetChanged(); <span class="t-k">return</span> <span class="t-k">true</span>;
+});</code></pre></div>
+<h3>9. Radio, pola wyboru, czas, kolor, widoczność</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">if</span> (rg.getCheckedRadioButtonId() == <span class="t-t">R</span>.id.rbUlgowy) { … }   <span class="t-c">// −1 gdy brak</span>
+rg.clearCheck();
+<span class="t-k">if</span> (cbKask.isChecked()) { … }
+tp.setIs24HourView(<span class="t-k">true</span>); tp.setHour(<span class="t-n">16</span>); tp.setMinute(<span class="t-n">0</span>);
+<span class="t-t">String</span> g = <span class="t-t">String</span>.format(<span class="t-s">"%02d:%02d"</span>, tp.getHour(), tp.getMinute());
+tv.setTextColor(<span class="t-t">Color</span>.parseColor(<span class="t-s">"#2E7D32"</span>));  uklad.setBackgroundColor(<span class="t-t">Color</span>.rgb(r, g, b));
+tv.setVisibility(<span class="t-t">View</span>.<span class="t-t">GONE</span>);  btn.setEnabled(<span class="t-k">false</span>);  btn.setText(<span class="t-s">"Wyłącz"</span>);</code></pre></div>
+<h3>10. Losowanie i algorytmy (12)</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">Random</span> los = <span class="t-k">new</span> <span class="t-t">Random</span>();
+<span class="t-k">int</span> kosc = los.nextInt(<span class="t-n">6</span>) + <span class="t-n">1</span>;                 <span class="t-c">// 1..6</span>
+<span class="t-k">int</span>[] ile = <span class="t-k">new</span> <span class="t-k">int</span>[<span class="t-n">7</span>]; <span class="t-k">for</span> (<span class="t-k">int</span> w : wyniki) ile[w]++;   <span class="t-c">// zliczanie wystąpień</span>
+indeks = (indeks + <span class="t-n">1</span>) % t.length;              <span class="t-c">// cykl w przód</span>
+indeks = (indeks - <span class="t-n">1</span> + t.length) % t.length;   <span class="t-c">// cykl w tył</span></code></pre></div>
+<h3>11. Odpowiedniki .NET MAUI (tylko informacyjnie)</h3>
+<p>Arkusze dopuszczają też .NET MAUI/Xamarin (XAML + C#). Ten kurs uczy wyłącznie Androida; tabela pomaga rozpoznać pomoce z arkuszy.</p>
+<div class="table-wrap"><table><thead><tr><th>Android (Java/XML)</th><th>MAUI (C#/XAML)</th></tr></thead><tbody><tr><td><code>LinearLayout</code> vertical/horizontal</td><td><code>VerticalStackLayout</code> / <code>HorizontalStackLayout</code> (<code>StackLayout</code>)</td></tr><tr><td><code>TextView</code> / <code>EditText</code> / <code>Button</code></td><td><code>Label</code> / <code>Entry</code> / <code>Button</code></td></tr><tr><td><code>SeekBar</code> + <code>onProgressChanged</code></td><td><code>Slider</code> + <code>ValueChanged</code></td></tr><tr><td><code>ListView</code> + <code>ArrayAdapter</code></td><td><code>ListView.ItemsSource</code> + <code>ObservableCollection</code></td></tr><tr><td><code>setOnItemClickListener</code></td><td><code>ItemTapped</code> / <code>ItemSelected</code></td></tr></tbody></table></div></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
