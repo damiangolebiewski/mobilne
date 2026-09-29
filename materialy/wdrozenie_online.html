@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wdrożenie online: konta uczniów i podgląd postępu — INF.04 — Aplikacje mobilne</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html">Bloki</a><a href="../zadania/index.html" class="active">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="page"><h1>Wdrożenie online: konta uczniów i podgląd postępu</h1><p>Po wdrożeniu uczniowie otwierają portal pod stałym adresem, np. z domu, logują się <strong>imieniem i nazwiskiem, kodem klasy i własnym PIN-em</strong>, a ich postęp jest zapisywany online. Mogą pracować w szkole i w domu, bo postęp jest ten sam na każdym urządzeniu. Ty widzisz wszystkich uczniów w <strong><a href="../nauczyciel.html">panelu nauczyciela</a></strong> i w swoim Arkuszu Google.</p>
+<p>Jak to działa:</p>
+<ul><li><strong>Portal</strong> to zwykłe pliki HTML na darmowym hostingu (Netlify albo GitHub Pages).</li><li><strong>Postęp</strong> trafia do <strong>Arkusza Google na Twoim koncie</strong> przez krótki skrypt Google Apps Script (<code>serwer/Code.gs</code>). Nie ma innego serwera i nic nie kosztuje.</li></ul>
+<p>Czas wdrożenia: około 20 minut, jednorazowo.</p>
+<div class="box box-tip"><p>Bez tego wdrożenia portal działa jak dotąd: offline, a postęp zapisuje się tylko w przeglądarce. Tryb online włącza dopiero wpisanie adresu w pliku <code>js/config.js</code>.</p></div>
+<h3>Krok 1. Arkusz i skrypt (Google)</h3>
+<ol><li>Zaloguj się na konto Google i utwórz nowy arkusz: <a href="https://sheets.new">sheets.new</a>. Nazwij go np. „INF04 — postęp uczniów”.</li><li>W arkuszu wybierz <strong>Rozszerzenia → Apps Script</strong>.</li><li>W edytorze usuń zawartość pliku <code>Kod.gs</code>. Otwórz plik <code>serwer/Code.gs</code> z folderu portalu w Notatniku, skopiuj całość i wklej.</li><li>Na górze pliku zmień dwa ustawienia:<ul><li><code>KLASY</code> — kod klasy, który podasz uczniom, np. <code>'5TP-jesien26': '5TP'</code>. Uczeń bez tego kodu nie założy konta. Możesz dopisać kolejne klasy.</li><li><code>HASLO_NAUCZYCIELA</code> — Twoje hasło do panelu, co najmniej 8 znaków. Dopóki zostaje domyślne <code>zmien-to-haslo</code>, panel jest wyłączony.</li></ul></li><li>Zapisz (<strong>Ctrl+S</strong>).</li><li>Na pasku u góry wybierz funkcję <strong>przygotuj</strong> i kliknij <strong>Uruchom</strong>. Tworzy ona zakładki <em>Uczniowie</em> i <em>Postep</em> oraz ich kolory.</li><li>Google poprosi o uprawnienia: <strong>Przejrzyj uprawnienia</strong> → wybierz konto → <strong>Zaawansowane</strong> → <strong>Przejdź do projektu (niebezpieczne)</strong> → <strong>Zezwól</strong>.<ul><li>Komunikat „niezweryfikowana aplikacja” jest normalny, bo to Twój własny skrypt.</li><li>Skrypt ma dostęp tylko do tego arkusza.</li></ul></li><li>Kliknij <strong>Wdróż → Nowe wdrożenie</strong>, a przy „Wybierz typ” (⚙) wybierz <strong>Aplikacja internetowa</strong>. Ustaw:<ul><li><strong>Wykonaj jako:</strong> Ja</li><li><strong>Kto ma dostęp:</strong> Każdy</li></ul></li><li>Kliknij <strong>Wdróż</strong> i skopiuj <strong>adres URL aplikacji internetowej</strong>, zakończony na <code>/exec</code>.</li><li>Wklej ten adres w nowej karcie przeglądarki. Powinna pojawić się odpowiedź z tekstem <code>"ok":true</code>.</li></ol>
+<div class="box box-warn"><p>Na koncie szkolnym (Google Workspace) administrator może nie pozwolić na „Kto ma dostęp: Każdy”. Wtedy uczniowie nie połączą się z domu. W takim przypadku zrób krok 1 na prywatnym koncie Gmail albo poproś administratora o zgodę.</p></div>
+<h3>Krok 2. Wpisz adres w portalu</h3>
+<p>W folderze portalu otwórz <code>js/config.js</code> w Notatniku i wklej adres między apostrofy:</p>
+<div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">window.PORTAL_CONFIG = {
+  syncUrl: 'https://script.google.com/macros/s/AKfy...TWÓJ_ADRES.../exec'
+};</code></pre></div>
+<h3>Krok 3. Umieść portal w internecie</h3>
+<p><strong>Sposób A: Netlify Drop (najprostszy)</strong></p>
+<ol><li>Wejdź na <a href="https://app.netlify.com/drop">app.netlify.com/drop</a> i załóż darmowe konto. Bez konta strona zniknie po godzinie.</li><li>Przeciągnij na stronę <strong>cały folder</strong> <code>INF04_MOBILE</code>, już z uzupełnionym <code>config.js</code>.</li><li>Po chwili dostaniesz adres, np. <code>https://nazwa-123.netlify.app</code>. Nazwę zmienisz w <em>Site configuration → Change site name</em>.</li><li>Aktualizacja portalu: w zakładce <strong>Deploys</strong> przeciągnij folder ponownie. Adres się nie zmienia.</li></ol>
+<p><strong>Sposób B: GitHub Pages</strong></p>
+<ol><li>Załóż konto na <a href="https://github.com">github.com</a> i utwórz publiczne repozytorium, np. <code>inf04-mobile</code>.</li><li>Wgraj <strong>zawartość</strong> folderu <code>INF04_MOBILE</code> tak, aby <code>index.html</code> był w głównym katalogu repozytorium.<ul><li>Przeglądarka przyjmuje najwyżej 100 plików naraz, a portal ma ich około 270.</li><li>Dlatego najlepiej użyj programu <strong>GitHub Desktop</strong>: <em>Clone</em> → skopiuj pliki → <em>Commit</em> → <em>Push</em>.</li></ul></li><li>W repozytorium wejdź w <strong>Settings → Pages</strong>, ustaw <em>Source: Deploy from a branch</em>, a potem <em>Branch: main / (root)</em>.</li><li>Po 1–2 minutach portal działa pod adresem <code>https://LOGIN.github.io/inf04-mobile/</code>.</li><li>Zaleta tego sposobu: <code>js/config.js</code> możesz później edytować wprost na stronie GitHub (ikona ołówka).</li></ol>
+<h3>Krok 4. Sprawdź, zanim dasz link uczniom</h3>
+<ol><li>Otwórz portal. Na górze strony powinien być pasek <strong>„Zaloguj się, aby Twój postęp zapisywał się online”</strong>.</li><li>Zaloguj się testowo, np. jako <em>Test Nauczyciel</em>, z kodem klasy i PIN-em <code>1234</code>. Oznacz jeden blok jako ukończony.</li><li>Otwórz portal na telefonie, zaloguj się tymi samymi danymi i sprawdź, czy blok jest ukończony.</li><li>Otwórz <a href="../nauczyciel.html">nauczyciel.html</a>, wpisz hasło nauczyciela i sprawdź, czy widzisz ucznia testowego.</li><li>Usuń ucznia testowego z arkusza: skasuj jego wiersz w zakładce <em>Uczniowie</em> i w zakładce <em>Postep</em>.</li></ol>
+<h3>Co przekazać uczniom</h3>
+<ul><li><strong>Adres portalu.</strong></li><li><strong>Kod klasy.</strong></li><li>Informacje dla uczniów:<ul><li>Przy pierwszym logowaniu wpisz imię i nazwisko, kod klasy i wymyślony PIN (4–8 cyfr). W ten sposób zakładasz konto.</li><li>Następnym razem wpisz te same dane. Zapamiętaj PIN i nie używaj PIN-u od telefonu ani karty.</li><li>Postęp zapisuje się sam. Stan zapisu widać na pasku u góry strony.</li><li>Na wspólnym komputerze w szkole po pracy kliknij <strong>Wyloguj</strong>.</li><li>Bez internetu możesz dalej pracować. Zmiany zapiszą się online, gdy połączenie wróci.</li></ul></li></ul>
+<h3>Co widzisz jako nauczyciel</h3>
+<p><strong><a href="../nauczyciel.html">Panel nauczyciela</a></strong>:</p>
+<ul><li>lista uczniów z klasą i ostatnią aktywnością;</li><li>ukończone bloki i wykonane zadania;</li><li>wyniki mini-testów i czas pracy;</li><li>mapa bloków B1–B15 z kolorami;</li><li>filtr klasy, sortowanie i eksport do CSV (Excel);</li><li>po kliknięciu ucznia: szczegóły każdego bloku i przycisk <strong>Resetuj PIN</strong>.</li></ul>
+<p><strong>Arkusz Google, zakładka <em>Postep</strong></em> — to samo w formie tabeli, odświeżane przy każdym zapisie ucznia. Możesz tu dodawać własne kolumny <em>na końcu</em>, np. oceny.</p>
+<p><strong>Zakładka <em>Uczniowie</strong></em> — dane techniczne. Nie zmieniaj ich ręcznie, z jednym wyjątkiem: wyczyszczenie komórki <code>pin_hash</code> resetuje PIN ucznia.</p>
+<p>Czas pracy to aktywność na stronach bloków: strona jest otwarta, a uczeń coś na niej robił w ostatnich 3 minutach. Czas spędzony w samym Android Studio nie jest liczony, więc traktuj go orientacyjnie.</p>
+<h3>Najczęstsze sytuacje</h3>
+<div class="table-wrap"><table><thead><tr><th>Sytuacja</th><th>Co zrobić</th></tr></thead><tbody><tr><td>Uczeń zapomniał PIN-u</td><td>Panel → kliknij ucznia → <strong>Resetuj PIN</strong>. Uczeń loguje się tymi samymi danymi i wpisuje nowy PIN. Postęp zostaje.</td></tr><tr><td>Uczeń ma dwa konta (literówka w nazwisku)</td><td>Usuń błędny wiersz w zakładkach <em>Uczniowie</em> i <em>Postep</em>.</td></tr><tr><td>Zmieniasz ustawienia w <code>Code.gs</code> (np. nowa klasa)</td><td>Zapisz, a potem <strong>Wdróż → Zarządzaj wdrożeniami → ✏ → Wersja: Nowa wersja → Wdróż</strong>. Bez nowej wersji zmiana nie działa. Adres się nie zmienia.</td></tr><tr><td>Pasek pokazuje „Brak połączenia — zapiszę później”</td><td>Uczeń może dalej pracować. Zmiany zapiszą się automatycznie, gdy wróci internet.</td></tr><tr><td>Uczeń pracował wcześniej bez logowania</td><td>Po pierwszym zalogowaniu portal zapyta, czy dołączyć postęp z tej przeglądarki do konta.</td></tr><tr><td>Chcesz wrócić do trybu offline</td><td>W <code>js/config.js</code> ustaw <code>syncUrl: ''</code>.</td></tr></tbody></table></div>
+<h3>Prywatność</h3>
+<p>Dane uczniów (imię i nazwisko, klasa, postęp) są zapisywane tylko w Twoim Arkuszu Google. PIN-y są przechowywane jako skróty SHA-256, a nie jawnie. Po kilku błędnych PIN-ach logowanie jest blokowane na 10 minut. Jeśli szkoła tego wymaga, poinformuj uczniów o zapisie danych. Zamiast nazwiska uczniowie mogą też używać np. numeru z dziennika („Uczeń 12”).</p></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
