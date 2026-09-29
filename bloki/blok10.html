@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blok 10 — Losowanie, tablice i algorytmy w aplikacji</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../" data-page="block" data-block="b10">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html" class="active">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="block-layout"><aside class="toc no-print"><strong>Blok 10</strong><ol><li><a href="#cel">Cel</a></li><li><a href="#przypomnienie">Krótkie przypomnienie</a></li><li><a href="#przyklad">Przykład</a></li><li><a href="#mikro">Mikroćwiczenia</a></li><li><a href="#prowadzone">Zadanie prowadzone</a></li><li><a href="#samodzielne">Zadanie samodzielne</a></li><li><a href="#inf04">Zadanie w stylu INF.04</a></li><li><a href="#checklista">Checklista</a></li><li><a href="#test">Mini-test</a></li><li><a href="#dodatkowe">Skończyłeś wcześniej?</a></li></ol><a class="skip" href="#samodzielne">Silniejszy? Przejdź od razu do zadania samodzielnego →</a><p class="small muted" style="margin-top:.8rem">Słabszy? Przypomnienie → Przykład → Mikroćwiczenia → Zadanie prowadzone (z podpowiedziami).</p></aside><article class="page"><div class="block-head"><div><div class="muted small"><a href="../index.html">Bloki</a> › Blok 10</div><h1>Blok 10. Losowanie, tablice i algorytmy w aplikacji</h1><span class="badge p2">Faza II — łączenie umiejętności</span> <span id="block-status" class="badge">W trakcie</span></div><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button></div>
+<p>Losujesz liczby, zapisujesz je w tablicy, liczysz punkty algorytmem zliczania wystąpień i pokazujesz wyniki jako obrazy. Logikę trzymasz w metodach niezależnych od interfejsu — tak jak w części konsolowej egzaminu.</p>
+<section class="sec" id="cel"><h2><span class="sec-num">1.</span> Cel</h2><p><strong>Po wykonaniu tego bloku będziesz potrafił:</strong></p><ul><li>losować liczby całkowite z zadanego zakresu (<code>Random.nextInt</code>),</li><li>zapisywać wyniki w tablicy i obsługiwać kilka kontrolek przez tablicę kontrolek i pętlę,</li><li>liczyć punkty algorytmem zliczania wystąpień (tablica liczników) i zwracać wynik z metody,</li><li>zamieniać wartości na obrazy przez tablicę <code>R.drawable</code> (wartość → indeks),</li><li>resetować stan gry (liczniki, obrazy, napisy, dostępność przycisku).</li></ul><details class="hint"><summary>Plan czasu (4 × 45 min = 180 min)</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>Przypomnienie</td><td>15 min</td></tr><tr><td>Przykład</td><td>10 min</td></tr><tr><td>Mikroćwiczenia</td><td>30 min</td></tr><tr><td>Zadanie prowadzone</td><td>35 min</td></tr><tr><td>Zadanie samodzielne</td><td>30 min</td></tr><tr><td>Zadanie INF.04</td><td>50 min</td></tr><tr><td>Checklista + mini-test</td><td>10 min</td></tr><tr><th>Razem</th><th>180 min</th></tr></tbody></table></div></div></details><p class="small muted">Powiązanie z arkuszami: Arkusz_12 (5 losowań 1–6, obrazy kości z tablicy, punkty = suma oczek wartości wylosowanych ≥ 2 razy, wynik gry kumulowany, reset do obrazu startowego); algorytmy losowania i zliczania w częściach konsolowych Arkuszy 12 i 15.</p></section>
+<section class="sec" id="przypomnienie"><h2><span class="sec-num">2.</span> Krótkie przypomnienie</h2><h4>Losowanie</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">import</span> java.util.<span class="t-t">Random</span>;
+<span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">Random</span> losowanie = <span class="t-k">new</span> <span class="t-t">Random</span>();   <span class="t-c">// pole — jedno na aplikację</span>
+
+<span class="t-k">int</span> kosc = losowanie.nextInt(<span class="t-n">6</span>) + <span class="t-n">1</span>;   <span class="t-c">// nextInt(6) → 0..5, więc +1 → 1..6</span>
+<span class="t-k">int</span> indeks = losowanie.nextInt(<span class="t-n">4</span>);     <span class="t-c">// 0..3 — gotowy indeks tablicy</span></code></pre></div>
+<div class="box box-err"><p><code>nextInt(6)</code> bez <code>+1</code> daje wartości 0..5 — kość z „zerem” i przesunięte obrazy.</p></div>
+<h4>Wartość → obraz</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] obrazyKosci = {<span class="t-t">R</span>.drawable.kosc1, <span class="t-t">R</span>.drawable.kosc2, <span class="t-t">R</span>.drawable.kosc3,
+                                   <span class="t-t">R</span>.drawable.kosc4, <span class="t-t">R</span>.drawable.kosc5, <span class="t-t">R</span>.drawable.kosc6};
+ivKosc.setImageResource(obrazyKosci[wartosc - <span class="t-n">1</span>]);   <span class="t-c">// wartość 1 → indeks 0</span></code></pre></div>
+<h4>Tablica kontrolek i pętla (5 obrazów z Arkusza_12)</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-t">ImageView</span>[] kosci = {findViewById(<span class="t-t">R</span>.id.iv1), findViewById(<span class="t-t">R</span>.id.iv2), findViewById(<span class="t-t">R</span>.id.iv3),
+                     findViewById(<span class="t-t">R</span>.id.iv4), findViewById(<span class="t-t">R</span>.id.iv5)};
+<span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; kosci.length; i++) {
+    kosci[i].setImageResource(obrazyKosci[wyniki[i] - <span class="t-n">1</span>]);
+}</code></pre></div>
+<h4>Zliczanie wystąpień</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">int</span>[] ile = <span class="t-k">new</span> <span class="t-k">int</span>[<span class="t-n">7</span>];              <span class="t-c">// indeksy 1..6 dla oczek (0 nieużywany)</span>
+<span class="t-k">for</span> (<span class="t-k">int</span> w : wyniki) {
+    ile[w]++;                        <span class="t-c">// ile[2] = ile razy wypadła dwójka</span>
+}</code></pre></div>
+<p>Z tablicy liczników łatwo policzyć: „wartość wypadła co najmniej 2 razy”, „wszystkie takie same”, „największa liczba powtórzeń”.</p>
+<h4>Logika bez interfejsu</h4>
+<p>Metody liczące <strong>nie</strong> dotykają kontrolek — dostają tablicę, zwracają liczbę. Tak samo jak w części konsolowej (i można je stamtąd skopiować):</p>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">int</span> policzPunkty(<span class="t-k">int</span>[] wyniki) { … <span class="t-k">return</span> suma; }</code></pre></div>
+<p><strong>Ćwiczenie natychmiastowe:</strong> w przykładzie wykonaj 20 rzutów i sprawdź, czy liczby orłów i reszek są „podobne”. Zmień <code>nextInt(2)</code> na <code>nextInt(3)</code> — co się stanie z kodem <code>if/else</code>?</p></section>
+<section class="sec" id="przyklad"><h2><span class="sec-num">3.</span> Przykład</h2><p>Rzut monetą: losowanie 0/1, obraz zależny od wyniku, dwa liczniki. Zasoby: <code>moneta_orzel.png</code>, <code>moneta_reszka.png</code>.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:16px"><div class="m-img" style="height:160px;align-self:stretch"><img src="../assets/zasoby/moneta_reszka.png" alt="" style="object-fit:contain"></div><div class="m-t" style="font-size:19.2px;text-align:center;align-self:stretch">Orły: 3, reszki: 4</div><div class="m-b" style="background:#6750A4;color:#ffffff;align-self:center">RZUĆ</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po 7 rzutach</figcaption></figure></div><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"20dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;ImageView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivMoneta"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"200dp"</span>
+        <span class="t-a">android:contentDescription</span>=<span class="t-s">"Moneta"</span>
+        <span class="t-a">android:src</span>=<span class="t-s">"@drawable/moneta_orzel"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvWynik"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Rzuć monetą"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"24sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnRzuc"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"RZUĆ"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ImageView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> java.util.<span class="t-t">Random</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">Random</span> losowanie = <span class="t-k">new</span> <span class="t-t">Random</span>();   <span class="t-c">// jeden obiekt na całą aplikację</span>
+    <span class="t-k">private</span> <span class="t-k">int</span> orly = <span class="t-n">0</span>;
+    <span class="t-k">private</span> <span class="t-k">int</span> reszki = <span class="t-n">0</span>;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        <span class="t-t">ImageView</span> ivMoneta = findViewById(<span class="t-t">R</span>.id.ivMoneta);
+        <span class="t-t">TextView</span> tvWynik = findViewById(<span class="t-t">R</span>.id.tvWynik);
+        <span class="t-t">Button</span> btnRzuc = findViewById(<span class="t-t">R</span>.id.btnRzuc);
+
+        btnRzuc.setOnClickListener(v -&gt; {
+            <span class="t-k">int</span> rzut = losowanie.nextInt(<span class="t-n">2</span>);   <span class="t-c">// 0 lub 1</span>
+            <span class="t-k">if</span> (rzut == <span class="t-n">0</span>) {
+                orly++;
+                ivMoneta.setImageResource(<span class="t-t">R</span>.drawable.moneta_orzel);
+            } <span class="t-k">else</span> {
+                reszki++;
+                ivMoneta.setImageResource(<span class="t-t">R</span>.drawable.moneta_reszka);
+            }
+            tvWynik.setText(<span class="t-s">"Orły: "</span> + orly + <span class="t-s">", reszki: "</span> + reszki);
+        });
+    }
+}</code></pre></div></section>
+<section class="sec" id="mikro"><h2><span class="sec-num">4.</span> Mikroćwiczenia</h2><div class="micro"><h4>Ćwiczenie 10.1 — Zakresy</h4><p>Zapisz losowanie: a) liczby 1–49, b) indeksu tablicy o długości <code>n</code>, c) liczby od −5 do 5.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>a) <code>losowanie.nextInt(49) + 1</code>; b) <code>losowanie.nextInt(n)</code>; c) <code>losowanie.nextInt(11) - 5</code> (11 wartości).</p></div></details></div><div class="micro"><h4>Ćwiczenie 10.2 — Punkty jak w Arkuszu_12</h4><p>Napisz metodę <code>int policzPunkty(int[] wyniki)</code>: punkty to suma oczek tych wartości, które wypadły co najmniej 2 razy. Test: {1, 5, 2, 2, 5} → 14; {2, 1, 2, 3, 2} → 6.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">int</span> policzPunkty(<span class="t-k">int</span>[] wyniki) {
+    <span class="t-k">int</span>[] ile = <span class="t-k">new</span> <span class="t-k">int</span>[<span class="t-n">7</span>];
+    <span class="t-k">for</span> (<span class="t-k">int</span> w : wyniki) {
+        ile[w]++;
+    }
+    <span class="t-k">int</span> suma = <span class="t-n">0</span>;
+    <span class="t-k">for</span> (<span class="t-k">int</span> oczka = <span class="t-n">1</span>; oczka &lt;= <span class="t-n">6</span>; oczka++) {
+        <span class="t-k">if</span> (ile[oczka] &gt;= <span class="t-n">2</span>) {
+            suma += oczka * ile[oczka];
+        }
+    }
+    <span class="t-k">return</span> suma;
+}</code></pre></div>
+<p>{1,5,2,2,5}: 2·2 + 5·2 = 14. {2,1,2,3,2}: 2·3 = 6.</p></div></details></div><div class="micro"><h4>Ćwiczenie 10.3 — Obraz kości</h4><p>Wylosowano <code>wartosc = 6</code>, tablica <code>obrazyKosci</code> ma 6 elementów. Który zapis jest poprawny: <code>obrazyKosci[wartosc]</code> czy <code>obrazyKosci[wartosc - 1]</code>? Co zrobi błędny?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>obrazyKosci[wartosc - 1]</code>. Wersja bez <code>-1</code> dla szóstki rzuci <code>ArrayIndexOutOfBoundsException</code> (indeks 6 w tablicy 0..5), a dla pozostałych pokaże złą ściankę.</p></div></details></div><div class="micro"><h4>Ćwiczenie 10.4 — Bez powtórzeń</h4><p>Opisz słowami (pseudokod), jak wylosować 6 różnych liczb z 1–49 (desktop/konsola Arkusza_15).</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Dopóki nie masz 6 liczb: wylosuj kandydata; jeśli nie ma go w dotychczasowych wynikach — dopisz. (Kod w zadaniu prowadzonym: <code>losujBezPowtorzen</code>.)</p></div></details></div><div class="micro"><h4>Ćwiczenie 10.5 — Reset</h4><p>Arkusz_12: „RESETUJ WYNIK” → pięć obrazów <code>question</code>, wynik gry 0, oba napisy wyników 0. Napisz treść metody <code>resetuj()</code> przy tablicy <code>kosci</code> i polu <code>wynikGry</code>.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">void</span> resetuj() {
+    wynikGry = <span class="t-n">0</span>;
+    <span class="t-k">for</span> (<span class="t-t">ImageView</span> k : kosci) {
+        k.setImageResource(<span class="t-t">R</span>.drawable.question);
+    }
+    tvWynikLosowania.setText(<span class="t-s">"Wynik tego losowania: 0"</span>);
+    tvWynikGry.setText(<span class="t-s">"Wynik gry: 0"</span>);
+}</code></pre></div></div></details></div></section>
+<section class="sec" id="prowadzone"><h2><span class="sec-num">5.</span> Zadanie prowadzone</h2><div class="task" id="b10-prowadzone">
+<div class="task-head"><h3>Mini Lotto 3 z 20</h3><span class="meta">⏱ ok. 35 min</span></div>
+<p>Losowanie bez powtórzeń, tablica kontrolek obsługiwana pętlą i dwie metody statystyk. Logika w osobnych metodach — interfejs tylko wywołuje je i pokazuje wyniki.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#FFFDE7;padding:12.8px"><div class="m-t" style="font-size:22.4px;font-weight:700;text-align:center;align-self:stretch">Mini Lotto 3 z 20</div><div class="m-row" style="margin:16px 0px 16px 0px;align-self:stretch"><div class="m-t" style="background:#F9A825;font-size:20.8px;padding:11.2px;margin:4.8px;text-align:center;flex:1 1 0;min-width:0;align-self:stretch">4</div><div class="m-t" style="background:#F9A825;font-size:20.8px;padding:11.2px;margin:4.8px;text-align:center;flex:1 1 0;min-width:0;align-self:stretch">17</div><div class="m-t" style="background:#F9A825;font-size:20.8px;padding:11.2px;margin:4.8px;text-align:center;flex:1 1 0;min-width:0;align-self:stretch">9</div></div><div class="m-b" style="background:#6750A4;color:#ffffff;align-self:stretch">LOSUJ</div><div class="m-t" style="font-size:16px;margin:12.8px 0px 0px 0px;text-align:center;align-self:stretch">Suma: 30, największa: 17</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po losowaniu</figcaption></figure></div>
+<p><strong>Działanie:</strong> LOSUJ losuje 3 <strong>różne</strong> liczby z 1–20 i wpisuje je do trzech pól. Pod spodem: „Suma: &lt;s&gt;, największa: &lt;m&gt;”.</p>
+<p><strong>Kroki:</strong></p>
+<ol><li>XML: tytuł, rząd trzech <code>TextView</code> (waga 1, tło <code>#F9A825</code>, 26sp, start „?”), przycisk, napis statystyki.</li><li>Java: <code>TextView[] pola</code> z trzech <code>findViewById</code>.</li><li>Metody: <code>losujBezPowtorzen(int ile, int zakres)</code>, <code>zawiera(int[] t, int ileElementow, int x)</code>, <code>suma(int[])</code>, <code>maksimum(int[])</code>.</li><li>LOSUJ: wynik do tablicy, pętla wpisująca liczby do pól, napis statystyki.</li><li>Test: kliknij 20 razy — nigdy nie pojawią się dwie takie same liczby.</li></ol>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Najpierw napisz i sprawdź <code>losujBezPowtorzen</code> — pętla <code>while</code> działa, dopóki nie zbierzesz wymaganej liczby różnych wartości.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p><code>zawiera</code> sprawdza tylko elementy już wylosowane (od 0 do <code>ileElementow - 1</code>), bo reszta tablicy to zera.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">losujBezPowtorzen(ile, zakres):
+    wynik ← tablica[ile]; n ← 0
+    dopóki n &lt; ile:
+        k ← los(1..zakres)
+        jeśli k nie występuje w wynik[0..n-1]: wynik[n] ← k; n++
+    zwróć wynik</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">int</span>[] losujBezPowtorzen(<span class="t-k">int</span> ile, <span class="t-k">int</span> zakres) {
+    <span class="t-k">int</span>[] wynik = <span class="t-k">new</span> <span class="t-k">int</span>[ile];
+    <span class="t-k">int</span> wylosowane = <span class="t-n">0</span>;
+    <span class="t-k">while</span> (wylosowane &lt; ile) {
+        <span class="t-k">int</span> kandydat = losowanie.nextInt(zakres) + <span class="t-n">1</span>;
+        <span class="t-k">if</span> (!zawiera(wynik, wylosowane, kandydat)) {
+            wynik[wylosowane] = kandydat;
+            wylosowane++;
+        }
+    }
+    <span class="t-k">return</span> wynik;
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#FFFDE7"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Mini Lotto 3 z 20"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginVertical</span>=<span class="t-s">"20dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvLiczba1"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"6dp"</span>
+            <span class="t-a">android:background</span>=<span class="t-s">"#F9A825"</span>
+            <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+            <span class="t-a">android:padding</span>=<span class="t-s">"14dp"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"?"</span>
+            <span class="t-a">android:textSize</span>=<span class="t-s">"26sp"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvLiczba2"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"6dp"</span>
+            <span class="t-a">android:background</span>=<span class="t-s">"#F9A825"</span>
+            <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+            <span class="t-a">android:padding</span>=<span class="t-s">"14dp"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"?"</span>
+            <span class="t-a">android:textSize</span>=<span class="t-s">"26sp"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvLiczba3"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"6dp"</span>
+            <span class="t-a">android:background</span>=<span class="t-s">"#F9A825"</span>
+            <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+            <span class="t-a">android:padding</span>=<span class="t-s">"14dp"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"?"</span>
+            <span class="t-a">android:textSize</span>=<span class="t-s">"26sp"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnLosuj"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"LOSUJ"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvStatystyka"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Suma: –, największa: –"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> java.util.<span class="t-t">Random</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">ILE_LICZB</span> = <span class="t-n">3</span>;
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">ZAKRES</span> = <span class="t-n">20</span>;
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">Random</span> losowanie = <span class="t-k">new</span> <span class="t-t">Random</span>();
+    <span class="t-k">private</span> <span class="t-t">TextView</span>[] pola;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvStatystyka;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        <span class="t-c">// tablica kontrolek — pozwala obsłużyć je w pętli</span>
+        pola = <span class="t-k">new</span> <span class="t-t">TextView</span>[]{findViewById(<span class="t-t">R</span>.id.tvLiczba1), findViewById(<span class="t-t">R</span>.id.tvLiczba2), findViewById(<span class="t-t">R</span>.id.tvLiczba3)};
+        tvStatystyka = findViewById(<span class="t-t">R</span>.id.tvStatystyka);
+        <span class="t-t">Button</span> btnLosuj = findViewById(<span class="t-t">R</span>.id.btnLosuj);
+
+        btnLosuj.setOnClickListener(v -&gt; {
+            <span class="t-k">int</span>[] liczby = losujBezPowtorzen(<span class="t-t">ILE_LICZB</span>, <span class="t-t">ZAKRES</span>);
+            <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; liczby.length; i++) {
+                pola[i].setText(<span class="t-t">String</span>.valueOf(liczby[i]));
+            }
+            tvStatystyka.setText(<span class="t-s">"Suma: "</span> + suma(liczby) + <span class="t-s">", największa: "</span> + maksimum(liczby));
+        });
+    }
+
+    <span class="t-c">// logika bez interfejsu — łatwa do sprawdzenia i ponownego użycia</span>
+    <span class="t-k">private</span> <span class="t-k">int</span>[] losujBezPowtorzen(<span class="t-k">int</span> ile, <span class="t-k">int</span> zakres) {
+        <span class="t-k">int</span>[] wynik = <span class="t-k">new</span> <span class="t-k">int</span>[ile];
+        <span class="t-k">int</span> wylosowane = <span class="t-n">0</span>;
+        <span class="t-k">while</span> (wylosowane &lt; ile) {
+            <span class="t-k">int</span> kandydat = losowanie.nextInt(zakres) + <span class="t-n">1</span>;   <span class="t-c">// 1..zakres</span>
+            <span class="t-k">if</span> (!zawiera(wynik, wylosowane, kandydat)) {
+                wynik[wylosowane] = kandydat;
+                wylosowane++;
+            }
+        }
+        <span class="t-k">return</span> wynik;
+    }
+
+    <span class="t-k">private</span> <span class="t-k">boolean</span> zawiera(<span class="t-k">int</span>[] tablica, <span class="t-k">int</span> ileElementow, <span class="t-k">int</span> wartosc) {
+        <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; ileElementow; i++) {
+            <span class="t-k">if</span> (tablica[i] == wartosc) {
+                <span class="t-k">return</span> <span class="t-k">true</span>;
+            }
+        }
+        <span class="t-k">return</span> <span class="t-k">false</span>;
+    }
+
+    <span class="t-k">private</span> <span class="t-k">int</span> suma(<span class="t-k">int</span>[] tablica) {
+        <span class="t-k">int</span> s = <span class="t-n">0</span>;
+        <span class="t-k">for</span> (<span class="t-k">int</span> x : tablica) {
+            s += x;
+        }
+        <span class="t-k">return</span> s;
+    }
+
+    <span class="t-k">private</span> <span class="t-k">int</span> maksimum(<span class="t-k">int</span>[] tablica) {
+        <span class="t-k">int</span> max = tablica[<span class="t-n">0</span>];
+        <span class="t-k">for</span> (<span class="t-k">int</span> x : tablica) {
+            <span class="t-k">if</span> (x &gt; max) {
+                max = x;
+            }
+        }
+        <span class="t-k">return</span> max;
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b10_prowadzone/">rozwiazania/b10_prowadzone/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b10-prowadzone">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="samodzielne"><h2><span class="sec-num">6.</span> Zadanie samodzielne</h2><div class="task" id="b10-samodzielne">
+<div class="task-head"><h3>Kamień, papier, nożyce</h3><span class="meta">⏱ ok. 30 min</span></div>
+<p>Wybór gracza (przycisk) kontra losowy wybór komputera; obrazy z tablicy, wynik rundy i wynik gry.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:12.8px"><div class="m-t" style="font-size:20.8px;font-weight:700;text-align:center;align-self:stretch">Gracz 2 : 1 Komputer</div><div class="m-row" style="margin:12.8px 0px 0px 0px;align-self:stretch"><div class="m-img" style="margin:6.4px;flex:1 1 0;min-width:0;height:104px;align-self:stretch"><img src="../assets/zasoby/papier.png" alt="" style="object-fit:contain"></div><div class="m-img" style="margin:6.4px;flex:1 1 0;min-width:0;height:104px;align-self:stretch"><img src="../assets/zasoby/kamien.png" alt="" style="object-fit:contain"></div></div><div class="m-t" style="font-size:16px;text-align:center;align-self:stretch">Wygrywasz rundę!</div><div class="m-row" style="margin:12.8px 0px 0px 0px;align-self:stretch"><div class="m-b" style="background:#6750A4;color:#ffffff;margin:3.2px;flex:1 1 0;min-width:0">KAMIEŃ</div><div class="m-b" style="background:#6750A4;color:#ffffff;margin:3.2px;flex:1 1 0;min-width:0">PAPIER</div><div class="m-b" style="background:#6750A4;color:#ffffff;margin:3.2px;flex:1 1 0;min-width:0">NOŻYCE</div></div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Gracz: papier, komputer: kamień</figcaption></figure></div>
+<ul><li>Kodowanie ruchów: 0 — kamień, 1 — papier, 2 — nożyce (tablica obrazów w tej kolejności). Na starcie oba obrazy to <code>pytajnik</code>.</li><li>Kliknięcie przycisku: obraz gracza, losowy ruch komputera i jego obraz, komunikat rundy („Remis”, „Wygrywasz rundę!”, „Komputer wygrywa rundę”), aktualizacja „Gracz x : y Komputer”.</li><li>Zasady: papier bije kamień, nożyce biją papier, kamień bije nożyce. Spróbuj zapisać rozstrzygnięcie <strong>jednym wzorem</strong>, bez 9 przypadków <code>if</code>.</li></ul>
+<h4>Zasoby do zadania</h4><div class="res-list"><figure><a href="../assets/zasoby/kamien.png" download><img src="../assets/zasoby/kamien.png" alt="kamien.png"></a><figcaption>kamien.png</figcaption></figure><figure><a href="../assets/zasoby/papier.png" download><img src="../assets/zasoby/papier.png" alt="papier.png"></a><figcaption>papier.png</figcaption></figure><figure><a href="../assets/zasoby/nozyce.png" download><img src="../assets/zasoby/nozyce.png" alt="nozyce.png"></a><figcaption>nozyce.png</figcaption></figure><figure><a href="../assets/zasoby/pytajnik.png" download><img src="../assets/zasoby/pytajnik.png" alt="pytajnik.png"></a><figcaption>pytajnik.png</figcaption></figure></div><p class="small">Pobierz wszystkie: <a href="../materialy/zasoby_b10-samodzielne.zip" download>zasoby_b10-samodzielne.zip</a>. Obrazy skopiuj do <code>app/src/main/res/drawable</code> (nazwy: małe litery, bez spacji i myślników).</p>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Wszystkie trzy przyciski wywołują <code>zagraj(ruchGracza)</code>.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Wzór: <code>(gracz - komputer + 3) % 3</code> → 0 remis, 1 wygrywa gracz, 2 wygrywa komputer. Sprawdź na kartce wszystkie 9 par.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">zagraj(g):
+    k ← los(0..2)
+    obrazy obu graczy z tablicy
+    r ← (g - k + 3) % 3
+    0 → "Remis"; 1 → gracz++ "Wygrywasz rundę!"; 2 → komputer++ "Komputer wygrywa rundę"
+    napis wyniku gry</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">int</span> roznica = (gracz - komputer + <span class="t-n">3</span>) % <span class="t-n">3</span>;
+<span class="t-k">if</span> (roznica == <span class="t-n">0</span>) {
+    tvRunda.setText(<span class="t-s">"Remis"</span>);
+} <span class="t-k">else</span> <span class="t-k">if</span> (roznica == <span class="t-n">1</span>) {
+    punktyGracza++;
+    tvRunda.setText(<span class="t-s">"Wygrywasz rundę!"</span>);
+} <span class="t-k">else</span> {
+    punktyKomputera++;
+    tvRunda.setText(<span class="t-s">"Komputer wygrywa rundę"</span>);
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvWynikGry"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Gracz 0 : 0 Komputer"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"26sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;ImageView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivGracz"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"130dp"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"8dp"</span>
+            <span class="t-a">android:contentDescription</span>=<span class="t-s">"Wybór gracza"</span>
+            <span class="t-a">android:src</span>=<span class="t-s">"@drawable/pytajnik"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;ImageView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivKomputer"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"130dp"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"8dp"</span>
+            <span class="t-a">android:contentDescription</span>=<span class="t-s">"Wybór komputera"</span>
+            <span class="t-a">android:src</span>=<span class="t-s">"@drawable/pytajnik"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvRunda"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Wybierz ruch"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnKamien"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"4dp"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"KAMIEŃ"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnPapier"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"4dp"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"PAPIER"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnNozyce"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"4dp"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"NOŻYCE"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ImageView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> java.util.<span class="t-t">Random</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-c">// 0 = kamień, 1 = papier, 2 = nożyce</span>
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] obrazy = {<span class="t-t">R</span>.drawable.kamien, <span class="t-t">R</span>.drawable.papier, <span class="t-t">R</span>.drawable.nozyce};
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">Random</span> losowanie = <span class="t-k">new</span> <span class="t-t">Random</span>();
+    <span class="t-k">private</span> <span class="t-k">int</span> punktyGracza = <span class="t-n">0</span>;
+    <span class="t-k">private</span> <span class="t-k">int</span> punktyKomputera = <span class="t-n">0</span>;
+
+    <span class="t-k">private</span> <span class="t-t">ImageView</span> ivGracz, ivKomputer;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvWynikGry, tvRunda;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        ivGracz = findViewById(<span class="t-t">R</span>.id.ivGracz);
+        ivKomputer = findViewById(<span class="t-t">R</span>.id.ivKomputer);
+        tvWynikGry = findViewById(<span class="t-t">R</span>.id.tvWynikGry);
+        tvRunda = findViewById(<span class="t-t">R</span>.id.tvRunda);
+        <span class="t-t">Button</span> btnKamien = findViewById(<span class="t-t">R</span>.id.btnKamien);
+        <span class="t-t">Button</span> btnPapier = findViewById(<span class="t-t">R</span>.id.btnPapier);
+        <span class="t-t">Button</span> btnNozyce = findViewById(<span class="t-t">R</span>.id.btnNozyce);
+
+        btnKamien.setOnClickListener(v -&gt; zagraj(<span class="t-n">0</span>));
+        btnPapier.setOnClickListener(v -&gt; zagraj(<span class="t-n">1</span>));
+        btnNozyce.setOnClickListener(v -&gt; zagraj(<span class="t-n">2</span>));
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> zagraj(<span class="t-k">int</span> gracz) {
+        <span class="t-k">int</span> komputer = losowanie.nextInt(<span class="t-n">3</span>);
+        ivGracz.setImageResource(obrazy[gracz]);
+        ivKomputer.setImageResource(obrazy[komputer]);
+
+        <span class="t-k">int</span> roznica = (gracz - komputer + <span class="t-n">3</span>) % <span class="t-n">3</span>;   <span class="t-c">// 0 remis, 1 wygrywa gracz, 2 wygrywa komputer</span>
+        <span class="t-k">if</span> (roznica == <span class="t-n">0</span>) {
+            tvRunda.setText(<span class="t-s">"Remis"</span>);
+        } <span class="t-k">else</span> <span class="t-k">if</span> (roznica == <span class="t-n">1</span>) {
+            punktyGracza++;
+            tvRunda.setText(<span class="t-s">"Wygrywasz rundę!"</span>);
+        } <span class="t-k">else</span> {
+            punktyKomputera++;
+            tvRunda.setText(<span class="t-s">"Komputer wygrywa rundę"</span>);
+        }
+        tvWynikGry.setText(<span class="t-s">"Gracz "</span> + punktyGracza + <span class="t-s">" : "</span> + punktyKomputera + <span class="t-s">" Komputer"</span>);
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b10_samodzielne/">rozwiazania/b10_samodzielne/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b10-samodzielne">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="inf04"><h2><span class="sec-num">7.</span> Zadanie w stylu INF.04</h2><div class="task exam" id="b10-inf">
+<div class="task-head"><h3>Automat owocowy</h3><span class="meta">⏱ ok. 50 min</span></div>
+<p>Wykonaj aplikację mobilną — prosty automat do gry. Do wykonania zadania wykorzystaj obrazy z archiwum <code>zasoby_b10-inf.zip</code>.</p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>tytuł, napis salda, rząd 3 obrazów, przycisk ZAGRAJ, napis wygranej, przycisk NOWA GRA, autor</td></tr><tr><td>DANE</td><td>brak pól — losowanie</td></tr><tr><td>ZDARZENIA</td><td>ZAGRAJ, NOWA GRA</td></tr><tr><td>LOGIKA</td><td>saldo −10; losowanie 3 symboli 0..3; zliczanie wystąpień: 3×7 → 200, 3 takie same → 50, 2 takie same → 20, inaczej 0; blokada przy saldzie &lt; 10; reset</td></tr><tr><td>WYNIK</td><td>obrazy symboli, „Wygrana w tej rundzie: x”, „Saldo: x żetonów”, „Koniec żetonów”</td></tr><tr><td>WYGLĄD</td><td>tło #FFEBEE; tytuł #B71C1C biały, wyśrodkowany, największy; rząd obrazów biały; obrazy 90dp, marginesy 8, wypełniają szerokość; ZAGRAJ #FFB300 czarny; NOWA GRA #616161</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#FFEBEE;padding:0px"><div class="m-t" style="background:#B71C1C;color:#fff;font-size:24px;padding:8px;text-align:center;align-self:stretch">Automat owocowy</div><div class="m-t" style="font-size:17.6px;font-weight:700;margin:8px 0px 8px 0px;text-align:center;align-self:stretch">Saldo: 100 żetonów</div><div class="m-row" style="background:#FFFFFF;align-self:stretch"><div class="m-img" style="margin:6.4px;flex:1 1 0;min-width:0;height:72px;align-self:stretch"><img src="../assets/zasoby/pytajnik.png" alt="" style="object-fit:contain"></div><div class="m-img" style="margin:6.4px;flex:1 1 0;min-width:0;height:72px;align-self:stretch"><img src="../assets/zasoby/pytajnik.png" alt="" style="object-fit:contain"></div><div class="m-img" style="margin:6.4px;flex:1 1 0;min-width:0;height:72px;align-self:stretch"><img src="../assets/zasoby/pytajnik.png" alt="" style="object-fit:contain"></div></div><div class="m-b" style="background:#FFB300;color:#000;margin:8px 0px 0px 0px;align-self:center">ZAGRAJ (10 ŻETONÓW)</div><div class="m-t" style="font-size:14.4px;margin:8px 0px 8px 0px;text-align:center;align-self:stretch">Wygrana w tej rundzie: 0</div><div class="m-b" style="background:#616161;color:#ffffff;align-self:center">NOWA GRA</div><div class="m-t" style="color:#808080;margin:12.8px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Stan początkowy</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#FFEBEE;padding:0px"><div class="m-t" style="background:#B71C1C;color:#fff;font-size:24px;padding:8px;text-align:center;align-self:stretch">Automat owocowy</div><div class="m-t" style="font-size:17.6px;font-weight:700;margin:8px 0px 8px 0px;text-align:center;align-self:stretch">Saldo: 110 żetonów</div><div class="m-row" style="background:#FFFFFF;align-self:stretch"><div class="m-img" style="margin:6.4px;flex:1 1 0;min-width:0;height:72px;align-self:stretch"><img src="../assets/zasoby/cytryna.png" alt="" style="object-fit:contain"></div><div class="m-img" style="margin:6.4px;flex:1 1 0;min-width:0;height:72px;align-self:stretch"><img src="../assets/zasoby/wisnia.png" alt="" style="object-fit:contain"></div><div class="m-img" style="margin:6.4px;flex:1 1 0;min-width:0;height:72px;align-self:stretch"><img src="../assets/zasoby/cytryna.png" alt="" style="object-fit:contain"></div></div><div class="m-b" style="background:#FFB300;color:#000;margin:8px 0px 0px 0px;align-self:center">ZAGRAJ (10 ŻETONÓW)</div><div class="m-t" style="font-size:14.4px;margin:8px 0px 8px 0px;text-align:center;align-self:stretch">Wygrana w tej rundzie: 20</div><div class="m-b" style="background:#616161;color:#ffffff;align-self:center">NOWA GRA</div><div class="m-t" style="color:#808080;margin:12.8px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 2. Dwie cytryny: +20 (100 − 10 + 20)</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Automat owocowy”.</li><li>Napis „Saldo: 100 żetonów”.</li><li>Trzy obrazy (bębny) obok siebie, w stanie początkowym wypełnione grafiką <code>pytajnik</code>.</li><li>Przycisk „ZAGRAJ (10 ŻETONÓW)”.</li><li>Napis „Wygrana w tej rundzie: 0”.</li><li>Przycisk „NOWA GRA”.</li><li>Napis „Autor: ”, dalej numer zdającego.</li></ul>
+<p><strong>Działanie aplikacji:</strong></p>
+<ul><li>Po wciśnięciu „ZAGRAJ”: saldo zmniejsza się o 10; dla każdego bębna losowany jest jeden z czterech symboli (<code>wisnia</code>, <code>cytryna</code>, <code>dzwonek</code>, <code>siodemka</code>) i wyświetlany jako obraz; obliczana jest wygrana i dodawana do salda.</li><li>Zasady wygranej: trzy siódemki — 200; trzy jednakowe inne symbole — 50; dokładnie dwa jednakowe symbole — 20; w pozostałych przypadkach — 0.</li><li>Po każdej grze aktualizowane są napisy wygranej i salda.</li><li>Jeżeli saldo jest mniejsze niż 10, przycisk „ZAGRAJ” staje się nieaktywny, a w napisie wygranej pojawia się „Koniec żetonów”.</li><li>„NOWA GRA”: saldo 100, trzy obrazy <code>pytajnik</code>, „Wygrana w tej rundzie: 0”, przycisk „ZAGRAJ” aktywny.</li></ul>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs w XML; rozkład liniowy pionowy z zagnieżdżonym rozkładem poziomym dla trzech obrazów.</li><li>Kolory tła: strona #FFEBEE, tytuł #B71C1C (biała czcionka, największa, wyśrodkowana), rozkład obrazów biały, „ZAGRAJ” #FFB300 (czarna czcionka), „NOWA GRA” #616161 (biała czcionka). Przyciski wyśrodkowane.</li><li>Obrazy: wysokość 90, marginesy 8, wypełniają całą szerokość rozkładu, widoczne w całości.</li><li>Program zawiera metodę losującą wszystkie bębny (zwraca tablicę) i metodę liczącą wygraną (przyjmuje tablicę, zwraca liczbę). Metody nie korzystają z kontrolek.</li></ul>
+<h4>Zasoby do zadania</h4><div class="res-list"><figure><a href="../assets/zasoby/wisnia.png" download><img src="../assets/zasoby/wisnia.png" alt="wisnia.png"></a><figcaption>wisnia.png</figcaption></figure><figure><a href="../assets/zasoby/cytryna.png" download><img src="../assets/zasoby/cytryna.png" alt="cytryna.png"></a><figcaption>cytryna.png</figcaption></figure><figure><a href="../assets/zasoby/dzwonek.png" download><img src="../assets/zasoby/dzwonek.png" alt="dzwonek.png"></a><figcaption>dzwonek.png</figcaption></figure><figure><a href="../assets/zasoby/siodemka.png" download><img src="../assets/zasoby/siodemka.png" alt="siodemka.png"></a><figcaption>siodemka.png</figcaption></figure><figure><a href="../assets/zasoby/pytajnik.png" download><img src="../assets/zasoby/pytajnik.png" alt="pytajnik.png"></a><figcaption>pytajnik.png</figcaption></figure></div><p class="small">Pobierz wszystkie: <a href="../materialy/zasoby_b10-inf.zip" download>zasoby_b10-inf.zip</a>. Obrazy skopiuj do <code>app/src/main/res/drawable</code> (nazwy: małe litery, bez spacji i myślników).</p>
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b10-inf"><li><label><input type="checkbox"> <span>stan początkowy: 3 × pytajnik, saldo 100, wygrana 0</span></label></li><li><label><input type="checkbox"> <span>każda gra zmniejsza saldo o 10 i pokazuje trzy losowe symbole</span></label></li><li><label><input type="checkbox"> <span>wygrane zgodne z zasadami (sprawdź na kartce kilka wyników z emulatora)</span></label></li><li><label><input type="checkbox"> <span>saldo &lt; 10 → ZAGRAJ nieaktywny, „Koniec żetonów”</span></label></li><li><label><input type="checkbox"> <span>NOWA GRA przywraca stan początkowy i aktywuje ZAGRAJ</span></label></li><li><label><input type="checkbox"> <span>metody <code>losujBebny()</code> i <code>policzWygrana(int[])</code> bez odwołań do kontrolek</span></label></li><li><label><input type="checkbox"> <span>obrazy: 90dp, marginesy 8dp, waga 1, białe tło rzędu</span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Rozpisz na kartce przykłady: (7,7,7) → 200; (dzwonek×3) → 50; (cytryna, wiśnia, cytryna) → 20; (wszystkie różne) → 0. Kolejność warunków ma znaczenie.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>W <code>policzWygrana</code> zbuduj tablicę liczników <code>int[4]</code> i znajdź największą liczbę powtórzeń. Trzy siódemki sprawdź jako pierwsze.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">zagraj(): saldo -= 10; wynik ← losujBebny(); obrazy z tablicy symboli
+          wygrana ← policzWygrana(wynik); saldo += wygrana; napisy
+          jeśli saldo &lt; 10 → przycisk nieaktywny, "Koniec żetonów"
+policzWygrana(w): licznik[4]; najwiecej ← max(licznik)
+          licznik[7] == 3 → 200; najwiecej == 3 → 50; najwiecej == 2 → 20; inaczej 0</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">int</span> policzWygrana(<span class="t-k">int</span>[] wynik) {
+    <span class="t-k">int</span>[] licznik = <span class="t-k">new</span> <span class="t-k">int</span>[symbole.length];
+    <span class="t-k">for</span> (<span class="t-k">int</span> s : wynik) {
+        licznik[s]++;
+    }
+    <span class="t-k">int</span> najwiecej = <span class="t-n">0</span>;
+    <span class="t-k">for</span> (<span class="t-k">int</span> ile : licznik) {
+        <span class="t-k">if</span> (ile &gt; najwiecej) {
+            najwiecej = ile;
+        }
+    }
+    <span class="t-k">if</span> (licznik[<span class="t-t">SIODEMKA</span>] == <span class="t-n">3</span>) <span class="t-k">return</span> <span class="t-n">200</span>;
+    <span class="t-k">if</span> (najwiecej == <span class="t-n">3</span>) <span class="t-k">return</span> <span class="t-n">50</span>;
+    <span class="t-k">if</span> (najwiecej == <span class="t-n">2</span>) <span class="t-k">return</span> <span class="t-n">20</span>;
+    <span class="t-k">return</span> <span class="t-n">0</span>;
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#FFEBEE"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#B71C1C"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Automat owocowy"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"30sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvSaldo"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginVertical</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Saldo: 100 żetonów"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"22sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;ImageView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivBeben1"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"90dp"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"8dp"</span>
+            <span class="t-a">android:contentDescription</span>=<span class="t-s">"Bęben 1"</span>
+            <span class="t-a">android:src</span>=<span class="t-s">"@drawable/pytajnik"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;ImageView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivBeben2"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"90dp"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"8dp"</span>
+            <span class="t-a">android:contentDescription</span>=<span class="t-s">"Bęben 2"</span>
+            <span class="t-a">android:src</span>=<span class="t-s">"@drawable/pytajnik"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;ImageView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivBeben3"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"90dp"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"8dp"</span>
+            <span class="t-a">android:contentDescription</span>=<span class="t-s">"Bęben 3"</span>
+            <span class="t-a">android:src</span>=<span class="t-s">"@drawable/pytajnik"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnZagraj"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#FFB300"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"ZAGRAJ (10 ŻETONÓW)"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#000000"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvWygrana"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginVertical</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Wygrana w tej rundzie: 0"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnNowaGra"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#616161"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"NOWA GRA"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvAutor"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ImageView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> java.util.<span class="t-t">Random</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">SALDO_POCZATKOWE</span> = <span class="t-n">100</span>;
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">KOSZT_GRY</span> = <span class="t-n">10</span>;
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">SIODEMKA</span> = <span class="t-n">3</span>;   <span class="t-c">// indeks symbolu 7</span>
+
+    <span class="t-c">// 0 = wiśnia, 1 = cytryna, 2 = dzwonek, 3 = siódemka</span>
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] symbole = {<span class="t-t">R</span>.drawable.wisnia, <span class="t-t">R</span>.drawable.cytryna, <span class="t-t">R</span>.drawable.dzwonek, <span class="t-t">R</span>.drawable.siodemka};
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">Random</span> losowanie = <span class="t-k">new</span> <span class="t-t">Random</span>();
+    <span class="t-k">private</span> <span class="t-k">int</span> saldo = <span class="t-t">SALDO_POCZATKOWE</span>;
+
+    <span class="t-k">private</span> <span class="t-t">ImageView</span>[] bebny;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvSaldo, tvWygrana;
+    <span class="t-k">private</span> <span class="t-t">Button</span> btnZagraj;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        bebny = <span class="t-k">new</span> <span class="t-t">ImageView</span>[]{findViewById(<span class="t-t">R</span>.id.ivBeben1), findViewById(<span class="t-t">R</span>.id.ivBeben2), findViewById(<span class="t-t">R</span>.id.ivBeben3)};
+        tvSaldo = findViewById(<span class="t-t">R</span>.id.tvSaldo);
+        tvWygrana = findViewById(<span class="t-t">R</span>.id.tvWygrana);
+        btnZagraj = findViewById(<span class="t-t">R</span>.id.btnZagraj);
+        <span class="t-t">Button</span> btnNowaGra = findViewById(<span class="t-t">R</span>.id.btnNowaGra);
+
+        btnZagraj.setOnClickListener(v -&gt; zagraj());
+        btnNowaGra.setOnClickListener(v -&gt; nowaGra());
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> zagraj() {
+        saldo -= <span class="t-t">KOSZT_GRY</span>;
+        <span class="t-k">int</span>[] wynik = losujBebny();
+        <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; bebny.length; i++) {
+            bebny[i].setImageResource(symbole[wynik[i]]);
+        }
+        <span class="t-k">int</span> wygrana = policzWygrana(wynik);
+        saldo += wygrana;
+        tvWygrana.setText(<span class="t-s">"Wygrana w tej rundzie: "</span> + wygrana);
+        tvSaldo.setText(<span class="t-s">"Saldo: "</span> + saldo + <span class="t-s">" żetonów"</span>);
+        <span class="t-k">if</span> (saldo &lt; <span class="t-t">KOSZT_GRY</span>) {
+            btnZagraj.setEnabled(<span class="t-k">false</span>);
+            tvWygrana.setText(<span class="t-s">"Koniec żetonów"</span>);
+        }
+    }
+
+    <span class="t-k">private</span> <span class="t-k">int</span>[] losujBebny() {
+        <span class="t-k">int</span>[] wynik = <span class="t-k">new</span> <span class="t-k">int</span>[<span class="t-n">3</span>];
+        <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; wynik.length; i++) {
+            wynik[i] = losowanie.nextInt(symbole.length);   <span class="t-c">// 0..3</span>
+        }
+        <span class="t-k">return</span> wynik;
+    }
+
+    <span class="t-c">// zliczanie wystąpień: licznik[s] = ile razy wypadł symbol s</span>
+    <span class="t-k">private</span> <span class="t-k">int</span> policzWygrana(<span class="t-k">int</span>[] wynik) {
+        <span class="t-k">int</span>[] licznik = <span class="t-k">new</span> <span class="t-k">int</span>[symbole.length];
+        <span class="t-k">for</span> (<span class="t-k">int</span> s : wynik) {
+            licznik[s]++;
+        }
+        <span class="t-k">int</span> najwiecej = <span class="t-n">0</span>;
+        <span class="t-k">for</span> (<span class="t-k">int</span> ile : licznik) {
+            <span class="t-k">if</span> (ile &gt; najwiecej) {
+                najwiecej = ile;
+            }
+        }
+        <span class="t-k">if</span> (licznik[<span class="t-t">SIODEMKA</span>] == <span class="t-n">3</span>) {
+            <span class="t-k">return</span> <span class="t-n">200</span>;
+        } <span class="t-k">else</span> <span class="t-k">if</span> (najwiecej == <span class="t-n">3</span>) {
+            <span class="t-k">return</span> <span class="t-n">50</span>;
+        } <span class="t-k">else</span> <span class="t-k">if</span> (najwiecej == <span class="t-n">2</span>) {
+            <span class="t-k">return</span> <span class="t-n">20</span>;
+        }
+        <span class="t-k">return</span> <span class="t-n">0</span>;
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> nowaGra() {
+        saldo = <span class="t-t">SALDO_POCZATKOWE</span>;
+        <span class="t-k">for</span> (<span class="t-t">ImageView</span> beben : bebny) {
+            beben.setImageResource(<span class="t-t">R</span>.drawable.pytajnik);
+        }
+        tvSaldo.setText(<span class="t-s">"Saldo: "</span> + saldo + <span class="t-s">" żetonów"</span>);
+        tvWygrana.setText(<span class="t-s">"Wygrana w tej rundzie: 0"</span>);
+        btnZagraj.setEnabled(<span class="t-k">true</span>);
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b10_inf/">rozwiazania/b10_inf/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b10-inf">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="checklista"><h2><span class="sec-num">8.</span> Checklista</h2><p class="small muted">Sprawdź swoją aplikację z zadania INF.04 punkt po punkcie (krok 10 procedury).</p><ul class="checklist" data-key="b10-check"><li><label><input type="checkbox"> <span><code>Random</code> jest polem klasy; zakres losowania sprawdzony na krańcach</span></label></li><li><label><input type="checkbox"> <span>wartość → obraz przez tablicę <code>int[]</code> z poprawnym przesunięciem indeksu</span></label></li><li><label><input type="checkbox"> <span>kilka podobnych kontrolek obsługuję tablicą i pętlą</span></label></li><li><label><input type="checkbox"> <span>algorytm (punkty, wygrana) w osobnej metodzie: dostaje tablicę, zwraca liczbę</span></label></li><li><label><input type="checkbox"> <span>reset przywraca <strong>wszystkie</strong> elementy stanu (liczniki, obrazy, napisy, dostępność)</span></label></li><li><label><input type="checkbox"> <span>przetestowałem algorytm na przykładach z polecenia</span></label></li></ul></section>
+<section class="sec" id="test"><h2><span class="sec-num">9.</span> Mini-test</h2><div class="quiz" data-quiz="b10"><script type="application/json">[{"q": "<p>Który zapis losuje oczko kości 1–6?<\/p>", "o": ["<code>r.nextInt(6)<\/code>", "<code>r.nextInt(6) + 1<\/code>", "<code>r.nextInt(7)<\/code>", "<code>r.nextInt(1, 6)<\/code>"], "a": 1, "e": "<p><code>nextInt(6)<\/code> daje 0–5. Wariant z dwoma argumentami ma górną granicę wyłączną (1–5) i nie jest dostępny na starszych Androidach.<\/p>"}, {"q": "<p>Wyniki {3, 3, 3, 1, 6}. Punkty wg Arkusza_12 (suma oczek wartości wylosowanych ≥ 2 razy):<\/p>", "o": ["16", "9", "3", "0"], "a": 1, "e": "<p>Tylko trójka wystąpiła więcej niż raz: 3 + 3 + 3 = 9.<\/p>"}, {"q": "<p><code>int[] ile = new int[7]; for (int w : wyniki) ile[w]++;<\/code> — co oznacza <code>ile[5]<\/code>?<\/p>", "o": ["piąty rzut", "ile razy wypadła piątka", "sumę pięciu rzutów", "nic, zawsze 0"], "a": 1, "e": "<p>To tablica liczników indeksowana wartością.<\/p>"}, {"q": "<p>Masz tablicę <code>ImageView[] kosci<\/code> (5 elementów). Jak ustawić wszystkim obraz <code>question<\/code>?<\/p>", "o": ["<code>kosci.setImageResource(R.drawable.question)<\/code>", "pętla <code>for (ImageView k : kosci) k.setImageResource(R.drawable.question);<\/code>", "<code>kosci[5].setImageResource(...)<\/code>", "nie da się"], "a": 1, "e": "<p>Tablica nie ma metod kontrolki — działamy na każdym elemencie.<\/p>"}, {"q": "<p>Dlaczego metoda licząca punkty nie powinna ustawiać napisów?<\/p>", "o": ["bo Android tego zabrania", "żeby dało się ją przetestować i użyć ponownie (np. z konsoli) — oddzielenie logiki od UI", "bo jest wolniejsza", "nie ma to znaczenia"], "a": 1, "e": "<p>Arkusz_12 wprost zachęca do użycia fragmentów kodu z aplikacji konsolowej.<\/p>"}]</script></div></section>
+<section class="sec" id="dodatkowe"><h2><span class="sec-num">10.</span> Skończyłeś wcześniej?</h2><div class="micro"><h4>Gra w kości (Arkusz_12) — trening</h4><p>Z sześciu dowolnych obrazów z zasobów kursu zrób „ścianki” 1–6 i zbuduj grę na 5 kościach: RZUĆ KOŚĆMI (punkty wg zasady powtórzeń, wynik gry kumulowany) i RESETUJ WYNIK. Zmierz czas.</p></div><div class="micro"><h4>Statystyka automatu</h4><p>Dodaj napis „Gier: n, wygranych: k (x%)”.</p></div><div class="micro"><h4>Ile rzutów do szóstki?</h4><p>Przycisk „RZUCAJ DO 6”: losuj kostką w pętli, aż wypadnie 6. Wyświetl liczbę rzutów i ostatnią ściankę.</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p>Pętla <code>do { … } while (wynik != 6);</code></p></div></details></div></section>
+<div class="nav-bottom"><a class="btn secondary" href="blok09.html">← Blok 9</a><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button><a class="btn secondary" href="blok11.html">Blok 11 →</a></div></article></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
