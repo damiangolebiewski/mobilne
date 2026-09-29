@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blok 12 — Debugowanie i procedura egzaminacyjna</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../" data-page="block" data-block="b12">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html" class="active">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="block-layout"><aside class="toc no-print"><strong>Blok 12</strong><ol><li><a href="#cel">Cel</a></li><li><a href="#przypomnienie">Krótkie przypomnienie</a></li><li><a href="#przyklad">Przykład</a></li><li><a href="#mikro">Mikroćwiczenia</a></li><li><a href="#prowadzone">Zadanie prowadzone (naprawa)</a></li><li><a href="#samodzielne">Zadanie samodzielne (naprawa)</a></li><li><a href="#inf04">Zadanie w stylu INF.04 — na czas</a></li><li><a href="#checklista">Checklista</a></li><li><a href="#test">Mini-test</a></li><li><a href="#dodatkowe">Skończyłeś wcześniej?</a></li></ol><a class="skip" href="#samodzielne">Silniejszy? Przejdź od razu do zadania samodzielnego →</a><p class="small muted" style="margin-top:.8rem">Słabszy? Przypomnienie → Przykład → Mikroćwiczenia → Zadanie prowadzone (z podpowiedziami).</p></aside><article class="page"><div class="block-head"><div><div class="muted small"><a href="../index.html">Bloki</a> › Blok 12</div><h1>Blok 12. Debugowanie i procedura egzaminacyjna</h1><span class="badge p3">Faza III — tryb egzaminacyjny</span> <span id="block-status" class="badge">W trakcie</span></div><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button></div>
+<p>Naprawiasz aplikacje z typowymi błędami (kompilacja, awaria, zła logika, zły wygląd), czytasz Logcat i ćwiczysz pełną procedurę oddania pracy. Na końcu — zadanie egzaminacyjne na czas (60 min).</p>
+<section class="sec" id="cel"><h2><span class="sec-num">1.</span> Cel</h2><p><strong>Po wykonaniu tego bloku będziesz potrafił:</strong></p><ul><li>rozróżnić błąd budowania, awarię w czasie działania, błąd logiki i błąd wyglądu,</li><li>odczytać w oknie Build i w Logcat nazwę błędu, plik i numer linii,</li><li>naprawić 10 najczęstszych błędów z aplikacji egzaminacyjnych,</li><li>wykonać komplet czynności oddania pracy: zrzuty, <code>mobilna.zip</code>, kopie plików, opis środowiska,</li><li>zmieścić się z zadaniem mobilnym w 60 minutach.</li></ul><details class="hint"><summary>Plan czasu (4 × 45 min = 180 min)</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>Przypomnienie (Logcat, procedura)</td><td>15 min</td></tr><tr><td>Przykład</td><td>5 min</td></tr><tr><td>Mikroćwiczenia (8 błędów)</td><td>30 min</td></tr><tr><td>Zadanie prowadzone</td><td>30 min</td></tr><tr><td>Zadanie samodzielne</td><td>30 min</td></tr><tr><td>Zadanie INF.04 na czas</td><td>60 min</td></tr><tr><td>Checklista + mini-test</td><td>10 min</td></tr><tr><th>Razem</th><th>180 min</th></tr></tbody></table></div></div></details><p class="small muted">Powiązanie z arkuszami: każde zadanie mobilne kończy się tą samą procedurą: kompilacja i emulacja, zrzuty całego ekranu, <code>mobilna.zip</code>, pliki XML i Java (Arkusz_07 dodatkowo <code>srodowisko.txt</code>); przy błędach kompilacji arkusze wymagają zrzutu z listą błędów. Błędy w ćwiczeniach wynikają z wymagań tych zadań (analiza, pkt 9).</p></section>
+<section class="sec" id="przypomnienie"><h2><span class="sec-num">2.</span> Krótkie przypomnienie</h2><h4>Cztery rodzaje błędów</h4>
+<div class="table-wrap"><table><thead><tr><th>Rodzaj</th><th>Gdzie widać</th><th>Przykład</th></tr></thead><tbody><tr><td><strong>budowanie / kompilacja</strong></td><td>okno <strong>Build</strong> (czerwone), aplikacja się nie uruchamia</td><td>literówka w id, brak <code>layout_height</code>, zła nazwa zasobu, <code>this</code> w klasie anonimowej</td></tr><tr><td><strong>awaria (crash)</strong></td><td>aplikacja „zamyka się”; <strong>Logcat</strong> → <code>FATAL EXCEPTION</code></td><td><code>setText(int)</code>, <code>parseInt("")</code>, indeks poza tablicą, <code>null</code> z <code>findViewById</code></td></tr><tr><td><strong>logika</strong></td><td>działa, ale wynik zły</td><td><code>==</code> na napisach, brak odświeżenia, zła kolejność warunków</td></tr><tr><td><strong>wygląd</strong></td><td>działa, ale niezgodny z obrazem</td><td><code>background</code> zamiast <code>backgroundTint</code>, brak <code>0dp</code> przy wadze, brak <code>dividerHeight</code></td></tr></tbody></table></div>
+<h4>Najczęstsze wyjątki w Logcat</h4>
+<div class="table-wrap"><table><thead><tr><th>Wyjątek</th><th>Najczęstsza przyczyna</th></tr></thead><tbody><tr><td><code>NullPointerException</code></td><td><code>findViewById</code> zwrócił <code>null</code>: id z innego pliku, wywołanie przed <code>setContentView</code>, usunięte <code>@+id/main</code> przy kodzie EdgeToEdge</td></tr><tr><td><code>Resources$NotFoundException: String resource ID</code></td><td><code>setText(liczba)</code></td></tr><tr><td><code>NumberFormatException</code></td><td><code>parseInt</code>/<code>parseDouble</code> z pustego lub niepoprawnego tekstu</td></tr><tr><td><code>ArrayIndexOutOfBoundsException</code></td><td>indeks = długość tablicy (brak <code>% length</code>, brak <code>-1</code> przy oczkach kości)</td></tr><tr><td><code>UnsupportedOperationException</code></td><td><code>add</code> na liście z <code>Arrays.asList</code></td></tr></tbody></table></div>
+<h4>Procedura oddania (wg arkuszy)</h4>
+<ol><li>Folder z numerem zdającego, w nim podfoldery z polecenia (np. <code>konsola</code>, <code>mobilna</code>, <code>dokumentacja</code>).</li><li>Uruchom aplikację w emulatorze. Zrzuty <strong>całego ekranu z paskiem zadań</strong> (emulator + otwarte Android Studio): stan początkowy i każda interakcja. Nazwy z polecenia (<code>mobile1.png</code>, <code>mobile2.png</code> … lub <code>mobilna.jpg</code>). Skrót Windows: <strong>Win+Shift+S</strong> (lub PrtSc) → wklej do Painta → zapisz.</li><li>Gdy aplikacja się nie kompiluje: zrzut z oknem błędów i otwartym środowiskiem — to też jest punktowane.</li><li><em>File → Close Project</em> (albo zamknij Android Studio), spakuj <strong>cały folder projektu</strong> do <code>mobilna.zip</code>.</li><li>Skopiuj do folderu <code>mobilna</code>: <code>app\src\main\res\layout\activity_main.xml</code> i <code>app\src\main\java\…\MainActivity.java</code> (+ inne zmieniane pliki, np. <code>list_item.xml</code>).</li><li>Opis środowiska — tam, gdzie wymaga polecenie (<code>egzamin.docx</code> lub <code>srodowisko.txt</code>): system operacyjny, <strong>Android Studio</strong> (wersja), język <strong>Java</strong>, nazwa emulatora (np. <em>Pixel 5 API 30</em>).</li></ol>
+<p>Szczegóły i lista kontrolna: <a href="../sciaga/procedura.html">Procedura egzaminu</a>.</p></section>
+<section class="sec" id="przyklad"><h2><span class="sec-num">3.</span> Przykład</h2><p><strong>Jak czytać Logcat — przykład.</strong> Aplikacja zamyka się po kliknięciu „USTAW CEL” przy pustym polu:</p>
+<div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">E/AndroidRuntime: FATAL EXCEPTION: main
+    Process: com.example.egzamin, PID: 7431
+    java.lang.NumberFormatException: For input string: ""
+        at java.lang.Integer.parseInt(Integer.java:627)
+        at com.example.egzamin.MainActivity.lambda$onCreate$2(MainActivity.java:41)</code></pre></div>
+<ol><li><strong>Nazwa wyjątku</strong> (<code>NumberFormatException</code>) mówi, <em>co</em> się stało.</li><li><strong>Pierwsza linia z Twoim pakietem</strong> (<code>com.example.egzamin.MainActivity…:41</code>) mówi, <em>gdzie</em> — kliknij niebieski link, a Android Studio otworzy linię 41.</li><li>Tekst po dwukropku (<code>For input string: ""</code>) mówi, <em>z jaką wartością</em>.</li></ol>
+<p>Naprawa: <code>try/catch</code> wokół <code>parseInt</code> + komunikat dla użytkownika.</p></section>
+<section class="sec" id="mikro"><h2><span class="sec-num">4.</span> Mikroćwiczenia</h2><div class="micro"><h4>Ćwiczenie 12.1 — Błąd budowania: nazwa zasobu</h4><p>Po wklejeniu obrazów Build pokazuje: <code>'-' is not a valid file-based resource name character</code> dla <code>kosc-1.png</code>. Co zrobić?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Zmień nazwę pliku (Shift+F6) na <code>kosc1.png</code> / <code>kosc_1.png</code> i popraw odwołania (<code>R.drawable.kosc1</code>).</p></div></details></div><div class="micro"><h4>Ćwiczenie 12.2 — Awaria przy starcie</h4><p>Szablon zawiera <code>ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), …)</code>. Uczeń zamienił <code>ConstraintLayout</code> na <code>LinearLayout</code> i aplikacja zamyka się od razu po uruchomieniu (<code>NullPointerException</code>). Dwie możliwe naprawy?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Dodaj <code>android:id="@+id/main"</code> do nowego korzenia <strong>albo</strong> usuń linie EdgeToEdge/ViewCompat z <code>onCreate</code> (wersja kursowa).</p></div></details></div><div class="micro"><h4>Ćwiczenie 12.3 — cannot find symbol</h4><p><code>error: cannot find symbol  symbol: variable btnZatwierdz  location: class id</code>. Co jest źle?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>W XML nie ma elementu z <code>android:id="@+id/btnZatwierdz"</code> (literówka, inna nazwa, brak id). Porównaj id w XML i w <code>findViewById</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 12.4 — Hasła „różne”</h4><p>Oba pola zawierają „abc123”, a aplikacja wyświetla „Hasła się różnią”. W kodzie: <code>if (haslo != haslo2)</code>. Popraw.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>if (!haslo.equals(haslo2))</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 12.5 — Kolor przycisku</h4><p>W XML przycisku jest <code>android:background="#D2691E"</code>, a w emulatorze przycisk jest fioletowy. Popraw.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Zamień na <code>android:backgroundTint="#D2691E"</code> (motyw Material 3 ignoruje <code>background</code> na przyciskach).</p></div></details></div><div class="micro"><h4>Ćwiczenie 12.6 — Kość z zerem</h4><p><code>int oczka = r.nextInt(6); ivKosc.setImageResource(kosci[oczka]);</code> — czasem pokazuje złą ściankę, a punkty się nie zgadzają. Co jest nie tak?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Oczka są 0..5 zamiast 1..6. Poprawnie: <code>int oczka = r.nextInt(6) + 1;</code> i obraz <code>kosci[oczka - 1]</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 12.7 — Równe przyciski</h4><p>Trzy przyciski mają <code>layout_weight="1"</code>, ale różną szerokość. Co sprawdzić?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Szerokość musi być <code>layout_width="0dp"</code>. Przy <code>wrap_content</code> waga dzieli tylko <strong>wolne</strong> miejsce, a nie całą szerokość.</p></div></details></div><div class="micro"><h4>Ćwiczenie 12.8 — Niewidoczny separator</h4><p>Lista ma <code>android:divider="#DC143C"</code>, a separatora nie widać. Dlaczego?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Kolor ustawiony jako separator nie ma własnej wysokości. Dodaj <code>android:dividerHeight="2dp"</code> (Arkusz_05: „separator jest widoczny, np. poprzez ustawienie wysokości separatora”).</p></div></details></div></section>
+<section class="sec" id="prowadzone"><h2><span class="sec-num">5.</span> Zadanie prowadzone (naprawa)</h2><div class="task" id="b12-prowadzone">
+<div class="task-head"><h3>Napraw: Licznik kroków (6 błędów)</h3><span class="meta">⏱ ok. 30 min</span></div>
+<p>Utwórz nowy projekt i wklej poniższe pliki. Aplikacja zawiera <strong>6 błędów</strong>: 2 w XML i 4 w Javie (budowanie, awarie, logika, wygląd). Naprawiaj po jednym i po każdej poprawce uruchamiaj aplikację.</p>
+<p><strong>Jak ma działać po naprawie:</strong> „+100 KROKÓW” dodaje 100; RESET ustawia 0 <strong>i odświeża ekran</strong>; USTAW CEL ustawia cel z pola (puste pole → <code>Toast</code> „Podaj cel”, bez awarii); napis „Do celu: n” lub „Cel osiągnięty!”. Przyciski w rzędzie mają równą szerokość.</p>
+<p><strong>Procedura:</strong> 1) Build → popraw błędy budowania (okno Build), 2) uruchom → popraw awarie (Logcat), 3) przetestuj każdy przycisk → popraw logikę, 4) porównaj wygląd z opisem.</p>
+<div class="code"><div class="code-bar"><span>activity_main.xml (z błędami)</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvKroki"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Kroki: 0"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"32sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnDodaj"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"+100 KROKÓW"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnReset"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"RESET"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etCel"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Cel (kroki)"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"number"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnUstawCel"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"USTAW CEL"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvStatus"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Do celu: 1000"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div>
+<div class="code"><div class="code-bar"><span>MainActivity.java (z błędami)</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">int</span> kroki = <span class="t-n">0</span>;
+    <span class="t-k">private</span> <span class="t-k">int</span> cel = <span class="t-n">1000</span>;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvKroki, tvStatus;
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etCel;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        tvKroki = findViewById(<span class="t-t">R</span>.id.tvKroki);
+        tvStatus = findViewById(<span class="t-t">R</span>.id.tvStatus);
+        etCel = findViewById(<span class="t-t">R</span>.id.etCel);
+        <span class="t-t">Button</span> btnDodaj = findViewById(<span class="t-t">R</span>.id.btnPlus);
+        <span class="t-t">Button</span> btnReset = findViewById(<span class="t-t">R</span>.id.btnReset);
+        <span class="t-t">Button</span> btnUstawCel = findViewById(<span class="t-t">R</span>.id.btnUstawCel);
+
+        btnDodaj.setOnClickListener(v -&gt; {
+            kroki += <span class="t-n">100</span>;
+            pokaz();
+        });
+
+        btnReset.setOnClickListener(v -&gt; {
+            kroki = <span class="t-n">0</span>;
+        });
+
+        btnUstawCel.setOnClickListener(v -&gt; {
+            cel = <span class="t-t">Integer</span>.parseInt(etCel.getText().toString().trim());
+            pokaz();
+        });
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> pokaz() {
+        tvKroki.setText(kroki);
+        <span class="t-k">if</span> (kroki &gt;= cel) {
+            tvStatus.setText(<span class="t-s">"Cel osiągnięty!"</span>);
+        } <span class="t-k">else</span> {
+            tvStatus.setText(<span class="t-s">"Do celu: "</span> + (cel - kroki));
+        }
+    }
+}</code></pre></div>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Zacznij od okna Build — dopóki projekt się nie buduje, nie zobaczysz pozostałych błędów. Dwa błędy budowania: jeden w XML, jeden w Javie.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Budowanie: <code>tvStatus</code> bez <code>layout_height</code>; <code>R.id.btnPlus</code> nie istnieje. Awarie: <code>setText(kroki)</code>, <code>parseInt</code> z pustego pola. Logika: RESET nie odświeża. Wygląd: wagi z <code>wrap_content</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">1. XML tvStatus  → dodaj android:layout_height="wrap_content"
+2. XML przyciski → layout_width="0dp"
+3. Java          → findViewById(R.id.btnDodaj)
+4. Java pokaz()  → setText("Kroki: " + kroki)
+5. Java cel      → try { parseInt … } catch (NumberFormatException e) { Toast }
+6. Java reset    → po kroki = 0 wywołaj pokaz()</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">btnUstawCel.setOnClickListener(v -&gt; {
+    <span class="t-k">try</span> {
+        cel = <span class="t-t">Integer</span>.parseInt(etCel.getText().toString().trim());
+        pokaz();
+    } <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) {
+        <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Podaj cel"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+    }
+});</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><p>Poprawki w kodzie Java oznaczono komentarzami <code>POPRAWKA n</code>. W XML: <code>layout_width="0dp"</code> dla przycisków (1) oraz <code>layout_height</code> dla <code>tvStatus</code> (2).</p><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvKroki"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Kroki: 0"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"32sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnDodaj"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"+100 KROKÓW"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnReset"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"RESET"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etCel"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Cel (kroki)"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"number"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnUstawCel"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"USTAW CEL"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvStatus"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Do celu: 1000"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Toast</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">int</span> kroki = <span class="t-n">0</span>;
+    <span class="t-k">private</span> <span class="t-k">int</span> cel = <span class="t-n">1000</span>;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvKroki, tvStatus;
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etCel;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        tvKroki = findViewById(<span class="t-t">R</span>.id.tvKroki);
+        tvStatus = findViewById(<span class="t-t">R</span>.id.tvStatus);
+        etCel = findViewById(<span class="t-t">R</span>.id.etCel);
+        <span class="t-t">Button</span> btnDodaj = findViewById(<span class="t-t">R</span>.id.btnDodaj);          <span class="t-c">// POPRAWKA 3: id zgodne z XML</span>
+        <span class="t-t">Button</span> btnReset = findViewById(<span class="t-t">R</span>.id.btnReset);
+        <span class="t-t">Button</span> btnUstawCel = findViewById(<span class="t-t">R</span>.id.btnUstawCel);
+
+        btnDodaj.setOnClickListener(v -&gt; {
+            kroki += <span class="t-n">100</span>;
+            pokaz();
+        });
+
+        btnReset.setOnClickListener(v -&gt; {
+            kroki = <span class="t-n">0</span>;
+            pokaz();                                            <span class="t-c">// POPRAWKA 6: odświeżenie ekranu</span>
+        });
+
+        btnUstawCel.setOnClickListener(v -&gt; {
+            <span class="t-k">try</span> {                                               <span class="t-c">// POPRAWKA 5: puste pole nie zamyka aplikacji</span>
+                cel = <span class="t-t">Integer</span>.parseInt(etCel.getText().toString().trim());
+                pokaz();
+            } <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) {
+                <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Podaj cel"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+            }
+        });
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> pokaz() {
+        tvKroki.setText(<span class="t-s">"Kroki: "</span> + kroki);                     <span class="t-c">// POPRAWKA 4: tekst, nie liczba</span>
+        <span class="t-k">if</span> (kroki &gt;= cel) {
+            tvStatus.setText(<span class="t-s">"Cel osiągnięty!"</span>);
+        } <span class="t-k">else</span> {
+            tvStatus.setText(<span class="t-s">"Do celu: "</span> + (cel - kroki));
+        }
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b12_prowadzone/">rozwiazania/b12_prowadzone/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b12-prowadzone">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="samodzielne"><h2><span class="sec-num">6.</span> Zadanie samodzielne (naprawa)</h2><div class="task" id="b12-samodzielne">
+<div class="task-head"><h3>Napraw: Lista zadań (6 błędów)</h3><span class="meta">⏱ ok. 30 min</span></div>
+<p>Tym razem bez podziału na kategorie — znajdź wszystkie <strong>6 błędów</strong> sam. Aplikacja wzorowana na Arkuszu_05.</p>
+<p><strong>Jak ma działać po naprawie:</strong> przycisk DODAJ w kolorze Crimson (#DC143C) z białą czcionką; lista z widocznym separatorem Crimson; na starcie 2 zadania i „Zadań: 2”; DODAJ dopisuje zadanie na koniec listy (lista odświeża się od razu), czyści pole i pokazuje <strong>aktualną</strong> liczbę zadań; puste pole → <code>Toast</code> „Wpisz zadanie”.</p>
+<div class="code"><div class="code-bar"><span>activity_main.xml (z błędami)</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"12dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;EditText</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/etZadanie"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:hint</span>=<span class="t-s">"Nowe zadanie"</span>
+            <span class="t-a">android:inputType</span>=<span class="t-s">"text"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnDodaj"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:background</span>=<span class="t-s">"#DC143C"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"DODAJ"</span>
+            <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvLiczba"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Zadań: 2"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ListView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/lvZadania"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"0dp"</span>
+        <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+        <span class="t-a">android:divider</span>=<span class="t-s">"#DC143C"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div>
+<div class="code"><div class="code-bar"><span>MainActivity.java (z błędami)</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.view.<span class="t-t">View</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ArrayAdapter</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ListView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Toast</span>;
+
+<span class="t-k">import</span> java.util.<span class="t-t">Arrays</span>;
+<span class="t-k">import</span> java.util.<span class="t-t">List</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">List</span>&lt;<span class="t-t">String</span>&gt; zadania = <span class="t-t">Arrays</span>.asList(<span class="t-s">"Projekt z INF.04"</span>, <span class="t-s">"Zakupy"</span>);
+    <span class="t-k">private</span> <span class="t-t">ArrayAdapter</span>&lt;<span class="t-t">String</span>&gt; adapter;
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etZadanie;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvLiczba;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etZadanie = findViewById(<span class="t-t">R</span>.id.etZadanie);
+        tvLiczba = findViewById(<span class="t-t">R</span>.id.tvLiczba);
+        <span class="t-t">ListView</span> lvZadania = findViewById(<span class="t-t">R</span>.id.lvZadania);
+        <span class="t-t">Button</span> btnDodaj = findViewById(<span class="t-t">R</span>.id.btnDodaj);
+
+        adapter = <span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, android.<span class="t-t">R</span>.layout.simple_list_item_1, zadania);
+        lvZadania.setAdapter(adapter);
+
+        btnDodaj.setOnClickListener(<span class="t-k">new</span> <span class="t-t">View</span>.<span class="t-t">OnClickListener</span>() {
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onClick(<span class="t-t">View</span> v) {
+                <span class="t-t">String</span> zadanie = etZadanie.getText().toString().trim();
+                <span class="t-k">if</span> (zadanie.isEmpty()) {
+                    <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Wpisz zadanie"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+                    <span class="t-k">return</span>;
+                }
+                tvLiczba.setText(<span class="t-s">"Zadań: "</span> + zadania.size());
+                zadania.add(zadanie);
+                etZadanie.setText(<span class="t-s">""</span>);
+            }
+        });
+    }
+}</code></pre></div>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Jeden błąd nie pozwala zbudować projektu, jeden zamyka aplikację przy pierwszym dodaniu, dwa dotyczą wyglądu, dwa — logiki.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Budowanie: <code>this</code> w klasie anonimowej. Awaria: <code>Arrays.asList</code> + <code>add</code>. Wygląd: <code>background</code> na przycisku, brak <code>dividerHeight</code>. Logika: brak <code>notifyDataSetChanged</code>, licznik ustawiany przed dodaniem.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">1. List z Arrays.asList → new ArrayList&lt;&gt;(Arrays.asList(...))
+2. po add → adapter.notifyDataSetChanged()
+3. Toast.makeText(this …) → MainActivity.this
+4. android:background → android:backgroundTint
+5. ListView → android:dividerHeight="2dp"
+6. tvLiczba.setText(...) przenieś za zadania.add(...)</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">ArrayList</span>&lt;<span class="t-t">String</span>&gt; zadania = <span class="t-k">new</span> <span class="t-t">ArrayList</span>&lt;&gt;(<span class="t-t">Arrays</span>.asList(<span class="t-s">"Projekt z INF.04"</span>, <span class="t-s">"Zakupy"</span>));
+...
+zadania.add(zadanie);
+adapter.notifyDataSetChanged();
+etZadanie.setText(<span class="t-s">""</span>);
+tvLiczba.setText(<span class="t-s">"Zadań: "</span> + zadania.size());</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><p>Poprawki Java: komentarze <code>POPRAWKA 1, 2, 3, 6</code>. XML: <code>backgroundTint</code> (4) i <code>dividerHeight</code> (5).</p><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"12dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;EditText</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/etZadanie"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:hint</span>=<span class="t-s">"Nowe zadanie"</span>
+            <span class="t-a">android:inputType</span>=<span class="t-s">"text"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnDodaj"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#DC143C"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"DODAJ"</span>
+            <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvLiczba"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Zadań: 2"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ListView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/lvZadania"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"0dp"</span>
+        <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+        <span class="t-a">android:divider</span>=<span class="t-s">"#DC143C"</span>
+        <span class="t-a">android:dividerHeight</span>=<span class="t-s">"2dp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.view.<span class="t-t">View</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ArrayAdapter</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ListView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Toast</span>;
+
+<span class="t-k">import</span> java.util.<span class="t-t">ArrayList</span>;
+<span class="t-k">import</span> java.util.<span class="t-t">Arrays</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-c">// POPRAWKA 1: ArrayList (zmienny rozmiar) zamiast samego Arrays.asList</span>
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">ArrayList</span>&lt;<span class="t-t">String</span>&gt; zadania = <span class="t-k">new</span> <span class="t-t">ArrayList</span>&lt;&gt;(<span class="t-t">Arrays</span>.asList(<span class="t-s">"Projekt z INF.04"</span>, <span class="t-s">"Zakupy"</span>));
+    <span class="t-k">private</span> <span class="t-t">ArrayAdapter</span>&lt;<span class="t-t">String</span>&gt; adapter;
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etZadanie;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvLiczba;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etZadanie = findViewById(<span class="t-t">R</span>.id.etZadanie);
+        tvLiczba = findViewById(<span class="t-t">R</span>.id.tvLiczba);
+        <span class="t-t">ListView</span> lvZadania = findViewById(<span class="t-t">R</span>.id.lvZadania);
+        <span class="t-t">Button</span> btnDodaj = findViewById(<span class="t-t">R</span>.id.btnDodaj);
+
+        adapter = <span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, android.<span class="t-t">R</span>.layout.simple_list_item_1, zadania);
+        lvZadania.setAdapter(adapter);
+
+        btnDodaj.setOnClickListener(<span class="t-k">new</span> <span class="t-t">View</span>.<span class="t-t">OnClickListener</span>() {
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onClick(<span class="t-t">View</span> v) {
+                <span class="t-t">String</span> zadanie = etZadanie.getText().toString().trim();
+                <span class="t-k">if</span> (zadanie.isEmpty()) {
+                    <span class="t-c">// POPRAWKA 3: w klasie anonimowej kontekst to MainActivity.this</span>
+                    <span class="t-t">Toast</span>.makeText(<span class="t-t">MainActivity</span>.<span class="t-k">this</span>, <span class="t-s">"Wpisz zadanie"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+                    <span class="t-k">return</span>;
+                }
+                zadania.add(zadanie);
+                adapter.notifyDataSetChanged();                     <span class="t-c">// POPRAWKA 2</span>
+                etZadanie.setText(<span class="t-s">""</span>);
+                tvLiczba.setText(<span class="t-s">"Zadań: "</span> + zadania.size());       <span class="t-c">// POPRAWKA 6: po dodaniu</span>
+            }
+        });
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b12_samodzielne/">rozwiazania/b12_samodzielne/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b12-samodzielne">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="inf04"><h2><span class="sec-num">7.</span> Zadanie w stylu INF.04 — na czas</h2><div class="task exam" id="b12-inf">
+<div class="task-head"><h3>Ankieta w stołówce — 60 minut</h3><span class="meta">⏱ ok. 60 min</span></div>
+<p><strong>Tryb egzaminacyjny:</strong> ustaw minutnik na 60 minut. W tym czasie: analiza, aplikacja, zrzuty ekranu <code>mobile1.png</code>, <code>mobile2.png</code>, …, archiwum <code>mobilna.zip</code>, kopie <code>activity_main.xml</code> i <code>MainActivity.java</code> w folderze <code>mobilna</code> oraz plik <code>srodowisko.txt</code> (nazwa środowiska i emulatora). Podpowiedzi otwieraj dopiero po upływie czasu.</p>
+<p>Za pomocą środowiska programistycznego wykonaj aplikację mobilną — ankietę oceniającą obiad w szkolnej stołówce. Do wykonania zadania wykorzystaj obrazy z archiwum <code>zasoby_b12-inf.zip</code>.</p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>tytuł, pytanie, grupa 3 pól radio w rzędzie, obraz (ukryty), rząd porcji (napis, suwak, wartość), pole komentarza, przycisk, 2 napisy wyników, autor</td></tr><tr><td>DANE</td><td>ocena (radio), porcja 1..5 (suwak), komentarz (opcjonalny)</td></tr><tr><td>ZDARZENIA</td><td>zmiana zaznaczenia radio, zmiana suwaka, WYŚLIJ</td></tr><tr><td>LOGIKA</td><td>obraz wg oceny (ukryty bez zaznaczenia); liczniki głosów w tablicy; suma porcji i średnia; walidacja braku oceny; reset formularza</td></tr><tr><td>WYNIK</td><td>napis głosów, średnia porcji (1 miejsce), Toast z podziękowaniem / komentarzem</td></tr><tr><td>WYGLĄD</td><td>tło #E8EAF6; tytuł #283593 biały; pytanie pogrubione; pola radio równo w rzędzie; obraz 120dp; przycisk #283593 wyśrodkowany; średnia pogrubiona</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#E8EAF6;padding:0px"><div class="m-t" style="background:#283593;color:#fff;font-size:20.8px;padding:8px;align-self:stretch">Ankieta — stołówka</div><div class="m-t" style="font-size:14.4px;font-weight:700;margin:8px">Jak oceniasz dzisiejszy obiad?</div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch"><div class="m-col" style="flex:1 1 0;min-width:0;align-self:stretch"><div class="m-radio"><span class="m-rb"></span>Źle</div></div><div class="m-col" style="flex:1 1 0;min-width:0;align-self:stretch"><div class="m-radio"><span class="m-rb"></span>Średnio</div></div><div class="m-col" style="flex:1 1 0;min-width:0;align-self:stretch"><div class="m-radio"><span class="m-rb"></span>Dobrze</div></div></div><div style="height:104px"></div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch;align-items:center"><div class="m-t" style="">Wielkość porcji:</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:50%;background:#6750A4"></div><div class="m-seek-thumb" style="left:50%;background:#6750A4"></div></div></div><div class="m-t" style="font-weight:700">3</div></div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span class="m-hint" style="">Komentarz (opcjonalnie)</span></div><div class="m-b" style="background:#283593;color:#ffffff;align-self:center">WYŚLIJ</div><div class="m-t" style="margin:8px 0px 0px 0px;text-align:center;align-self:stretch">Głosów: 0 | źle: 0, średnio: 0, dobrze: 0</div><div class="m-t" style="font-weight:700;text-align:center;align-self:stretch">Średnia porcja: –</div><div class="m-t" style="color:#808080;margin:8px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Stan początkowy</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#E8EAF6;padding:0px"><div class="m-t" style="background:#283593;color:#fff;font-size:20.8px;padding:8px;align-self:stretch">Ankieta — stołówka</div><div class="m-t" style="font-size:14.4px;font-weight:700;margin:8px">Jak oceniasz dzisiejszy obiad?</div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch"><div class="m-col" style="flex:1 1 0;min-width:0;align-self:stretch"><div class="m-radio"><span class="m-rb"></span>Źle</div></div><div class="m-col" style="flex:1 1 0;min-width:0;align-self:stretch"><div class="m-radio"><span class="m-rb"></span>Średnio</div></div><div class="m-col" style="flex:1 1 0;min-width:0;align-self:stretch"><div class="m-radio"><span class="m-rb on"></span>Dobrze</div></div></div><div class="m-img" style="margin:4.8px 0px 4.8px 0px;height:96px;align-self:stretch"><img src="../assets/zasoby/buzka_dobra.png" alt="" style="object-fit:contain"></div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch;align-items:center"><div class="m-t" style="">Wielkość porcji:</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:75%;background:#6750A4"></div><div class="m-seek-thumb" style="left:75%;background:#6750A4"></div></div></div><div class="m-t" style="font-weight:700">4</div></div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span class="m-hint" style="">Komentarz (opcjonalnie)</span></div><div class="m-b" style="background:#283593;color:#ffffff;align-self:center">WYŚLIJ</div><div class="m-t" style="margin:8px 0px 0px 0px;text-align:center;align-self:stretch">Głosów: 2 | źle: 0, średnio: 1, dobrze: 1</div><div class="m-t" style="font-weight:700;text-align:center;align-self:stretch">Średnia porcja: 3,5</div><div class="m-t" style="color:#808080;margin:8px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 2. Po dwóch głosach; trzecia osoba zaznaczyła „Dobrze”, porcja 4</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Ankieta — stołówka”.</li><li>Napis „Jak oceniasz dzisiejszy obiad?”.</li><li>Trzy pola radio w jednym rzędzie: „Źle”, „Średnio”, „Dobrze”; w stanie początkowym żadne nie jest zaznaczone.</li><li>Obraz oceny — w stanie początkowym niewidoczny, ale zajmujący miejsce.</li><li>Rząd: napis „Wielkość porcji:”, suwak, napis z wartością (początkowo „3”). Suwak pozwala wybrać wartość od 1 do 5.</li><li>Pole edycyjne z podpowiedzią „Komentarz (opcjonalnie)”.</li><li>Przycisk „WYŚLIJ”.</li><li>Napis „Głosów: 0 | źle: 0, średnio: 0, dobrze: 0” oraz napis „Średnia porcja: –”.</li><li>Napis „Autor: ”, dalej numer zdającego.</li></ul>
+<p><strong>Działanie aplikacji:</strong></p>
+<ul><li>Zaznaczenie pola radio od razu wyświetla odpowiedni obraz: <code>buzka_zla</code>, <code>buzka_neutralna</code>, <code>buzka_dobra</code>.</li><li>Przesuwanie suwaka zmienia napis z wartością porcji (liczba całkowita 1–5).</li><li>Po wybraniu „WYŚLIJ”:<ul><li>gdy nie zaznaczono oceny — komunikat <code>Toast</code> „Zaznacz ocenę”, nic więcej się nie zmienia;</li><li>w przeciwnym razie głos jest zliczany, napis głosów i napis „Średnia porcja: x” (jedno miejsce po przecinku, średnia ze wszystkich oddanych głosów) są aktualizowane, wyświetla się <code>Toast</code> „Dziękujemy za głos” albo — gdy wpisano komentarz — „Dziękujemy! Komentarz: &lt;treść&gt;”;</li><li>formularz jest przygotowany dla następnej osoby: brak zaznaczenia (obraz niewidoczny), porcja 3, puste pole komentarza.</li></ul></li></ul>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs w XML; rozkład liniowy pionowy z zagnieżdżonymi rozkładami poziomymi (pola radio, porcja).</li><li>Tło strony #E8EAF6; tytuł: tło #283593, biała czcionka, największa, marginesy wewnętrzne 10; pytanie pogrubione.</li><li>Pola radio równej szerokości; obraz wysokości 120; przycisk wyśrodkowany, tło #283593, biała czcionka; średnia pogrubiona.</li><li>Liczby głosów przechowywane w tablicy trzech liczb całkowitych.</li><li>Kod aplikacji przygotuj jak na egzaminie (zrzuty, <code>mobilna.zip</code>, pliki źródłowe, <code>srodowisko.txt</code>).</li></ul>
+<h4>Zasoby do zadania</h4><div class="res-list"><figure><a href="../assets/zasoby/buzka_zla.png" download><img src="../assets/zasoby/buzka_zla.png" alt="buzka_zla.png"></a><figcaption>buzka_zla.png</figcaption></figure><figure><a href="../assets/zasoby/buzka_neutralna.png" download><img src="../assets/zasoby/buzka_neutralna.png" alt="buzka_neutralna.png"></a><figcaption>buzka_neutralna.png</figcaption></figure><figure><a href="../assets/zasoby/buzka_dobra.png" download><img src="../assets/zasoby/buzka_dobra.png" alt="buzka_dobra.png"></a><figcaption>buzka_dobra.png</figcaption></figure></div><p class="small">Pobierz wszystkie: <a href="../materialy/zasoby_b12-inf.zip" download>zasoby_b12-inf.zip</a>. Obrazy skopiuj do <code>app/src/main/res/drawable</code> (nazwy: małe litery, bez spacji i myślników).</p>
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b12-inf"><li><label><input type="checkbox"> <span>zmieściłem się w 60 minutach (łącznie ze zrzutami i archiwum)</span></label></li><li><label><input type="checkbox"> <span>stan początkowy: brak zaznaczenia, obraz niewidoczny (miejsce zachowane), porcja 3</span></label></li><li><label><input type="checkbox"> <span>zaznaczenie radio od razu zmienia obraz</span></label></li><li><label><input type="checkbox"> <span>WYŚLIJ bez oceny → Toast, liczniki bez zmian</span></label></li><li><label><input type="checkbox"> <span>dwa głosy (porcje 3 i 4) → „Średnia porcja: 3,5”</span></label></li><li><label><input type="checkbox"> <span>po wysłaniu formularz wraca do stanu początkowego (także obraz)</span></label></li><li><label><input type="checkbox"> <span>Toast z komentarzem, gdy komentarz wpisano</span></label></li><li><label><input type="checkbox"> <span>zrzuty <code>mobile1.png</code>…, <code>mobilna.zip</code>, <code>activity_main.xml</code>, <code>MainActivity.java</code>, <code>srodowisko.txt</code> w folderze <code>mobilna</code></span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Obraz „niewidoczny, ale zajmujący miejsce” → <code>android:visibility="invisible"</code>. Obraz zmienia się od razu po zaznaczeniu — potrzebujesz <code>setOnCheckedChangeListener</code> grupy radio.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Zamień id pola radio na indeks 0/1/2 w jednej metodzie pomocniczej (zwraca −1, gdy nic nie zaznaczono). Uwaga: <code>clearCheck()</code> też wywołuje zdarzenie zmiany (z id −1).</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">radio zmienione(id): i ← indeksOceny(id); i == −1 → obraz INVISIBLE; inaczej obraz[i], VISIBLE
+suwak: napis ← progress + 1
+WYŚLIJ: i ← indeksOceny(zaznaczone); i == −1 → Toast; koniec
+        glosy[i]++; sumaPorcji += porcja; wszystkie ← suma glosy
+        napisy; średnia = sumaPorcji / wszystkie (double, %.1f)
+        Toast (z komentarzem lub bez)
+        clearCheck(); setProgress(2); komentarz ← ""</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">rgOcena.setOnCheckedChangeListener((group, checkedId) -&gt; {
+    <span class="t-k">int</span> indeks = indeksOceny(checkedId);
+    <span class="t-k">if</span> (indeks == -<span class="t-n">1</span>) {
+        ivBuzka.setVisibility(<span class="t-t">View</span>.<span class="t-t">INVISIBLE</span>);
+        <span class="t-k">return</span>;
+    }
+    <span class="t-k">int</span>[] buzki = {<span class="t-t">R</span>.drawable.buzka_zla, <span class="t-t">R</span>.drawable.buzka_neutralna, <span class="t-t">R</span>.drawable.buzka_dobra};
+    ivBuzka.setImageResource(buzki[indeks]);
+    ivBuzka.setVisibility(<span class="t-t">View</span>.<span class="t-t">VISIBLE</span>);
+});</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#E8EAF6"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#283593"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Ankieta — stołówka"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"26sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvPytanie"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Jak oceniasz dzisiejszy obiad?"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;RadioGroup</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/rgOcena"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbZle"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Źle"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbSrednio"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Średnio"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbDobrze"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Dobrze"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/RadioGroup</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;ImageView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivBuzka"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"120dp"</span>
+        <span class="t-a">android:layout_marginVertical</span>=<span class="t-s">"6dp"</span>
+        <span class="t-a">android:contentDescription</span>=<span class="t-s">"Ocena"</span>
+        <span class="t-a">android:src</span>=<span class="t-s">"@drawable/buzka_neutralna"</span>
+        <span class="t-a">android:visibility</span>=<span class="t-s">"invisible"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center_vertical"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvPorcjaEtykieta"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Wielkość porcji:"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;SeekBar</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbPorcja"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:max</span>=<span class="t-s">"4"</span>
+            <span class="t-a">android:progress</span>=<span class="t-s">"2"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvPorcja"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"3"</span>
+            <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etKomentarz"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Komentarz (opcjonalnie)"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"text"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnWyslij"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#283593"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"WYŚLIJ"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvWyniki"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Głosów: 0 | źle: 0, średnio: 0, dobrze: 0"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvSrednia"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Średnia porcja: –"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvAutor"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.view.<span class="t-t">View</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ImageView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">RadioGroup</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">SeekBar</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Toast</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">PORCJA_START</span> = <span class="t-n">2</span>;   <span class="t-c">// progress 2 = porcja 3 (zakres 1..5)</span>
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] glosy = <span class="t-k">new</span> <span class="t-k">int</span>[<span class="t-n">3</span>];       <span class="t-c">// 0 źle, 1 średnio, 2 dobrze</span>
+    <span class="t-k">private</span> <span class="t-k">int</span> sumaPorcji = <span class="t-n">0</span>;
+
+    <span class="t-k">private</span> <span class="t-t">RadioGroup</span> rgOcena;
+    <span class="t-k">private</span> <span class="t-t">ImageView</span> ivBuzka;
+    <span class="t-k">private</span> <span class="t-t">SeekBar</span> sbPorcja;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvPorcja, tvWyniki, tvSrednia;
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etKomentarz;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        rgOcena = findViewById(<span class="t-t">R</span>.id.rgOcena);
+        ivBuzka = findViewById(<span class="t-t">R</span>.id.ivBuzka);
+        sbPorcja = findViewById(<span class="t-t">R</span>.id.sbPorcja);
+        tvPorcja = findViewById(<span class="t-t">R</span>.id.tvPorcja);
+        tvWyniki = findViewById(<span class="t-t">R</span>.id.tvWyniki);
+        tvSrednia = findViewById(<span class="t-t">R</span>.id.tvSrednia);
+        etKomentarz = findViewById(<span class="t-t">R</span>.id.etKomentarz);
+        <span class="t-t">Button</span> btnWyslij = findViewById(<span class="t-t">R</span>.id.btnWyslij);
+
+        rgOcena.setOnCheckedChangeListener((group, checkedId) -&gt; {
+            <span class="t-k">int</span> indeks = indeksOceny(checkedId);
+            <span class="t-k">if</span> (indeks == -<span class="t-n">1</span>) {                       <span class="t-c">// clearCheck() też wywołuje to zdarzenie</span>
+                ivBuzka.setVisibility(<span class="t-t">View</span>.<span class="t-t">INVISIBLE</span>);
+                <span class="t-k">return</span>;
+            }
+            <span class="t-k">int</span>[] buzki = {<span class="t-t">R</span>.drawable.buzka_zla, <span class="t-t">R</span>.drawable.buzka_neutralna, <span class="t-t">R</span>.drawable.buzka_dobra};
+            ivBuzka.setImageResource(buzki[indeks]);
+            ivBuzka.setVisibility(<span class="t-t">View</span>.<span class="t-t">VISIBLE</span>);
+        });
+
+        sbPorcja.setOnSeekBarChangeListener(<span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+                tvPorcja.setText(<span class="t-t">String</span>.valueOf(progress + <span class="t-n">1</span>));
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+        });
+
+        btnWyslij.setOnClickListener(v -&gt; wyslij());
+    }
+
+    <span class="t-k">private</span> <span class="t-k">int</span> indeksOceny(<span class="t-k">int</span> idPola) {
+        <span class="t-k">if</span> (idPola == <span class="t-t">R</span>.id.rbZle) {
+            <span class="t-k">return</span> <span class="t-n">0</span>;
+        } <span class="t-k">else</span> <span class="t-k">if</span> (idPola == <span class="t-t">R</span>.id.rbSrednio) {
+            <span class="t-k">return</span> <span class="t-n">1</span>;
+        } <span class="t-k">else</span> <span class="t-k">if</span> (idPola == <span class="t-t">R</span>.id.rbDobrze) {
+            <span class="t-k">return</span> <span class="t-n">2</span>;
+        }
+        <span class="t-k">return</span> -<span class="t-n">1</span>;
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> wyslij() {
+        <span class="t-k">int</span> indeks = indeksOceny(rgOcena.getCheckedRadioButtonId());
+        <span class="t-k">if</span> (indeks == -<span class="t-n">1</span>) {
+            <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Zaznacz ocenę"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+            <span class="t-k">return</span>;
+        }
+        glosy[indeks]++;
+        sumaPorcji += sbPorcja.getProgress() + <span class="t-n">1</span>;
+        <span class="t-k">int</span> wszystkie = glosy[<span class="t-n">0</span>] + glosy[<span class="t-n">1</span>] + glosy[<span class="t-n">2</span>];
+
+        tvWyniki.setText(<span class="t-s">"Głosów: "</span> + wszystkie + <span class="t-s">" | źle: "</span> + glosy[<span class="t-n">0</span>] + <span class="t-s">", średnio: "</span> + glosy[<span class="t-n">1</span>] + <span class="t-s">", dobrze: "</span> + glosy[<span class="t-n">2</span>]);
+        tvSrednia.setText(<span class="t-t">String</span>.format(<span class="t-s">"Średnia porcja: %.1f"</span>, (<span class="t-k">double</span>) sumaPorcji / wszystkie));
+
+        <span class="t-t">String</span> komentarz = etKomentarz.getText().toString().trim();
+        <span class="t-t">String</span> podziekowanie = komentarz.isEmpty() ? <span class="t-s">"Dziękujemy za głos"</span> : <span class="t-s">"Dziękujemy! Komentarz: "</span> + komentarz;
+        <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, podziekowanie, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+
+        <span class="t-c">// przygotowanie formularza dla następnej osoby</span>
+        rgOcena.clearCheck();
+        sbPorcja.setProgress(<span class="t-t">PORCJA_START</span>);
+        etKomentarz.setText(<span class="t-s">""</span>);
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b12_inf/">rozwiazania/b12_inf/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b12-inf">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="checklista"><h2><span class="sec-num">8.</span> Checklista</h2><p class="small muted">Sprawdź swoją aplikację z zadania INF.04 punkt po punkcie (krok 10 procedury).</p><ul class="checklist" data-key="b12-check"><li><label><input type="checkbox"> <span>znam różnicę: błąd budowania / awaria / logika / wygląd</span></label></li><li><label><input type="checkbox"> <span>w Logcat znajduję <code>FATAL EXCEPTION</code>, nazwę wyjątku i linię w <code>MainActivity.java</code></span></label></li><li><label><input type="checkbox"> <span>przy niedziałającej kompilacji wiem, jaki zrzut wykonać</span></label></li><li><label><input type="checkbox"> <span>umiem spakować projekt do <code>mobilna.zip</code> i wskazać pliki XML i Java do skopiowania</span></label></li><li><label><input type="checkbox"> <span>wiem, jaką nazwę emulatora i środowiska wpisać w dokumentacji</span></label></li><li><label><input type="checkbox"> <span>zadanie na czas zakończyłem w 60 minutach</span></label></li></ul></section>
+<section class="sec" id="test"><h2><span class="sec-num">9.</span> Mini-test</h2><div class="quiz" data-quiz="b12"><script type="application/json">[{"q": "<p>Aplikacja uruchamia się, ale zamyka po kliknięciu przycisku. Gdzie szukasz przyczyny?<\/p>", "o": ["w oknie Build", "w Logcat (<code>FATAL EXCEPTION<\/code>)", "w pliku <code>build.gradle<\/code>", "w Device Manager"], "a": 1, "e": "<p>Awaria w czasie działania jest zapisywana w Logcat wraz z numerem linii.<\/p>"}, {"q": "<p><code>NullPointerException<\/code> przy <code>tvWynik.setText(...)<\/code> — najbardziej prawdopodobna przyczyna:<\/p>", "o": ["zły kolor tekstu", "<code>findViewById<\/code> z id, którego nie ma w wyświetlanym układzie (lub przed <code>setContentView<\/code>)", "brak internetu", "zbyt długi tekst"], "a": 1, "e": "<p><code>findViewById<\/code> zwraca <code>null<\/code>, gdy nie znajdzie widoku.<\/p>"}, {"q": "<p>Projekt nie kompiluje się do końca egzaminu. Co zrobić według arkuszy?<\/p>", "o": ["nic nie oddawać", "zrzut ekranu z oknem błędów i otwartym środowiskiem + oddać kod i archiwum", "oddać tylko XML", "napisać wyjaśnienie w pliku tekstowym"], "a": 1, "e": "<p>„Jeżeli aplikacja nie uruchamia się z powodu błędów kompilacji, należy na zrzucie umieścić okno ze spisem błędów”. Kod i tak podlega ocenie.<\/p>"}, {"q": "<p>Co trafia do <code>mobilna.zip<\/code>?<\/p>", "o": ["tylko <code>MainActivity.java<\/code>", "cały folder projektu", "plik <code>.apk<\/code>", "zrzuty ekranu"], "a": 1, "e": "<p>„W podfolderze mobilna powinno znaleźć się archiwum całego projektu o nazwie mobilna.zip”.<\/p>"}, {"q": "<p><code>Toast.makeText(this, …)<\/code> w <code>new View.OnClickListener() { … }<\/code> powoduje:<\/p>", "o": ["awarię", "błąd kompilacji — <code>this<\/code> to obiekt słuchacza", "nic", "wyświetlenie pustego Toasta"], "a": 1, "e": "<p>W klasie anonimowej użyj <code>MainActivity.this<\/code>.<\/p>"}, {"q": "<p>Lista z <code>Arrays.asList(...)<\/code> po <code>add<\/code> rzuca:<\/p>", "o": ["<code>NullPointerException<\/code>", "<code>UnsupportedOperationException<\/code>", "<code>NumberFormatException<\/code>", "nic nie rzuca"], "a": 1, "e": "<p>Lista ma stały rozmiar. Użyj <code>new ArrayList&lt;&gt;(Arrays.asList(...))<\/code>.<\/p>"}]</script></div></section>
+<section class="sec" id="dodatkowe"><h2><span class="sec-num">10.</span> Skończyłeś wcześniej?</h2><div class="micro"><h4>Własna pułapka</h4><p>Weź swoje rozwiązanie z bloku 9 lub 10 i wprowadź do niego 3 błędy z tego bloku. Zamień się z kolegą/koleżanką — kto szybciej znajdzie wszystkie?</p></div><div class="micro"><h4>Debugger</h4><p>Postaw punkt przerwania (kliknij na marginesie przy numerze linii) w <code>wyslij()</code> i uruchom aplikację przyciskiem z robakiem (Debug). Podejrzyj wartości <code>glosy</code> i <code>sumaPorcji</code> w panelu Variables.</p></div><div class="micro"><h4>Dokument egzamin</h4><p>Przygotuj szablon dokumentu <code>egzamin.docx</code>: system operacyjny, środowiska (Android Studio + wersja z <em>Help → About</em>), języki (Java, XML), emulator (nazwa z Device Manager), miejsca na podpisane zrzuty. Zapisz — przyda się w blokach 13–15.</p></div></section>
+<div class="nav-bottom"><a class="btn secondary" href="blok11.html">← Blok 11</a><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button><a class="btn secondary" href="blok13.html">Blok 13 →</a></div></article></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
