@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blok 14 — Tryb egzaminacyjny II: listy, suwaki i obrazy w nowych kombinacjach</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../" data-page="block" data-block="b14">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html" class="active">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="block-layout"><aside class="toc no-print"><strong>Blok 14</strong><ol><li><a href="#cel">Cel</a></li><li><a href="#przypomnienie">Krótkie przypomnienie: workflow egzaminacyjny</a></li><li><a href="#przyklad">Przykład: analiza specyfikacji krok po kroku</a></li><li><a href="#mikro">Mikroćwiczenia: sprint z pamięci</a></li><li><a href="#prowadzone">Zadanie prowadzone (rozgrzewka)</a></li><li><a href="#samodzielne">Próbny egzamin — zadanie 1</a></li><li><a href="#inf04">Próbny egzamin — zadanie 2</a></li><li><a href="#checklista">Checklista</a></li><li><a href="#test">Mini-test</a></li><li><a href="#dodatkowe">Skończyłeś wcześniej?</a></li></ol><a class="skip" href="#samodzielne">Silniejszy? Przejdź od razu do zadania samodzielnego →</a><p class="small muted" style="margin-top:.8rem">Słabszy? Przypomnienie → Przykład → Mikroćwiczenia → Zadanie prowadzone (z podpowiedziami).</p></aside><article class="page"><div class="block-head"><div><div class="muted small"><a href="../index.html">Bloki</a> › Blok 14</div><h1>Blok 14. Tryb egzaminacyjny II: listy, suwaki i obrazy w nowych kombinacjach</h1><span class="badge p3">Faza III — tryb egzaminacyjny</span> <span id="block-status" class="badge">W trakcie</span></div><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button></div>
+<p>Dwa kolejne pełne zadania: lista z dwiema kolekcjami i obliczeniami na danych oraz suwak z przesunięciem zakresu sterujący obrazem, kolorem tła i listą pomiarów.</p>
+<section class="sec" id="cel"><h2><span class="sec-num">1.</span> Cel</h2><p><strong>Po wykonaniu tego bloku będziesz potrafił:</strong></p><ul><li>prowadzić dwie kolekcje równoległe (tekst do listy + liczby do obliczeń) i liczyć na nich sumę i maksimum,</li><li>usuwać elementy listy długim przytrzymaniem i przeliczać wyniki,</li><li>obsłużyć suwak z ujemnym zakresem i uzależnić od przedziału obraz, opis i kolor tła,</li><li>zmieścić się w czasie z dwoma zadaniami złożonymi z 3–4 wzorców.</li></ul><details class="hint"><summary>Plan czasu (4 × 45 min = 180 min)</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>Przypomnienie (workflow)</td><td>10 min</td></tr><tr><td>Przykład (analiza)</td><td>10 min</td></tr><tr><td>Mikroćwiczenia (sprint)</td><td>20 min</td></tr><tr><td>Rozgrzewka</td><td>20 min</td></tr><tr><td>Próbny egzamin — zadanie 1</td><td>50 min</td></tr><tr><td>Próbny egzamin — zadanie 2</td><td>60 min</td></tr><tr><td>Samoocena + mini-test</td><td>10 min</td></tr><tr><th>Razem</th><th>180 min</th></tr></tbody></table></div></div></details><p class="small muted">Powiązanie z arkuszami: zadanie 1: W5 (lista jak Arkusz_05) + W2 (walidacja) + obliczenia na kolekcji (konsola Arkusza_14: suma, maksimum); zadanie 2: W4 (suwak jak 07/10, zakres przesunięty) + W6 (obraz wg przedziału) + zmiana tła (W1) + W5. Żadne nie kopiuje arkusza.</p></section>
+<section class="sec" id="przypomnienie"><h2><span class="sec-num">2.</span> Krótkie przypomnienie: workflow egzaminacyjny</h2><h4>Workflow egzaminacyjny — 10 kroków</h4>
+<div class="table-wrap"><table><thead><tr><th>Krok</th><th>Co robisz</th><th>Czas (z ~60 min)</th></tr></thead><tbody><tr><td>1</td><td>Przeczytaj <strong>całe</strong> zadanie (także założenia i ostatnią stronę)</td><td>3 min</td></tr><tr><td>2</td><td>Wypisz elementy interfejsu (kolejność z góry na dół, rzędy)</td><td>2 min</td></tr><tr><td>3</td><td>Wypisz dane wejściowe</td><td>1 min</td></tr><tr><td>4</td><td>Wypisz zdarzenia (co klika / przesuwa użytkownik)</td><td>1 min</td></tr><tr><td>5</td><td>Wypisz logikę (wzory, warunki, cykle, liczniki)</td><td>2 min</td></tr><tr><td>6</td><td>Wypisz wyniki (co i gdzie się zmienia)</td><td>1 min</td></tr><tr><td>7</td><td>Zbuduj interfejs w XML → uruchom</td><td>15 min</td></tr><tr><td>8</td><td>Dodaj logikę w Javie (zdarzenie po zdarzeniu, uruchamiając po każdym)</td><td>20 min</td></tr><tr><td>9</td><td>Przetestuj każdy punkt „Działanie aplikacji”, zrób zrzuty</td><td>7 min</td></tr><tr><td>10</td><td>Porównaj punkt po punkcie ze specyfikacją; spakuj <code>mobilna.zip</code>, skopiuj pliki</td><td>8 min</td></tr></tbody></table></div>
+<div class="box box-exam"><p>Zasada: <strong>najpierw działający szkielet, potem szczegóły.</strong> Aplikacja, która się uruchamia i realizuje 80% wymagań, daje więcej punktów niż „prawie gotowa”, która się nie kompiluje. Po każdej większej zmianie — uruchom.</p></div>
+<h4>Nowe w tym bloku (krótko)</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-c">// długie przytrzymanie elementu listy</span>
+lvLista.setOnItemLongClickListener((parent, view, position, id) -&gt; {
+    lista.remove(position);            <span class="t-c">// usuń z kolekcji (po indeksie)</span>
+    adapter.notifyDataSetChanged();
+    <span class="t-k">return</span> <span class="t-k">true</span>;                       <span class="t-c">// zdarzenie obsłużone</span>
+});
+
+<span class="t-c">// kolekcja liczb: typ obiektowy Double / Integer</span>
+<span class="t-t">ArrayList</span>&lt;<span class="t-t">Double</span>&gt; kwoty = <span class="t-k">new</span> <span class="t-t">ArrayList</span>&lt;&gt;();
+kwoty.add(<span class="t-n">12.5</span>);
+<span class="t-k">double</span> pierwsza = kwoty.get(<span class="t-n">0</span>);</code></pre></div></section>
+<section class="sec" id="przyklad"><h2><span class="sec-num">3.</span> Przykład: analiza specyfikacji krok po kroku</h2><p><strong>Specyfikacja (fragment):</strong> <em>„Aplikacja «Oceny z przedmiotu». Pole «Ocena» (1–6) i przycisk «DODAJ». Lista ocen w kolejności dodawania. Napisy «Średnia: x,xx» i «Najczęstsza ocena: y». Oceny spoza zakresu nie są dodawane (komunikat). Przytrzymanie oceny na liście usuwa ją.”</em></p>
+<div class="table-wrap"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>INTERFEJS</td><td>rząd [pole + przycisk], lista, 2 napisy</td></tr><tr><td>DANE</td><td>ocena (int 1..6)</td></tr><tr><td>ZDARZENIA</td><td>DODAJ, długie przytrzymanie elementu</td></tr><tr><td>LOGIKA</td><td>walidacja zakresu; <code>ArrayList&lt;Integer&gt;</code>; średnia; najczęstsza = zliczanie wystąpień <code>int[7]</code> (jak w bloku 10)</td></tr><tr><td>WYNIK</td><td>lista, dwa napisy, Toast przy błędzie</td></tr><tr><td>WYGLĄD</td><td>wg obrazu</td></tr></tbody></table></div>
+<p><strong>Jakie wzorce?</strong> W5 (lista) + W2 (walidacja) + zliczanie z bloku 10. <strong>Pułapka:</strong> po usunięciu elementu trzeba przeliczyć oba napisy — więc całe przeliczanie trzymaj w jednej metodzie <code>odswiez()</code> wołanej po dodaniu <strong>i</strong> po usunięciu. Pusta lista → średnia „—” (bez dzielenia przez zero).</p></section>
+<section class="sec" id="mikro"><h2><span class="sec-num">4.</span> Mikroćwiczenia: sprint z pamięci</h2><div class="micro"><h4>Ćwiczenie 14.1 — Sprint 1 (3 min): suma i maksimum listy</h4><p>Dla <code>ArrayList&lt;Double&gt; kwoty</code> policz sumę i indeks największego elementu (−1 dla pustej listy).</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">double</span> suma = <span class="t-n">0</span>;
+<span class="t-k">int</span> indeksMax = -<span class="t-n">1</span>;
+<span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; kwoty.size(); i++) {
+    suma += kwoty.get(i);
+    <span class="t-k">if</span> (indeksMax == -<span class="t-n">1</span> || kwoty.get(i) &gt; kwoty.get(indeksMax)) {
+        indeksMax = i;
+    }
+}</code></pre></div></div></details></div><div class="micro"><h4>Ćwiczenie 14.2 — Sprint 2 (2 min): zakres −20..40</h4><p>Jakie <code>max</code> ma suwak i jak odczytasz temperaturę? Jaki <code>progress</code> ustawisz, aby na starcie było 20 °C?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>max="60"</code>, temperatura = <code>progress - 20</code>; 20 °C → <code>progress="40"</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 14.3 — Sprint 3 (3 min): przedziały</h4><p>Zapisz <code>if/else if/else</code> dla temperatury <code>t</code>: poniżej 0 — „Mróz”, 0..20 — „Umiarkowanie”, powyżej 20 — „Gorąco”.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>if (t &lt; 0) … else if (t &lt;= 20) … else …</code> — kolejność od najmniejszych wartości, granice zgodnie z treścią (0 i 20 należą do „Umiarkowanie”).</p></div></details></div><div class="micro"><h4>Ćwiczenie 14.4 — Sprint 4 (2 min): tło rozkładu</h4><p>Ustaw tło rozkładu głównego (id <code>main</code>) na <code>#FFCCBC</code>.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>LinearLayout uklad = findViewById(R.id.main); uklad.setBackgroundColor(Color.parseColor("#FFCCBC"));</code></p></div></details></div><div class="micro"><h4>Ćwiczenie 14.5 — Sprint 5 (3 min): usuwanie z list równoległych</h4><p>Masz <code>opisy</code> i <code>kwoty</code> (równoległe). Napisz obsługę długiego przytrzymania, która usuwa element z obu.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">lv.setOnItemLongClickListener((parent, view, position, id) -&gt; {
+    opisy.remove(position);
+    kwoty.remove(position);
+    odswiez();
+    <span class="t-k">return</span> <span class="t-k">true</span>;
+});</code></pre></div>
+<p>Uwaga: <code>kwoty.remove(position)</code> z argumentem <code>int</code> usuwa po indeksie.</p></div></details></div></section>
+<section class="sec" id="prowadzone"><h2><span class="sec-num">5.</span> Zadanie prowadzone (rozgrzewka)</h2><div class="task" id="b14-prowadzone">
+<div class="task-head"><h3>Rozgrzewka: kolejka w sekretariacie (20 min)</h3><span class="meta">⏱ ok. 20 min</span></div>
+<p>Lista działająca jak kolejka: nowe numerki trafiają na koniec, obsługiwany jest zawsze pierwszy, a przytrzymanie usuwa dowolny numerek. Najpierw analiza (6 wierszy), potem kod.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:9.6px"><div class="m-t" style="font-size:20.8px;font-weight:700">Kolejka w sekretariacie</div><div class="m-t" style="background:#FFF3E0;font-size:16px;padding:8px;margin:8px 0px 8px 0px;text-align:center;align-self:stretch">Obsługiwany: Numerek 2</div><div class="m-row" style="align-self:stretch"><div class="m-b" style="background:#6750A4;color:#ffffff;margin:0px 4px 0px 0px;flex:1 1 0;min-width:0">NOWY NUMEREK</div><div class="m-b" style="background:#E65100;color:#ffffff;margin:0px 0px 0px 4px;flex:1 1 0;min-width:0">NASTĘPNY</div></div><div class="m-t" style="">W kolejce: 2</div><div class="m-list" style="align-self:stretch"><div class="m-li" style="border-bottom:1px solid #9E9E9E;">Numerek 3</div><div class="m-li" style="border-bottom:1px solid #9E9E9E;">Numerek 4</div></div><div style="height:96px"></div><div class="m-t" style="color:#808080;text-align:center;align-self:stretch">Przytrzymaj numerek, aby go usunąć (osoba zrezygnowała)</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Wydano 4 numerki, obsłużono 2</figcaption></figure></div>
+<ul><li>NOWY NUMEREK dopisuje na koniec listy „Numerek n” (n rośnie od 1 i nie cofa się, nawet gdy ktoś zrezygnuje).</li><li>NASTĘPNY usuwa <strong>pierwszy</strong> element i pokazuje go w polu „Obsługiwany: …”; przy pustej kolejce — <code>Toast</code> „Kolejka jest pusta”.</li><li>Przytrzymanie numerka usuwa go z kolejki.</li><li>Napis „W kolejce: n” zawsze aktualny. Lista wypełnia wolne miejsce, separator szary 1dp.</li></ul>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Jedna metoda <code>odswiez()</code> (adapter + napis) wołana po każdej zmianie kolejki. Licznik numerków to osobne pole — nie <code>size()</code>.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p><code>String pierwszy = kolejka.remove(0);</code> — <code>remove(int)</code> zwraca usunięty element. Przytrzymanie: <code>setOnItemLongClickListener(... -&gt; { …; return true; })</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">NOWY: ostatniNumer++; add("Numerek " + ostatniNumer); odswiez()
+NASTĘPNY: pusta → Toast; koniec; p ← remove(0); "Obsługiwany: " + p; odswiez()
+długie(pos): remove(pos); odswiez(); return true</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">lvKolejka.setOnItemLongClickListener((parent, view, position, id) -&gt; {
+    kolejka.remove(position);
+    odswiez();
+    <span class="t-k">return</span> <span class="t-k">true</span>;
+});</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"12dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Kolejka w sekretariacie"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"26sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvObslugiwany"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginVertical</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#FFF3E0"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Obsługiwany: —"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnNowy"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginEnd</span>=<span class="t-s">"5dp"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"NOWY NUMEREK"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnNastepny"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"5dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#E65100"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"NASTĘPNY"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvLiczba"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"W kolejce: 0"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ListView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/lvKolejka"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"0dp"</span>
+        <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+        <span class="t-a">android:divider</span>=<span class="t-s">"#9E9E9E"</span>
+        <span class="t-a">android:dividerHeight</span>=<span class="t-s">"1dp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvPodpowiedz"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Przytrzymaj numerek, aby go usunąć (osoba zrezygnowała)"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ArrayAdapter</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ListView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Toast</span>;
+
+<span class="t-k">import</span> java.util.<span class="t-t">ArrayList</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">ArrayList</span>&lt;<span class="t-t">String</span>&gt; kolejka = <span class="t-k">new</span> <span class="t-t">ArrayList</span>&lt;&gt;();
+    <span class="t-k">private</span> <span class="t-t">ArrayAdapter</span>&lt;<span class="t-t">String</span>&gt; adapter;
+    <span class="t-k">private</span> <span class="t-k">int</span> ostatniNumer = <span class="t-n">0</span>;   <span class="t-c">// numerki rosną, nawet gdy ktoś wyjdzie z kolejki</span>
+
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvObslugiwany, tvLiczba;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        tvObslugiwany = findViewById(<span class="t-t">R</span>.id.tvObslugiwany);
+        tvLiczba = findViewById(<span class="t-t">R</span>.id.tvLiczba);
+        <span class="t-t">ListView</span> lvKolejka = findViewById(<span class="t-t">R</span>.id.lvKolejka);
+        <span class="t-t">Button</span> btnNowy = findViewById(<span class="t-t">R</span>.id.btnNowy);
+        <span class="t-t">Button</span> btnNastepny = findViewById(<span class="t-t">R</span>.id.btnNastepny);
+
+        adapter = <span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, android.<span class="t-t">R</span>.layout.simple_list_item_1, kolejka);
+        lvKolejka.setAdapter(adapter);
+
+        btnNowy.setOnClickListener(v -&gt; {
+            ostatniNumer++;
+            kolejka.add(<span class="t-s">"Numerek "</span> + ostatniNumer);   <span class="t-c">// na koniec kolejki</span>
+            odswiez();
+        });
+
+        btnNastepny.setOnClickListener(v -&gt; {
+            <span class="t-k">if</span> (kolejka.isEmpty()) {
+                <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Kolejka jest pusta"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+                <span class="t-k">return</span>;
+            }
+            <span class="t-t">String</span> obslugiwany = kolejka.remove(<span class="t-n">0</span>);    <span class="t-c">// pierwszy w kolejce</span>
+            tvObslugiwany.setText(<span class="t-s">"Obsługiwany: "</span> + obslugiwany);
+            odswiez();
+        });
+
+        <span class="t-c">// długie przytrzymanie: usuń dowolny element; true = zdarzenie obsłużone</span>
+        lvKolejka.setOnItemLongClickListener((parent, view, position, id) -&gt; {
+            kolejka.remove(position);
+            odswiez();
+            <span class="t-k">return</span> <span class="t-k">true</span>;
+        });
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> odswiez() {
+        adapter.notifyDataSetChanged();
+        tvLiczba.setText(<span class="t-s">"W kolejce: "</span> + kolejka.size());
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b14_prowadzone/">rozwiazania/b14_prowadzone/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b14-prowadzone">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="samodzielne"><h2><span class="sec-num">6.</span> Próbny egzamin — zadanie 1</h2><div class="task exam" id="b14-egzC">
+<div class="task-head"><h3>Próbny egzamin 3: Wydatki (50 min)</h3><span class="meta">⏱ ok. 50 min</span></div>
+<p><strong>Warunki próbnego egzaminu:</strong> pracuj bez zaglądania do wcześniejszych bloków i własnych projektów (wolno: ta treść, zasoby, dokumentacja Android Studio). Zmierz czas. Podpowiedzi otwieraj dopiero po upływie czasu albo gdy zupełnie utkniesz — i zapisz, z których skorzystałeś. Na koniec: zrzuty <code>mobile1.png</code>…, <code>mobilna.zip</code>, kopie plików źródłowych, <code>srodowisko.txt</code>.</p>
+<p>Za pomocą środowiska programistycznego wykonaj aplikację mobilną do zapisywania wydatków i uruchom ją w emulatorze.</p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>tytuł; rząd 2 pól (nazwa 2:1 kwota); przycisk na szerokość; lista; linia; napis sumy; napis największego wydatku; autor</td></tr><tr><td>DANE</td><td>nazwa (tekst), kwota (dziesiętna)</td></tr><tr><td>ZDARZENIA</td><td>DODAJ WYDATEK, długie przytrzymanie elementu listy</td></tr><tr><td>LOGIKA</td><td>walidacja (nazwa niepusta, kwota &gt; 0); kolekcje: opisy (lista), kwoty, nazwy; suma; maksimum; usuwanie z wszystkich kolekcji</td></tr><tr><td>WYNIK</td><td>wpis „&lt;nazwa&gt; — &lt;kwota&gt; zł”, „Suma: x zł”, „Największy wydatek: &lt;nazwa&gt;”/„—”, Toast przy błędzie</td></tr><tr><td>WYGLĄD</td><td>tło #E0F7FA; tytuł #00838F biały; przycisk #00838F; separator #00838F; linia 2dp; suma do prawej, pogrubiona, większa</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#E0F7FA;padding:0px"><div class="m-t" style="background:#00838F;color:#fff;font-size:22.4px;padding:8px;align-self:stretch">Wydatki</div><div class="m-row" style="margin:8px 8px 0px 8px;align-self:stretch"><div class="m-e" style="flex:2 1 0;min-width:0;align-self:stretch"><span class="m-hint" style="">Na co?</span></div><div class="m-e" style="flex:1 1 0;min-width:0;align-self:stretch"><span class="m-hint" style="">Kwota</span></div></div><div class="m-b" style="background:#00838F;color:#ffffff;margin:0px 8px 0px 8px;align-self:stretch">DODAJ WYDATEK</div><div class="m-list" style="margin:0px 8px 0px 8px;align-self:stretch"><div class="m-li" style="border-bottom:1px solid #00838F;">Bilet miesięczny — 55,00 zł</div><div class="m-li" style="border-bottom:1px solid #00838F;">Obiad — 18,50 zł</div><div class="m-li" style="border-bottom:1px solid #00838F;">Książka — 39,90 zł</div></div><div style="height:72px"></div><div class="m-line" style="background:#00838F;height:2px;align-self:stretch"></div><div class="m-t" style="font-size:17.6px;font-weight:700;margin:0px 8px 0px 8px;text-align:right;align-self:stretch">Suma: 113,40 zł</div><div class="m-t" style="margin:0px 8px 0px 8px;text-align:right;align-self:stretch">Największy wydatek: Bilet miesięczny</div><div class="m-t" style="color:#808080;padding:4.8px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Po dodaniu trzech wydatków</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Wydatki”.</li><li>Rząd dwóch pól edycyjnych: „Na co?” (tekst) i „Kwota” (liczby dziesiętne); pole nazwy jest dwa razy szersze.</li><li>Przycisk „DODAJ WYDATEK”.</li><li>Lista wydatków.</li><li>Linia pozioma.</li><li>Napis „Suma: 0,00 zł” i napis „Największy wydatek: —”.</li><li>Napis „Autor: ”, dalej numer zdającego.</li></ul>
+<p><strong>Działanie aplikacji:</strong></p>
+<ul><li>„DODAJ WYDATEK”: jeżeli nazwa jest pusta albo kwota nie jest liczbą większą od 0 — <code>Toast</code> „Podaj nazwę i poprawną kwotę”. W przeciwnym razie na końcu listy pojawia się wpis „&lt;nazwa&gt; — &lt;kwota&gt; zł” (kwota z dwoma miejscami po przecinku), pola są czyszczone, a napisy sumy i największego wydatku są aktualizowane.</li><li>Długie przytrzymanie wpisu usuwa go z listy i aktualizuje oba napisy. Gdy lista jest pusta: „Suma: 0,00 zł” i „Największy wydatek: —”.</li></ul>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs w XML; rozkład liniowy pionowy z zagnieżdżonym rozkładem poziomym dla pól; proporcja szerokości pól 2:1.</li><li>Tło strony #E0F7FA; tytuł: tło #00838F, biała czcionka, największa, marginesy wewnętrzne 10.</li><li>Przycisk na całą szerokość (margines boczny 10), tło #00838F, biała czcionka. Separator listy #00838F, widoczny. Linia #00838F o wysokości 2.</li><li>Lista wypełnia wolne miejsce. Napisy sumy i największego wydatku wyrównane do prawej; suma pogrubiona i większa.</li><li>Kwoty przechowywane w kolekcji liczb (nie odczytywane z tekstów listy). Przeliczanie napisów w jednej metodzie.</li></ul>
+
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b14-egzC"><li><label><input type="checkbox"> <span>pola w proporcji 2:1 (wagi), kwota przyjmuje ułamki</span></label></li><li><label><input type="checkbox"> <span>pusta nazwa / kwota 0 / puste pole kwoty → Toast, lista bez zmian</span></label></li><li><label><input type="checkbox"> <span>wpis w formacie „Obiad — 18,50 zł”, pola wyczyszczone</span></label></li><li><label><input type="checkbox"> <span>suma i największy wydatek zgodne po każdej zmianie</span></label></li><li><label><input type="checkbox"> <span>przytrzymanie usuwa wpis i przelicza napisy; pusta lista → „—”</span></label></li><li><label><input type="checkbox"> <span>kwoty w <code>ArrayList&lt;Double&gt;</code>, nie parsowane z tekstów listy</span></label></li><li><label><input type="checkbox"> <span>linia 2dp, separator widoczny, napisy do prawej</span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Trzy kolekcje równoległe: tekst do wyświetlenia (<code>opisy</code>), <code>kwoty</code> (Double) i <code>nazwy</code> (do napisu „Największy wydatek”). Wszystkie zmieniasz razem.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Walidacja w jednym warunku: <code>if (nazwa.isEmpty() || kwota &lt;= 0)</code>, gdzie przy błędzie konwersji ustawiasz <code>kwota = -1</code> w <code>catch</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">dodaj(): nazwa, kwota (try → −1 przy błędzie)
+         nazwa pusta lub kwota ≤ 0 → Toast; koniec
+         nazwy.add; kwoty.add; opisy.add(format); wyczyść pola; odswiez()
+długie(pos): remove(pos) z 3 kolekcji; odswiez()
+odswiez(): notify; pętla: suma, indeksMax; napisy (indeksMax == −1 → "—")</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">void</span> odswiez() {
+    adapter.notifyDataSetChanged();
+    <span class="t-k">double</span> suma = <span class="t-n">0</span>;
+    <span class="t-k">int</span> indeksMax = -<span class="t-n">1</span>;
+    <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; kwoty.size(); i++) {
+        suma += kwoty.get(i);
+        <span class="t-k">if</span> (indeksMax == -<span class="t-n">1</span> || kwoty.get(i) &gt; kwoty.get(indeksMax)) {
+            indeksMax = i;
+        }
+    }
+    tvSuma.setText(<span class="t-t">String</span>.format(<span class="t-s">"Suma: %.2f zł"</span>, suma));
+    tvNajwiekszy.setText(indeksMax == -<span class="t-n">1</span> ? <span class="t-s">"Największy wydatek: —"</span> : <span class="t-s">"Największy wydatek: "</span> + nazwy.get(indeksMax));
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#E0F7FA"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#00838F"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Wydatki"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;EditText</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/etNazwa"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"2"</span>
+            <span class="t-a">android:hint</span>=<span class="t-s">"Na co?"</span>
+            <span class="t-a">android:inputType</span>=<span class="t-s">"text"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;EditText</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/etKwota"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:hint</span>=<span class="t-s">"Kwota"</span>
+            <span class="t-a">android:inputType</span>=<span class="t-s">"numberDecimal"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnDodaj"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#00838F"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"DODAJ WYDATEK"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ListView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/lvWydatki"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"0dp"</span>
+        <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:divider</span>=<span class="t-s">"#00838F"</span>
+        <span class="t-a">android:dividerHeight</span>=<span class="t-s">"1dp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;View</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"2dp"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#00838F"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvSuma"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"end"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Suma: 0,00 zł"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"22sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvNajwiekszy"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"end"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Największy wydatek: —"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvAutor"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"6dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ArrayAdapter</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ListView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Toast</span>;
+
+<span class="t-k">import</span> java.util.<span class="t-t">ArrayList</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-c">// dwie kolekcje równoległe: opisy do wyświetlenia i kwoty do obliczeń</span>
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">ArrayList</span>&lt;<span class="t-t">String</span>&gt; opisy = <span class="t-k">new</span> <span class="t-t">ArrayList</span>&lt;&gt;();
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">ArrayList</span>&lt;<span class="t-t">Double</span>&gt; kwoty = <span class="t-k">new</span> <span class="t-t">ArrayList</span>&lt;&gt;();
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">ArrayList</span>&lt;<span class="t-t">String</span>&gt; nazwy = <span class="t-k">new</span> <span class="t-t">ArrayList</span>&lt;&gt;();
+    <span class="t-k">private</span> <span class="t-t">ArrayAdapter</span>&lt;<span class="t-t">String</span>&gt; adapter;
+
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etNazwa, etKwota;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvSuma, tvNajwiekszy;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etNazwa = findViewById(<span class="t-t">R</span>.id.etNazwa);
+        etKwota = findViewById(<span class="t-t">R</span>.id.etKwota);
+        tvSuma = findViewById(<span class="t-t">R</span>.id.tvSuma);
+        tvNajwiekszy = findViewById(<span class="t-t">R</span>.id.tvNajwiekszy);
+        <span class="t-t">ListView</span> lvWydatki = findViewById(<span class="t-t">R</span>.id.lvWydatki);
+        <span class="t-t">Button</span> btnDodaj = findViewById(<span class="t-t">R</span>.id.btnDodaj);
+
+        adapter = <span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, android.<span class="t-t">R</span>.layout.simple_list_item_1, opisy);
+        lvWydatki.setAdapter(adapter);
+
+        btnDodaj.setOnClickListener(v -&gt; dodaj());
+
+        lvWydatki.setOnItemLongClickListener((parent, view, position, id) -&gt; {
+            opisy.remove(position);
+            kwoty.remove(position);
+            nazwy.remove(position);
+            odswiez();
+            <span class="t-k">return</span> <span class="t-k">true</span>;
+        });
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> dodaj() {
+        <span class="t-t">String</span> nazwa = etNazwa.getText().toString().trim();
+        <span class="t-t">String</span> tekstKwoty = etKwota.getText().toString().trim().replace(<span class="t-s">','</span>, <span class="t-s">'.'</span>);
+        <span class="t-k">double</span> kwota;
+        <span class="t-k">try</span> {
+            kwota = <span class="t-t">Double</span>.parseDouble(tekstKwoty);
+        } <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) {
+            kwota = -<span class="t-n">1</span>;
+        }
+        <span class="t-k">if</span> (nazwa.isEmpty() || kwota &lt;= <span class="t-n">0</span>) {
+            <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Podaj nazwę i poprawną kwotę"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+            <span class="t-k">return</span>;
+        }
+        nazwy.add(nazwa);
+        kwoty.add(kwota);
+        opisy.add(<span class="t-t">String</span>.format(<span class="t-s">"%s — %.2f zł"</span>, nazwa, kwota));
+        etNazwa.setText(<span class="t-s">""</span>);
+        etKwota.setText(<span class="t-s">""</span>);
+        odswiez();
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> odswiez() {
+        adapter.notifyDataSetChanged();
+        <span class="t-k">double</span> suma = <span class="t-n">0</span>;
+        <span class="t-k">int</span> indeksMax = -<span class="t-n">1</span>;
+        <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; kwoty.size(); i++) {
+            suma += kwoty.get(i);
+            <span class="t-k">if</span> (indeksMax == -<span class="t-n">1</span> || kwoty.get(i) &gt; kwoty.get(indeksMax)) {
+                indeksMax = i;
+            }
+        }
+        tvSuma.setText(<span class="t-t">String</span>.format(<span class="t-s">"Suma: %.2f zł"</span>, suma));
+        <span class="t-k">if</span> (indeksMax == -<span class="t-n">1</span>) {
+            tvNajwiekszy.setText(<span class="t-s">"Największy wydatek: —"</span>);
+        } <span class="t-k">else</span> {
+            tvNajwiekszy.setText(<span class="t-s">"Największy wydatek: "</span> + nazwy.get(indeksMax));
+        }
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b14_egzC/">rozwiazania/b14_egzC/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b14-egzC">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="inf04"><h2><span class="sec-num">7.</span> Próbny egzamin — zadanie 2</h2><div class="task exam" id="b14-egzD">
+<div class="task-head"><h3>Próbny egzamin 4: Stacja pogodowa (60 min)</h3><span class="meta">⏱ ok. 60 min</span></div>
+<p><strong>Warunki próbnego egzaminu:</strong> pracuj bez zaglądania do wcześniejszych bloków i własnych projektów (wolno: ta treść, zasoby, dokumentacja Android Studio). Zmierz czas. Podpowiedzi otwieraj dopiero po upływie czasu albo gdy zupełnie utkniesz — i zapisz, z których skorzystałeś. Na koniec: zrzuty <code>mobile1.png</code>…, <code>mobilna.zip</code>, kopie plików źródłowych, <code>srodowisko.txt</code>.</p>
+<p>Za pomocą środowiska programistycznego wykonaj aplikację mobilną — prostą stację pogodową z zapisem pomiarów. Do wykonania zadania wykorzystaj obrazy z archiwum <code>zasoby_b14-egzD.zip</code>.</p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>tytuł; rząd [obraz | kolumna 3 napisów]; suwak; przycisk; napis średniej; lista; autor</td></tr><tr><td>DANE</td><td>temperatura −20..40 (suwak z przesunięciem)</td></tr><tr><td>ZDARZENIA</td><td>zmiana suwaka, ZAPISZ POMIAR</td></tr><tr><td>LOGIKA</td><td>t = progress − 20; °F = t·9/5 + 32; przedziały &lt;0 / 0..20 / &gt;20 → obraz, opis, tło; lista pomiarów; średnia</td></tr><tr><td>WYNIK</td><td>„t °C”, „x,x °F”, opis, obraz, kolor tła strony; wpisy „Pomiar n: t °C”; średnia (1 miejsce)</td></tr><tr><td>WYGLĄD</td><td>tytuł #37474F biały wyśrodkowany; obraz 160dp w lewej połowie; temperatura 26sp pogrubiona; przycisk #37474F wyśrodkowany; lista wypełnia resztę</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#C8E6C9;padding:0px"><div class="m-t" style="background:#37474F;color:#fff;font-size:22.4px;padding:8px;text-align:center;align-self:stretch">Stacja pogodowa</div><div class="m-row" style="margin:8px;align-self:stretch;align-items:center"><div class="m-img" style="flex:1 1 0;min-width:0;height:128px;align-self:stretch"><img src="../assets/zasoby/termometr_umiarkowanie.png" alt="" style="object-fit:contain"></div><div class="m-col" style="flex:1 1 0;min-width:0"><div class="m-t" style="font-size:20.8px;font-weight:700;text-align:center;align-self:stretch">20 °C</div><div class="m-t" style="text-align:center;align-self:stretch">68,0 °F</div><div class="m-t" style="font-size:14.4px;text-align:center;align-self:stretch">Umiarkowanie</div></div></div><div class="m-seek" style="margin:0px 8px 0px 8px;align-self:stretch"><div class="m-seek-track"><div class="m-seek-fill" style="width:66%;background:#6750A4"></div><div class="m-seek-thumb" style="left:66%;background:#6750A4"></div></div></div><div class="m-b" style="background:#37474F;color:#ffffff;margin:8px 0px 0px 0px;align-self:center">ZAPISZ POMIAR</div><div class="m-t" style="font-weight:700;text-align:center;align-self:stretch">Średnia z pomiarów: —</div><div style="height:72px"></div><div class="m-t" style="color:#616161;padding:4.8px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Stan początkowy (20 °C)</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#BBDEFB;padding:0px"><div class="m-t" style="background:#37474F;color:#fff;font-size:22.4px;padding:8px;text-align:center;align-self:stretch">Stacja pogodowa</div><div class="m-row" style="margin:8px;align-self:stretch;align-items:center"><div class="m-img" style="flex:1 1 0;min-width:0;height:128px;align-self:stretch"><img src="../assets/zasoby/termometr_zimno.png" alt="" style="object-fit:contain"></div><div class="m-col" style="flex:1 1 0;min-width:0"><div class="m-t" style="font-size:20.8px;font-weight:700;text-align:center;align-self:stretch">-5 °C</div><div class="m-t" style="text-align:center;align-self:stretch">23,0 °F</div><div class="m-t" style="font-size:14.4px;text-align:center;align-self:stretch">Mróz</div></div></div><div class="m-seek" style="margin:0px 8px 0px 8px;align-self:stretch"><div class="m-seek-track"><div class="m-seek-fill" style="width:25%;background:#6750A4"></div><div class="m-seek-thumb" style="left:25%;background:#6750A4"></div></div></div><div class="m-b" style="background:#37474F;color:#ffffff;margin:8px 0px 0px 0px;align-self:center">ZAPISZ POMIAR</div><div class="m-t" style="font-weight:700;text-align:center;align-self:stretch">Średnia z pomiarów: 7,5 °C</div><div class="m-list" style="margin:0px 8px 0px 8px;align-self:stretch"><div class="m-li" style="border-bottom:1px solid #dddddd;">Pomiar 1: 20 °C</div><div class="m-li" style="border-bottom:1px solid #dddddd;">Pomiar 2: -5 °C</div></div><div style="height:8px"></div><div class="m-t" style="color:#616161;padding:4.8px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 2. Zapisano 20 °C i −5 °C</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Stacja pogodowa”.</li><li>Rząd: po lewej obraz termometru, po prawej kolumna trzech napisów: temperatura w °C, temperatura w °F, opis.</li><li>Suwak temperatury.</li><li>Przycisk „ZAPISZ POMIAR”.</li><li>Napis „Średnia z pomiarów: —”.</li><li>Lista pomiarów.</li><li>Napis „Autor: ”, dalej numer zdającego.</li></ul>
+<p><strong>Działanie aplikacji:</strong></p>
+<ul><li>Suwak pozwala ustawić temperaturę od −20 do 40 °C (liczby całkowite); w stanie początkowym 20 °C.</li><li>Każda zmiana suwaka aktualizuje: napis „&lt;t&gt; °C”, napis „&lt;f&gt; °F” (f = t · 9/5 + 32, jedno miejsce po przecinku), opis, obraz i kolor tła strony:<ul><li>t &lt; 0: „Mróz”, <code>termometr_zimno</code>, tło #BBDEFB;</li><li>0 ≤ t ≤ 20: „Umiarkowanie”, <code>termometr_umiarkowanie</code>, tło #C8E6C9;</li><li>t &gt; 20: „Gorąco”, <code>termometr_goraco</code>, tło #FFCCBC.</li></ul></li><li>„ZAPISZ POMIAR” dopisuje na końcu listy „Pomiar &lt;n&gt;: &lt;t&gt; °C” i aktualizuje napis „Średnia z pomiarów: &lt;x&gt; °C” (jedno miejsce po przecinku).</li></ul>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs w XML; rozkład liniowy pionowy z zagnieżdżonym rozkładem poziomym (obraz + rozkład pionowy napisów), obie części równej szerokości.</li><li>Tytuł: tło #37474F, biała czcionka, największa, wyśrodkowana, marginesy wewnętrzne 10. Obraz wysokości 160.</li><li>Napis temperatury w °C: 26, pogrubiony. Przycisk wyśrodkowany, tło #37474F, biała czcionka. Średnia pogrubiona.</li><li>Lista wypełnia wolne miejsce nad napisem autora.</li><li>Zamiana wartości suwaka na temperaturę w osobnej metodzie; stała z minimalną temperaturą.</li></ul>
+<h4>Zasoby do zadania</h4><div class="res-list"><figure><a href="../assets/zasoby/termometr_zimno.png" download><img src="../assets/zasoby/termometr_zimno.png" alt="termometr_zimno.png"></a><figcaption>termometr_zimno.png</figcaption></figure><figure><a href="../assets/zasoby/termometr_umiarkowanie.png" download><img src="../assets/zasoby/termometr_umiarkowanie.png" alt="termometr_umiarkowanie.png"></a><figcaption>termometr_umiarkowanie.png</figcaption></figure><figure><a href="../assets/zasoby/termometr_goraco.png" download><img src="../assets/zasoby/termometr_goraco.png" alt="termometr_goraco.png"></a><figcaption>termometr_goraco.png</figcaption></figure></div><p class="small">Pobierz wszystkie: <a href="../materialy/zasoby_b14-egzD.zip" download>zasoby_b14-egzD.zip</a>. Obrazy skopiuj do <code>app/src/main/res/drawable</code> (nazwy: małe litery, bez spacji i myślników).</p>
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b14-egzD"><li><label><input type="checkbox"> <span>start: 20 °C, 68,0 °F, „Umiarkowanie”, tło zielone</span></label></li><li><label><input type="checkbox"> <span>suwak skrajnie w lewo → −20 °C, w prawo → 40 °C</span></label></li><li><label><input type="checkbox"> <span>granice: 0 °C → Umiarkowanie; −1 → Mróz; 20 → Umiarkowanie; 21 → Gorąco</span></label></li><li><label><input type="checkbox"> <span>kolor tła całej strony zmienia się wg przedziału</span></label></li><li><label><input type="checkbox"> <span>ZAPISZ: „Pomiar n: t °C” na końcu listy, średnia z 1 miejscem po przecinku (20 i −5 → 7,5)</span></label></li><li><label><input type="checkbox"> <span>rząd obraz/kolumna po równo (wagi), lista wypełnia wolne miejsce</span></label></li><li><label><input type="checkbox"> <span>metoda <code>temperatura()</code> i stała <code>MIN_TEMPERATURA</code></span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Jedna metoda <code>pokazTemperature(int t)</code> ustawia wszystkie 5 rzeczy zależnych od temperatury. Wywołaj ją z listenera i na końcu <code>onCreate</code> (stan początkowy).</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p><code>max="60"</code>, <code>progress="40"</code>, <code>t = progress - 20</code>. °F: <code>t * 9 / 5.0 + 32</code> (dzielenie przez <code>5.0</code>!). Średnia: <code>(double) suma / pomiary.size()</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">listener: pokazTemperature(temperatura())
+pokazTemperature(t): "t °C"; "%.1f °F"; jeśli t&lt;0 → zimno/Mróz/#BBDEFB; t&lt;=20 → …; inaczej → …
+ZAPISZ: t ← temperatura(); suma += t; lista.add("Pomiar " + (size+1) + ": " + t + " °C"); notify; średnia</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">void</span> pokazTemperature(<span class="t-k">int</span> t) {
+    tvCelsjusz.setText(t + <span class="t-s">" °C"</span>);
+    tvFahrenheit.setText(<span class="t-t">String</span>.format(<span class="t-s">"%.1f °F"</span>, t * <span class="t-n">9</span> / <span class="t-n">5.0</span> + <span class="t-n">32</span>));
+    <span class="t-k">if</span> (t &lt; <span class="t-n">0</span>) {
+        ivTermometr.setImageResource(<span class="t-t">R</span>.drawable.termometr_zimno);
+        tvOpis.setText(<span class="t-s">"Mróz"</span>);
+        ukladGlowny.setBackgroundColor(<span class="t-t">Color</span>.parseColor(<span class="t-s">"#BBDEFB"</span>));
+    } <span class="t-k">else</span> <span class="t-k">if</span> (t &lt;= <span class="t-n">20</span>) {
+        …
+    } <span class="t-k">else</span> {
+        …
+    }
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#C8E6C9"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#37474F"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Stacja pogodowa"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center_vertical"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;ImageView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivTermometr"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"160dp"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:contentDescription</span>=<span class="t-s">"Termometr"</span>
+            <span class="t-a">android:src</span>=<span class="t-s">"@drawable/termometr_umiarkowanie"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;LinearLayout</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span><span class="t-k">&gt;</span>
+
+            <span class="t-k">&lt;TextView</span>
+                <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvCelsjusz"</span>
+                <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+                <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+                <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+                <span class="t-a">android:text</span>=<span class="t-s">"20 °C"</span>
+                <span class="t-a">android:textSize</span>=<span class="t-s">"26sp"</span>
+                <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+            <span class="t-k">&lt;TextView</span>
+                <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvFahrenheit"</span>
+                <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+                <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+                <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+                <span class="t-a">android:text</span>=<span class="t-s">"68,0 °F"</span> <span class="t-k">/&gt;</span>
+
+            <span class="t-k">&lt;TextView</span>
+                <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvOpis"</span>
+                <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+                <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+                <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+                <span class="t-a">android:text</span>=<span class="t-s">"Umiarkowanie"</span>
+                <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+        <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;SeekBar</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbTemperatura"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:max</span>=<span class="t-s">"60"</span>
+        <span class="t-a">android:progress</span>=<span class="t-s">"40"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnZapisz"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#37474F"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"ZAPISZ POMIAR"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvSrednia"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Średnia z pomiarów: —"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ListView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/lvPomiary"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"0dp"</span>
+        <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvAutor"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"6dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#616161"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.graphics.<span class="t-t">Color</span>;
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ArrayAdapter</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ImageView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">LinearLayout</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ListView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">SeekBar</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> java.util.<span class="t-t">ArrayList</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">MIN_TEMPERATURA</span> = -<span class="t-n">20</span>;   <span class="t-c">// suwak 0..60 → temperatura -20..40</span>
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">ArrayList</span>&lt;<span class="t-t">String</span>&gt; pomiary = <span class="t-k">new</span> <span class="t-t">ArrayList</span>&lt;&gt;();
+    <span class="t-k">private</span> <span class="t-t">ArrayAdapter</span>&lt;<span class="t-t">String</span>&gt; adapter;
+    <span class="t-k">private</span> <span class="t-k">int</span> sumaPomiarow = <span class="t-n">0</span>;
+
+    <span class="t-k">private</span> <span class="t-t">LinearLayout</span> ukladGlowny;
+    <span class="t-k">private</span> <span class="t-t">SeekBar</span> sbTemperatura;
+    <span class="t-k">private</span> <span class="t-t">ImageView</span> ivTermometr;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvCelsjusz, tvFahrenheit, tvOpis, tvSrednia;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        ukladGlowny = findViewById(<span class="t-t">R</span>.id.main);
+        sbTemperatura = findViewById(<span class="t-t">R</span>.id.sbTemperatura);
+        ivTermometr = findViewById(<span class="t-t">R</span>.id.ivTermometr);
+        tvCelsjusz = findViewById(<span class="t-t">R</span>.id.tvCelsjusz);
+        tvFahrenheit = findViewById(<span class="t-t">R</span>.id.tvFahrenheit);
+        tvOpis = findViewById(<span class="t-t">R</span>.id.tvOpis);
+        tvSrednia = findViewById(<span class="t-t">R</span>.id.tvSrednia);
+        <span class="t-t">ListView</span> lvPomiary = findViewById(<span class="t-t">R</span>.id.lvPomiary);
+        <span class="t-t">Button</span> btnZapisz = findViewById(<span class="t-t">R</span>.id.btnZapisz);
+
+        adapter = <span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, android.<span class="t-t">R</span>.layout.simple_list_item_1, pomiary);
+        lvPomiary.setAdapter(adapter);
+
+        sbTemperatura.setOnSeekBarChangeListener(<span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+                pokazTemperature(temperatura());
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+        });
+
+        btnZapisz.setOnClickListener(v -&gt; {
+            <span class="t-k">int</span> t = temperatura();
+            sumaPomiarow += t;
+            pomiary.add(<span class="t-s">"Pomiar "</span> + (pomiary.size() + <span class="t-n">1</span>) + <span class="t-s">": "</span> + t + <span class="t-s">" °C"</span>);
+            adapter.notifyDataSetChanged();
+            tvSrednia.setText(<span class="t-t">String</span>.format(<span class="t-s">"Średnia z pomiarów: %.1f °C"</span>, (<span class="t-k">double</span>) sumaPomiarow / pomiary.size()));
+        });
+
+        pokazTemperature(temperatura());
+    }
+
+    <span class="t-k">private</span> <span class="t-k">int</span> temperatura() {
+        <span class="t-k">return</span> sbTemperatura.getProgress() + <span class="t-t">MIN_TEMPERATURA</span>;
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> pokazTemperature(<span class="t-k">int</span> t) {
+        tvCelsjusz.setText(t + <span class="t-s">" °C"</span>);
+        tvFahrenheit.setText(<span class="t-t">String</span>.format(<span class="t-s">"%.1f °F"</span>, t * <span class="t-n">9</span> / <span class="t-n">5.0</span> + <span class="t-n">32</span>));
+        <span class="t-k">if</span> (t &lt; <span class="t-n">0</span>) {
+            ivTermometr.setImageResource(<span class="t-t">R</span>.drawable.termometr_zimno);
+            tvOpis.setText(<span class="t-s">"Mróz"</span>);
+            ukladGlowny.setBackgroundColor(<span class="t-t">Color</span>.parseColor(<span class="t-s">"#BBDEFB"</span>));
+        } <span class="t-k">else</span> <span class="t-k">if</span> (t &lt;= <span class="t-n">20</span>) {
+            ivTermometr.setImageResource(<span class="t-t">R</span>.drawable.termometr_umiarkowanie);
+            tvOpis.setText(<span class="t-s">"Umiarkowanie"</span>);
+            ukladGlowny.setBackgroundColor(<span class="t-t">Color</span>.parseColor(<span class="t-s">"#C8E6C9"</span>));
+        } <span class="t-k">else</span> {
+            ivTermometr.setImageResource(<span class="t-t">R</span>.drawable.termometr_goraco);
+            tvOpis.setText(<span class="t-s">"Gorąco"</span>);
+            ukladGlowny.setBackgroundColor(<span class="t-t">Color</span>.parseColor(<span class="t-s">"#FFCCBC"</span>));
+        }
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b14_egzD/">rozwiazania/b14_egzD/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b14-egzD">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="checklista"><h2><span class="sec-num">8.</span> Checklista</h2><p class="small muted">Sprawdź swoją aplikację z zadania INF.04 punkt po punkcie (krok 10 procedury).</p><ul class="checklist" data-key="b14-check"><li><label><input type="checkbox"> <span>analiza wypełniona przed kodowaniem (oba zadania)</span></label></li><li><label><input type="checkbox"> <span>czas: zadanie 1 ≤ 50 min, zadanie 2 ≤ 60 min (zapisz faktyczny)</span></label></li><li><label><input type="checkbox"> <span>przetestowałem granice przedziałów i przypadki puste (pusta lista, puste pola)</span></label></li><li><label><input type="checkbox"> <span>wszystkie przeliczenia w jednej metodzie wołanej po każdej zmianie danych</span></label></li><li><label><input type="checkbox"> <span>porównałem wygląd z obrazami punkt po punkcie</span></label></li><li><label><input type="checkbox"> <span>zapisałem tematy, przy których sięgnąłem po podpowiedź</span></label></li></ul></section>
+<section class="sec" id="test"><h2><span class="sec-num">9.</span> Mini-test</h2><div class="quiz" data-quiz="b14"><script type="application/json">[{"q": "<p><code>ArrayList&lt;Double&gt; k<\/code> ma 3 elementy. Co usuwa <code>k.remove(1)<\/code>?<\/p>", "o": ["element równy 1.0", "drugi element (indeks 1)", "pierwszy element", "nic — błąd"], "a": 1, "e": "<p>Argument <code>int<\/code> wybiera wersję usuwającą po indeksie.<\/p>"}, {"q": "<p>Temperatura t = 7 (int). Który zapis daje 44,6 °F?<\/p>", "o": ["<code>t * 9 / 5 + 32<\/code>", "<code>t * 9 / 5.0 + 32<\/code>", "<code>t * (9 / 5) + 32<\/code>", "<code>(t + 32) * 9 / 5<\/code>"], "a": 1, "e": "<p>W wariancie 1 i 3 dzielenie jest całkowite (9/5 = 1). Wynik dokładny: 7·1,8 + 32 = 44,6.<\/p>"}, {"q": "<p>Po usunięciu elementu napis sumy się nie zmienia. Najbardziej prawdopodobna przyczyna?<\/p>", "o": ["zły kolor", "przeliczanie jest tylko w obsłudze DODAJ, a nie we wspólnej metodzie", "brak <code>layout_weight<\/code>", "lista jest za krótka"], "a": 1, "e": "<p>Każda zmiana danych musi kończyć się tym samym odświeżeniem.<\/p>"}, {"q": "<p>Opis „0 ≤ t ≤ 20: Umiarkowanie” przy łańcuchu zaczynającym się od <code>if (t &lt; 0)<\/code>. Drugi warunek to:<\/p>", "o": ["<code>else if (t &lt; 20)<\/code>", "<code>else if (t &lt;= 20)<\/code>", "<code>else if (t &gt; 0 &amp;&amp; t &lt; 20)<\/code>", "<code>else if (t == 20)<\/code>"], "a": 1, "e": "<p>Przypadek t &lt; 0 odpadł wcześniej, więc wystarczy górna granica włącznie.<\/p>"}, {"q": "<p>Średnia z pustej listy pomiarów:<\/p>", "o": ["dzielimy przez 0 — w porządku", "nie liczymy — wyświetlamy „—”", "zawsze 0", "wyjątek jest akceptowalny"], "a": 1, "e": "<p>Dla <code>double<\/code> dzielenie przez 0 daje NaN/Infinity (dla <code>int<\/code> wyjątek) — trzeba obsłużyć pusty przypadek.<\/p>"}]</script></div></section>
+<section class="sec" id="dodatkowe"><h2><span class="sec-num">10.</span> Skończyłeś wcześniej?</h2><div class="micro"><h4>Oceny z przedmiotu</h4><p>Zaimplementuj aplikację z przykładu analizy (średnia, najczęstsza ocena, usuwanie) w 30 minut.</p></div><div class="micro"><h4>Kategorie wydatków</h4><p>Dodaj do wydatków <code>RadioGroup</code> z kategoriami (Jedzenie, Transport, Inne) i napis z sumą dla wybranej kategorii.</p></div><div class="micro"><h4>Min i max pomiarów</h4><p>W stacji pogodowej dodaj napis „Min: x °C, Max: y °C” dla zapisanych pomiarów.</p></div></section>
+<div class="nav-bottom"><a class="btn secondary" href="blok13.html">← Blok 13</a><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button><a class="btn secondary" href="blok15.html">Blok 15 →</a></div></article></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
