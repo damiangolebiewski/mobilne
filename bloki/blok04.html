@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blok 4 — Walidacja danych i komunikaty</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../" data-page="block" data-block="b04">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html" class="active">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="block-layout"><aside class="toc no-print"><strong>Blok 4</strong><ol><li><a href="#cel">Cel</a></li><li><a href="#przypomnienie">Krótkie przypomnienie</a></li><li><a href="#przyklad">Przykład</a></li><li><a href="#mikro">Mikroćwiczenia</a></li><li><a href="#prowadzone">Zadanie prowadzone</a></li><li><a href="#samodzielne">Zadanie samodzielne</a></li><li><a href="#inf04">Zadanie w stylu INF.04</a></li><li><a href="#checklista">Checklista</a></li><li><a href="#test">Mini-test</a></li><li><a href="#dodatkowe">Skończyłeś wcześniej?</a></li></ol><a class="skip" href="#samodzielne">Silniejszy? Przejdź od razu do zadania samodzielnego →</a><p class="small muted" style="margin-top:.8rem">Słabszy? Przypomnienie → Przykład → Mikroćwiczenia → Zadanie prowadzone (z podpowiedziami).</p></aside><article class="page"><div class="block-head"><div><div class="muted small"><a href="../index.html">Bloki</a> › Blok 4</div><h1>Blok 4. Walidacja danych i komunikaty</h1><span class="badge p1">Faza I — wyrównanie</span> <span id="block-status" class="badge">W trakcie</span></div><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button></div>
+<p>Sprawdzasz dane z formularza kilkoma warunkami w ustalonej kolejności, porównujesz napisy poprawnie i wyświetlasz właściwy komunikat w obszarze komunikatów.</p>
+<section class="sec" id="cel"><h2><span class="sec-num">1.</span> Cel</h2><p><strong>Po wykonaniu tego bloku będziesz potrafił:</strong></p><ul><li>zapisać ciąg warunków <code>if / else if / else</code> tak, aby komunikaty miały właściwy priorytet,</li><li>porównywać napisy metodą <code>equals</code> (a nie <code>==</code>) i sprawdzać <code>contains</code>, <code>length</code>, <code>isEmpty</code>,</li><li>sprawdzić znak po znaku, czy tekst zawiera same cyfry (<code>Character.isDigit</code>),</li><li>wydzielić walidację do metody zwracającej komunikat (<code>String</code>) i pokazać go w obszarze komunikatów.</li></ul><details class="hint"><summary>Plan czasu (4 × 45 min = 180 min)</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>Przypomnienie</td><td>15 min</td></tr><tr><td>Przykład</td><td>10 min</td></tr><tr><td>Mikroćwiczenia</td><td>25 min</td></tr><tr><td>Zadanie prowadzone</td><td>40 min</td></tr><tr><td>Zadanie samodzielne</td><td>35 min</td></tr><tr><td>Zadanie INF.04</td><td>45 min</td></tr><tr><td>Checklista + mini-test</td><td>10 min</td></tr><tr><th>Razem</th><th>180 min</th></tr></tbody></table></div></div></details><p class="small muted">Powiązanie z arkuszami: Arkusz_01 (e-mail zawiera „@”, hasła równe, priorytet komunikatów, „Autor” na starcie), Arkusz_13 (zakres 1..12), desktopowe Arkusze 06 i 09 (kod pocztowy: długość i same cyfry, puste pola).</p></section>
+<section class="sec" id="przypomnienie"><h2><span class="sec-num">2.</span> Krótkie przypomnienie</h2><h4>Priorytet komunikatów = kolejność warunków</h4>
+<p>Arkusz_01 wymaga: najpierw sprawdź e-mail, potem hasła, a gdy wszystko jest dobrze — powitanie. W kodzie to łańcuch <code>else if</code>: pierwszy spełniony warunek wygrywa.</p>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-t">String</span> sprawdz(<span class="t-t">String</span> email, <span class="t-t">String</span> haslo, <span class="t-t">String</span> haslo2) {
+    <span class="t-k">if</span> (!email.contains(<span class="t-s">"@"</span>)) {
+        <span class="t-k">return</span> <span class="t-s">"Nieprawidłowy adres e-mail"</span>;
+    } <span class="t-k">else</span> <span class="t-k">if</span> (!haslo.equals(haslo2)) {
+        <span class="t-k">return</span> <span class="t-s">"Hasła się różnią"</span>;
+    } <span class="t-k">else</span> {
+        <span class="t-k">return</span> <span class="t-s">"Witaj "</span> + email;
+    }
+}
+<span class="t-c">// w obsłudze przycisku:</span>
+tvKomunikat.setText(sprawdz(email, haslo, haslo2));</code></pre></div>
+<h4>Metody klasy String, których potrzebujesz</h4>
+<div class="table-wrap"><table><thead><tr><th>Zapis</th><th>Znaczenie</th></tr></thead><tbody><tr><td><code>s.isEmpty()</code></td><td>czy pusty</td></tr><tr><td><code>s.length()</code></td><td>liczba znaków</td></tr><tr><td><code>s.contains("@")</code></td><td>czy zawiera fragment</td></tr><tr><td><code>s.equals(t)</code></td><td>czy <strong>te same znaki</strong></td></tr><tr><td><code>s.equalsIgnoreCase(t)</code></td><td>jw., bez rozróżniania wielkości liter</td></tr><tr><td><code>s.charAt(i)</code></td><td>znak na pozycji <code>i</code> (od 0)</td></tr><tr><td><code>s.substring(0, 2)</code></td><td>fragment od 0 do 2 (bez 2)</td></tr><tr><td><code>s.startsWith("48")</code></td><td>czy zaczyna się od</td></tr><tr><td><code>Character.isDigit(c)</code></td><td>czy znak jest cyfrą</td></tr></tbody></table></div>
+<div class="box box-err"><p><code>if (haslo == haslo2)</code> porównuje <strong>adresy obiektów</strong>, nie treść. Dla dwóch pól z tym samym hasłem zwykle da <code>false</code>. Napisy porównuj zawsze przez <code>equals</code>.</p></div>
+<h4>Zakres liczby (Arkusz_13: numer prania 1..12)</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">int</span> numer = <span class="t-t">Integer</span>.parseInt(tekst);
+<span class="t-k">if</span> (numer &gt;= <span class="t-n">1</span> &amp;&amp; numer &lt;= <span class="t-n">12</span>) {
+    tvNumer.setText(<span class="t-s">"Numer prania: "</span> + numer);
+}</code></pre></div>
+<h4>Obszar komunikatów</h4>
+<p>W XML nadaj mu tekst startowy z polecenia — często „Autor: &lt;numer zdającego&gt;”. Po kliknięciu nadpisujesz go komunikatem.</p>
+<p><strong>Ćwiczenie natychmiastowe:</strong> w przykładzie poniżej dopisz warunek „wiek &gt; 120 → Nieprawidłowy wiek” <strong>na końcu</strong> łańcucha zamiast na początku. Wpisz 150. Co się wyświetla i dlaczego?</p></section>
+<section class="sec" id="przyklad"><h2><span class="sec-num">3.</span> Przykład</h2><p>Walidacja wieku w osobnej metodzie <code>ocenWiek</code>, która dostaje tekst i zwraca komunikat. Obsługa przycisku ma jedną linię.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:12.8px"><div class="m-e" style="align-self:stretch"><span class="m-hint" style="">Wiek</span></div><div class="m-b" style="background:#6750A4;color:#ffffff;align-self:center">SPRAWDŹ</div><div class="m-t" style="font-size:16px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Stan początkowy</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:12.8px"><div class="m-e" style="align-self:stretch"><span>16</span></div><div class="m-b" style="background:#6750A4;color:#ffffff;align-self:center">SPRAWDŹ</div><div class="m-t" style="font-size:16px;text-align:center;align-self:stretch">Niepełnoletni</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po wpisaniu 16</figcaption></figure></div><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etWiek"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Wiek"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"number"</span>
+        <span class="t-a">android:maxLength</span>=<span class="t-s">"3"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnSprawdz"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"SPRAWDŹ"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvKomunikat"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etWiek;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvKomunikat;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etWiek = findViewById(<span class="t-t">R</span>.id.etWiek);
+        tvKomunikat = findViewById(<span class="t-t">R</span>.id.tvKomunikat);
+        <span class="t-t">Button</span> btnSprawdz = findViewById(<span class="t-t">R</span>.id.btnSprawdz);
+
+        btnSprawdz.setOnClickListener(v -&gt; tvKomunikat.setText(ocenWiek(etWiek.getText().toString().trim())));
+    }
+
+    <span class="t-c">// Walidacja w osobnej metodzie: dostaje tekst, zwraca komunikat.</span>
+    <span class="t-c">// Kolejność warunków = priorytet komunikatów.</span>
+    <span class="t-k">private</span> <span class="t-t">String</span> ocenWiek(<span class="t-t">String</span> tekst) {
+        <span class="t-k">if</span> (tekst.isEmpty()) {
+            <span class="t-k">return</span> <span class="t-s">"Podaj wiek"</span>;
+        }
+        <span class="t-k">int</span> wiek = <span class="t-t">Integer</span>.parseInt(tekst);    <span class="t-c">// bezpieczne: inputType="number" i pole niepuste</span>
+        <span class="t-k">if</span> (wiek &gt; <span class="t-n">120</span>) {
+            <span class="t-k">return</span> <span class="t-s">"Nieprawidłowy wiek"</span>;
+        } <span class="t-k">else</span> <span class="t-k">if</span> (wiek &lt; <span class="t-n">18</span>) {
+            <span class="t-k">return</span> <span class="t-s">"Niepełnoletni"</span>;
+        } <span class="t-k">else</span> {
+            <span class="t-k">return</span> <span class="t-s">"Pełnoletni"</span>;
+        }
+    }
+}</code></pre></div><p>Zwróć uwagę na <code>maxLength="3"</code> w XML: dzięki niemu <code>parseInt</code> nie dostanie zbyt długiej liczby.</p></section>
+<section class="sec" id="mikro"><h2><span class="sec-num">4.</span> Mikroćwiczenia</h2><div class="micro"><h4>Ćwiczenie 4.1 — equals czy ==</h4><p>Które warunki są poprawne? a) <code>if (kod == "1234")</code> b) <code>if (kod.equals("1234"))</code> c) <code>if ("1234".equals(kod))</code> d) <code>if (kod.length() == 4)</code></p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Poprawne: b, c, d. Porównanie liczb (<code>length() == 4</code>) przez <code>==</code> jest dobre; porównanie napisów — tylko <code>equals</code>. Wariant c) nie rzuci wyjątku, nawet gdy <code>kod</code> jest <code>null</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 4.2 — Kolejność warunków</h4><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">if</span> (haslo.length() &lt; <span class="t-n">6</span>) <span class="t-k">return</span> <span class="t-s">"Hasło za krótkie"</span>;
+<span class="t-k">else</span> <span class="t-k">if</span> (haslo.isEmpty()) <span class="t-k">return</span> <span class="t-s">"Podaj hasło"</span>;
+<span class="t-k">else</span> <span class="t-k">return</span> <span class="t-s">"OK"</span>;</code></pre></div>
+<p>Użytkownik nic nie wpisał. Jaki komunikat zobaczy? Czy o to chodziło? Popraw.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>„Hasło za krótkie” — pusty tekst ma długość 0 &lt; 6, więc pierwszy warunek wygrywa. Najpierw sprawdzaj przypadek najbardziej szczegółowy (puste pole), potem długość.</p></div></details></div><div class="micro"><h4>Ćwiczenie 4.3 — Same cyfry</h4><p>Napisz metodę <code>boolean czySameCyfry(String tekst)</code>, która zwraca <code>true</code>, gdy każdy znak jest cyfrą.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">boolean</span> czySameCyfry(<span class="t-t">String</span> tekst) {
+    <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; tekst.length(); i++) {
+        <span class="t-k">if</span> (!<span class="t-t">Character</span>.isDigit(tekst.charAt(i))) {
+            <span class="t-k">return</span> <span class="t-k">false</span>;
+        }
+    }
+    <span class="t-k">return</span> <span class="t-k">true</span>;
+}</code></pre></div></div></details></div><div class="micro"><h4>Ćwiczenie 4.4 — Zakres</h4><p>Zapisz warunek: „liczba należy do przedziału ⟨1, 12⟩”. Potem zapisz warunek przeciwny (liczba spoza przedziału) na dwa sposoby.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>n &gt;= 1 &amp;&amp; n &lt;= 12</code>. Przeciwny: <code>n &lt; 1 || n &gt; 12</code> albo <code>!(n &gt;= 1 &amp;&amp; n &lt;= 12)</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 4.5 — Komunikat z danymi</h4><p>Po poprawnej walidacji wyświetl „Witaj anna@poczta.pl” (Arkusz_01), gdzie adres pochodzi z pola <code>etEmail</code>. Napisz jedną linię.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>tvKomunikat.setText("Witaj " + etEmail.getText().toString().trim());</code></p></div></details></div></section>
+<section class="sec" id="prowadzone"><h2><span class="sec-num">5.</span> Zadanie prowadzone</h2><div class="task" id="b04-prowadzone">
+<div class="task-head"><h3>Sprawdzanie kodu pocztowego</h3><span class="meta">⏱ ok. 40 min</span></div>
+<p>Wzorzec walidacji z zadania desktopowego (Arkusz_06) przeniesiony do aplikacji mobilnej: kod ma mieć dokładnie 5 znaków i składać się z samych cyfr.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:12.8px"><div class="m-t" style="font-size:22.4px;font-weight:700;text-align:center;align-self:stretch">Kod pocztowy</div><div class="m-e" style="margin:8px 0px 0px 0px;align-self:stretch"><span>06l00</span></div><div class="m-b" style="background:#6750A4;color:#ffffff;align-self:center">SPRAWDŹ</div><div class="m-t" style="font-size:16px;margin:8px 0px 0px 0px;text-align:center;align-self:stretch">Kod może zawierać tylko cyfry</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Litera „l” zamiast cyfry „1”</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:12.8px"><div class="m-t" style="font-size:22.4px;font-weight:700;text-align:center;align-self:stretch">Kod pocztowy</div><div class="m-e" style="margin:8px 0px 0px 0px;align-self:stretch"><span>06100</span></div><div class="m-b" style="background:#6750A4;color:#ffffff;align-self:center">SPRAWDŹ</div><div class="m-t" style="font-size:16px;margin:8px 0px 0px 0px;text-align:center;align-self:stretch">Kod poprawny: 06-100</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Kod poprawny</figcaption></figure></div>
+<p><strong>Komunikaty (w tej kolejności):</strong></p>
+<ol><li>długość różna od 5 → „Nieprawidłowa liczba znaków w kodzie”,</li><li>przynajmniej jeden znak nie jest cyfrą → „Kod może zawierać tylko cyfry”,</li><li>w przeciwnym razie → „Kod poprawny: 06-100” (myślnik wstaw po dwóch pierwszych cyfrach).</li></ol>
+<p>Pole ma celowo <code>inputType="text"</code>, żeby dało się wpisać literę i przetestować drugi komunikat.</p>
+<p><strong>Kroki:</strong></p>
+<ol><li>XML: tytuł, <code>EditText</code>, przycisk wyśrodkowany, napis komunikatu.</li><li>Metoda <code>boolean czySameCyfry(String tekst)</code>.</li><li>Metoda <code>String sprawdzKod(String kod)</code> zwracająca komunikat.</li><li>Obsługa przycisku: odczyt, <code>trim</code>, <code>setText(sprawdzKod(kod))</code>.</li><li>Testy: <code>0610</code>, <code>061000</code>, <code>06l00</code>, <code>06100</code>.</li></ol>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Najpierw długość, potem cyfry. Metoda zwracająca <code>String</code> może kończyć się <code>return</code> w każdym warunku — nie potrzeba wtedy <code>else</code>.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Formatowanie: <code>kod.substring(0, 2) + "-" + kod.substring(2)</code> → „06” + „-” + „100”.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">sprawdzKod(kod):
+    jeśli długość ≠ 5        → zwróć "Nieprawidłowa liczba znaków w kodzie"
+    jeśli nie same cyfry     → zwróć "Kod może zawierać tylko cyfry"
+    zwróć "Kod poprawny: " + pierwsze 2 znaki + "-" + reszta</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-t">String</span> sprawdzKod(<span class="t-t">String</span> kod) {
+    <span class="t-k">if</span> (kod.length() != <span class="t-n">5</span>) {
+        <span class="t-k">return</span> <span class="t-s">"Nieprawidłowa liczba znaków w kodzie"</span>;
+    }
+    <span class="t-k">if</span> (!czySameCyfry(kod)) {
+        <span class="t-k">return</span> <span class="t-s">"Kod może zawierać tylko cyfry"</span>;
+    }
+    <span class="t-k">return</span> <span class="t-s">"Kod poprawny: "</span> + kod.substring(<span class="t-n">0</span>, <span class="t-n">2</span>) + <span class="t-s">"-"</span> + kod.substring(<span class="t-n">2</span>);
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Kod pocztowy"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etKod"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Kod pocztowy (5 znaków, bez myślnika)"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"text"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnSprawdz"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"SPRAWDŹ"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvKomunikat"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etKod;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvKomunikat;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etKod = findViewById(<span class="t-t">R</span>.id.etKod);
+        tvKomunikat = findViewById(<span class="t-t">R</span>.id.tvKomunikat);
+        <span class="t-t">Button</span> btnSprawdz = findViewById(<span class="t-t">R</span>.id.btnSprawdz);
+
+        btnSprawdz.setOnClickListener(v -&gt; {
+            <span class="t-t">String</span> kod = etKod.getText().toString().trim();
+            tvKomunikat.setText(sprawdzKod(kod));
+        });
+    }
+
+    <span class="t-k">private</span> <span class="t-t">String</span> sprawdzKod(<span class="t-t">String</span> kod) {
+        <span class="t-k">if</span> (kod.length() != <span class="t-n">5</span>) {
+            <span class="t-k">return</span> <span class="t-s">"Nieprawidłowa liczba znaków w kodzie"</span>;
+        }
+        <span class="t-k">if</span> (!czySameCyfry(kod)) {
+            <span class="t-k">return</span> <span class="t-s">"Kod może zawierać tylko cyfry"</span>;
+        }
+        <span class="t-k">return</span> <span class="t-s">"Kod poprawny: "</span> + kod.substring(<span class="t-n">0</span>, <span class="t-n">2</span>) + <span class="t-s">"-"</span> + kod.substring(<span class="t-n">2</span>);
+    }
+
+    <span class="t-k">private</span> <span class="t-k">boolean</span> czySameCyfry(<span class="t-t">String</span> tekst) {
+        <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; tekst.length(); i++) {
+            <span class="t-k">if</span> (!<span class="t-t">Character</span>.isDigit(tekst.charAt(i))) {
+                <span class="t-k">return</span> <span class="t-k">false</span>;
+            }
+        }
+        <span class="t-k">return</span> <span class="t-k">true</span>;
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b04_prowadzone/">rozwiazania/b04_prowadzone/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b04-prowadzone">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="samodzielne"><h2><span class="sec-num">6.</span> Zadanie samodzielne</h2><div class="task" id="b04-samodzielne">
+<div class="task-head"><h3>Bankomat: PIN i trzy próby</h3><span class="meta">⏱ ok. 35 min</span></div>
+<p>Walidacja z pamięcią: aplikacja liczy nieudane próby i po trzeciej blokuje przycisk.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:19.2px"><div class="m-t" style="font-size:24px;font-weight:700;text-align:center;align-self:stretch">Bankomat</div><div class="m-e" style="margin:16px 0px 0px 0px;align-self:stretch"><span>••••</span></div><div class="m-b" style="background:#6750A4;color:#ffffff;align-self:stretch">ZALOGUJ</div><div class="m-t" style="font-size:16px;margin:12.8px 0px 0px 0px;text-align:center;align-self:stretch">Błędny PIN. Pozostało prób: 2</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po pierwszej błędnej próbie</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:19.2px"><div class="m-t" style="font-size:24px;font-weight:700;text-align:center;align-self:stretch">Bankomat</div><div class="m-e" style="margin:16px 0px 0px 0px;align-self:stretch"><span class="m-hint" style="">PIN</span></div><div class="m-b" style="background:#bdbdbd;color:#ffffff;align-self:stretch">ZALOGUJ</div><div class="m-t" style="font-size:16px;margin:12.8px 0px 0px 0px;text-align:center;align-self:stretch">Karta zablokowana</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po trzeciej błędnej próbie</figcaption></figure></div>
+<ul><li>Poprawny PIN to <code>2468</code> (stała w kodzie). Pole ukrywa cyfry i przyjmuje maksymalnie 4 znaki.</li><li>Na starcie napis „Pozostało prób: 3”.</li><li>PIN o długości innej niż 4 → „PIN musi mieć 4 cyfry” (to <strong>nie</strong> zużywa próby).</li><li>Poprawny PIN → „Zalogowano”, przycisk przestaje działać.</li><li>Błędny PIN → pole się czyści, „Błędny PIN. Pozostało prób: n”; po trzeciej błędnej próbie „Karta zablokowana” i przycisk przestaje działać.</li></ul>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Potrzebujesz pola klasy z liczbą nieudanych prób. Przycisk wyłączysz metodą, którą poznasz dokładniej w bloku 7: <code>setEnabled(false)</code>.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Pole: <code>android:inputType="numberPassword"</code> i <code>android:maxLength="4"</code>. Porównanie: <code>pin.equals(POPRAWNY_PIN)</code>. Czyszczenie pola: <code>etPin.setText("")</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">sprawdzPin():
+    jeśli długość ≠ 4 → komunikat; zakończ
+    jeśli PIN poprawny → "Zalogowano"; wyłącz przycisk; zakończ
+    nieudane++ ; wyczyść pole
+    jeśli nieudane &gt;= 3 → "Karta zablokowana"; wyłącz przycisk
+    inaczej → "Błędny PIN. Pozostało prób: " + (3 − nieudane)</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">nieudaneProby++;
+etPin.setText(<span class="t-s">""</span>);
+<span class="t-k">if</span> (nieudaneProby &gt;= <span class="t-t">LIMIT_PROB</span>) {
+    tvKomunikat.setText(<span class="t-s">"Karta zablokowana"</span>);
+    btnZaloguj.setEnabled(<span class="t-k">false</span>);
+} <span class="t-k">else</span> {
+    tvKomunikat.setText(<span class="t-s">"Błędny PIN. Pozostało prób: "</span> + (<span class="t-t">LIMIT_PROB</span> - nieudaneProby));
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"24dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Bankomat"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"30sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etPin"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"20dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"PIN"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"numberPassword"</span>
+        <span class="t-a">android:maxLength</span>=<span class="t-s">"4"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnZaloguj"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"ZALOGUJ"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvKomunikat"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Pozostało prób: 3"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-t">String</span> <span class="t-t">POPRAWNY_PIN</span> = <span class="t-s">"2468"</span>;
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">LIMIT_PROB</span> = <span class="t-n">3</span>;
+
+    <span class="t-k">private</span> <span class="t-k">int</span> nieudaneProby = <span class="t-n">0</span>;
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etPin;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvKomunikat;
+    <span class="t-k">private</span> <span class="t-t">Button</span> btnZaloguj;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etPin = findViewById(<span class="t-t">R</span>.id.etPin);
+        tvKomunikat = findViewById(<span class="t-t">R</span>.id.tvKomunikat);
+        btnZaloguj = findViewById(<span class="t-t">R</span>.id.btnZaloguj);
+
+        btnZaloguj.setOnClickListener(v -&gt; sprawdzPin());
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> sprawdzPin() {
+        <span class="t-t">String</span> pin = etPin.getText().toString();
+        <span class="t-k">if</span> (pin.length() != <span class="t-n">4</span>) {
+            tvKomunikat.setText(<span class="t-s">"PIN musi mieć 4 cyfry"</span>);
+            <span class="t-k">return</span>;
+        }
+        <span class="t-k">if</span> (pin.equals(<span class="t-t">POPRAWNY_PIN</span>)) {
+            tvKomunikat.setText(<span class="t-s">"Zalogowano"</span>);
+            btnZaloguj.setEnabled(<span class="t-k">false</span>);
+            <span class="t-k">return</span>;
+        }
+        nieudaneProby++;
+        etPin.setText(<span class="t-s">""</span>);
+        <span class="t-k">if</span> (nieudaneProby &gt;= <span class="t-t">LIMIT_PROB</span>) {
+            tvKomunikat.setText(<span class="t-s">"Karta zablokowana"</span>);
+            btnZaloguj.setEnabled(<span class="t-k">false</span>);
+        } <span class="t-k">else</span> {
+            tvKomunikat.setText(<span class="t-s">"Błędny PIN. Pozostało prób: "</span> + (<span class="t-t">LIMIT_PROB</span> - nieudaneProby));
+        }
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b04_samodzielne/">rozwiazania/b04_samodzielne/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b04-samodzielne">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="inf04"><h2><span class="sec-num">7.</span> Zadanie w stylu INF.04</h2><div class="task exam" id="b04-inf">
+<div class="task-head"><h3>Aktywacja karty miejskiej</h3><span class="meta">⏱ ok. 45 min</span></div>
+<p>Wykonaj aplikację mobilną do aktywacji karty miejskiej i uruchom ją w emulatorze.</p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>tytuł, 3 etykiety, 3 pola edycyjne, przycisk, obszar komunikatów</td></tr><tr><td>DANE</td><td>numer karty (cyfry), PIN i powtórzony PIN (ukryte cyfry)</td></tr><tr><td>ZDARZENIA</td><td>kliknięcie „AKTYWUJ”</td></tr><tr><td>LOGIKA</td><td>4 warunki w kolejności: długość numeru 8, długość PIN 4, równość PIN-ów (equals), PIN nie z 4 identycznych cyfr</td></tr><tr><td>WYNIK</td><td>jeden z 5 komunikatów; na starcie „Autor: &lt;numer&gt;”</td></tr><tr><td>WYGLĄD</td><td>tytuł #6A1B9A biały, największy; pola na całą szerokość z marginesem 10; przycisk #6A1B9A wyśrodkowany; komunikat wyśrodkowany</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:0px"><div class="m-t" style="background:#6A1B9A;color:#fff;font-size:24px;padding:8px;align-self:stretch">Karta miejska</div><div class="m-t" style="margin:8px 0px 0px 8px">Numer karty:</div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span class="m-hint" style="">8 cyfr</span></div><div class="m-t" style="margin:0px 0px 0px 8px">PIN:</div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span class="m-hint" style="">4 cyfry</span></div><div class="m-t" style="margin:0px 0px 0px 8px">Powtórz PIN:</div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span class="m-hint" style="">4 cyfry</span></div><div class="m-b" style="background:#6A1B9A;color:#ffffff;margin:8px 0px 0px 0px;align-self:center">AKTYWUJ</div><div class="m-t" style="font-size:14.4px;margin:8px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Stan początkowy</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:0px"><div class="m-t" style="background:#6A1B9A;color:#fff;font-size:24px;padding:8px;align-self:stretch">Karta miejska</div><div class="m-t" style="margin:8px 0px 0px 8px">Numer karty:</div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span>12345678</span></div><div class="m-t" style="margin:0px 0px 0px 8px">PIN:</div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span>••••</span></div><div class="m-t" style="margin:0px 0px 0px 8px">Powtórz PIN:</div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span>••••</span></div><div class="m-b" style="background:#6A1B9A;color:#ffffff;margin:8px 0px 0px 0px;align-self:center">AKTYWUJ</div><div class="m-t" style="font-size:14.4px;margin:8px 0px 0px 0px;text-align:center;align-self:stretch">PIN jest zbyt prosty</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 2. PIN 1111</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Karta miejska”.</li><li>Napis „Numer karty:”, a pod nim pole edycyjne z podpowiedzią „8 cyfr”, przyjmujące tylko cyfry.</li><li>Napis „PIN:”, a pod nim pole edycyjne z podpowiedzią „4 cyfry” — ukrywa wpisywane cyfry.</li><li>Napis „Powtórz PIN:”, a pod nim pole jak wyżej.</li><li>Przycisk „AKTYWUJ” (wyśrodkowany).</li><li>Obszar do wyświetlania komunikatów (wyśrodkowany); na początku działania aplikacji wyświetla „Autor: ”, dalej numer zdającego.</li></ul>
+<p><strong>Działanie aplikacji:</strong> po wybraniu „AKTYWUJ” sprawdzane są kolejno warunki i wyświetlany jest <strong>pierwszy</strong> pasujący komunikat:</p>
+<ol><li>numer karty nie ma dokładnie 8 znaków → „Numer karty musi mieć 8 cyfr”,</li><li>PIN nie ma dokładnie 4 znaków → „PIN musi mieć 4 cyfry”,</li><li>PIN różni się od powtórzonego PIN-u → „PIN-y są różne”,</li><li>PIN składa się z czterech jednakowych cyfr (np. 1111) → „PIN jest zbyt prosty”,</li><li>brak błędów → „Karta &lt;numer&gt; aktywna”, gdzie &lt;numer&gt; to wpisany numer karty.</li></ol>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs w XML, rozkład liniowy pionowy.</li><li>Tytuł: tło #6A1B9A, biała czcionka, rozmiar największy, marginesy wewnętrzne 10.</li><li>Pola edycyjne rozciągnięte na szerokość ekranu (margines boczny 10). Przycisk: tło #6A1B9A, biała czcionka.</li><li>Sprawdzanie danych zrealizuj w osobnej metodzie zwracającej treść komunikatu.</li></ul>
+
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b04-inf"><li><label><input type="checkbox"> <span>na starcie w obszarze komunikatów widać „Autor: …”</span></label></li><li><label><input type="checkbox"> <span>pole numeru przyjmuje tylko cyfry; pola PIN ukrywają cyfry</span></label></li><li><label><input type="checkbox"> <span>„1234567” → komunikat 1; „12345678” + PIN „12” → komunikat 2</span></label></li><li><label><input type="checkbox"> <span>PIN „1357” i powtórzony „1358” → „PIN-y są różne” (sprawdź, że użyto <code>equals</code>)</span></label></li><li><label><input type="checkbox"> <span>PIN „1111” w obu polach → „PIN jest zbyt prosty”</span></label></li><li><label><input type="checkbox"> <span>poprawne dane → „Karta 12345678 aktywna”</span></label></li><li><label><input type="checkbox"> <span>walidacja jest w osobnej metodzie zwracającej <code>String</code></span></label></li><li><label><input type="checkbox"> <span>wygląd: kolory #6A1B9A, tytuł największy, przycisk i komunikat wyśrodkowane</span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Napisz najpierw metodę <code>sprawdzDane(numer, pin, pin2)</code> z łańcuchem <code>if / else if</code>. Obsługa przycisku ma tylko odczytać pola i wywołać tę metodę.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>„Cztery jednakowe cyfry”: porównaj każdy znak z pierwszym (<code>charAt(i) != charAt(0)</code>). Znaki (<code>char</code>) można porównywać przez <code>==</code>/<code>!=</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">sprawdzDane(numer, pin, pin2):
+    jeśli długość numeru ≠ 8   → "Numer karty musi mieć 8 cyfr"
+    inaczej jeśli długość pin ≠ 4 → "PIN musi mieć 4 cyfry"
+    inaczej jeśli !pin.equals(pin2) → "PIN-y są różne"
+    inaczej jeśli wszystkie znaki pin jak pierwszy → "PIN jest zbyt prosty"
+    inaczej → "Karta " + numer + " aktywna"</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">boolean</span> czyTeSameZnaki(<span class="t-t">String</span> tekst) {
+    <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">1</span>; i &lt; tekst.length(); i++) {
+        <span class="t-k">if</span> (tekst.charAt(i) != tekst.charAt(<span class="t-n">0</span>)) {
+            <span class="t-k">return</span> <span class="t-k">false</span>;
+        }
+    }
+    <span class="t-k">return</span> <span class="t-k">true</span>;
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#6A1B9A"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Karta miejska"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"30sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvNumerEtykieta"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Numer karty:"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etNumer"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"8 cyfr"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"number"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvPinEtykieta"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"PIN:"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etPin"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"4 cyfry"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"numberPassword"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvPin2Etykieta"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Powtórz PIN:"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etPin2"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"4 cyfry"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"numberPassword"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnAktywuj"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#6A1B9A"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"AKTYWUJ"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvKomunikat"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etNumer, etPin, etPin2;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvKomunikat;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etNumer = findViewById(<span class="t-t">R</span>.id.etNumer);
+        etPin = findViewById(<span class="t-t">R</span>.id.etPin);
+        etPin2 = findViewById(<span class="t-t">R</span>.id.etPin2);
+        tvKomunikat = findViewById(<span class="t-t">R</span>.id.tvKomunikat);
+        <span class="t-t">Button</span> btnAktywuj = findViewById(<span class="t-t">R</span>.id.btnAktywuj);
+
+        btnAktywuj.setOnClickListener(v -&gt; {
+            <span class="t-t">String</span> numer = etNumer.getText().toString().trim();
+            <span class="t-t">String</span> pin = etPin.getText().toString();
+            <span class="t-t">String</span> pin2 = etPin2.getText().toString();
+            tvKomunikat.setText(sprawdzDane(numer, pin, pin2));
+        });
+    }
+
+    <span class="t-c">// Warunki sprawdzane w kolejności z polecenia — pierwszy niespełniony decyduje o komunikacie.</span>
+    <span class="t-k">private</span> <span class="t-t">String</span> sprawdzDane(<span class="t-t">String</span> numer, <span class="t-t">String</span> pin, <span class="t-t">String</span> pin2) {
+        <span class="t-k">if</span> (numer.length() != <span class="t-n">8</span>) {
+            <span class="t-k">return</span> <span class="t-s">"Numer karty musi mieć 8 cyfr"</span>;
+        } <span class="t-k">else</span> <span class="t-k">if</span> (pin.length() != <span class="t-n">4</span>) {
+            <span class="t-k">return</span> <span class="t-s">"PIN musi mieć 4 cyfry"</span>;
+        } <span class="t-k">else</span> <span class="t-k">if</span> (!pin.equals(pin2)) {
+            <span class="t-k">return</span> <span class="t-s">"PIN-y są różne"</span>;
+        } <span class="t-k">else</span> <span class="t-k">if</span> (czyTeSameZnaki(pin)) {
+            <span class="t-k">return</span> <span class="t-s">"PIN jest zbyt prosty"</span>;
+        } <span class="t-k">else</span> {
+            <span class="t-k">return</span> <span class="t-s">"Karta "</span> + numer + <span class="t-s">" aktywna"</span>;
+        }
+    }
+
+    <span class="t-k">private</span> <span class="t-k">boolean</span> czyTeSameZnaki(<span class="t-t">String</span> tekst) {
+        <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">1</span>; i &lt; tekst.length(); i++) {
+            <span class="t-k">if</span> (tekst.charAt(i) != tekst.charAt(<span class="t-n">0</span>)) {
+                <span class="t-k">return</span> <span class="t-k">false</span>;
+            }
+        }
+        <span class="t-k">return</span> <span class="t-k">true</span>;
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b04_inf/">rozwiazania/b04_inf/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b04-inf">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="checklista"><h2><span class="sec-num">8.</span> Checklista</h2><p class="small muted">Sprawdź swoją aplikację z zadania INF.04 punkt po punkcie (krok 10 procedury).</p><ul class="checklist" data-key="b04-check"><li><label><input type="checkbox"> <span>komunikaty pojawiają się w kolejności (priorytecie) z polecenia</span></label></li><li><label><input type="checkbox"> <span>napisy porównuję przez <code>equals</code>, znaki (<code>char</code>) i liczby przez <code>==</code></span></label></li><li><label><input type="checkbox"> <span>obszar komunikatów ma tekst startowy z polecenia (np. „Autor: …”)</span></label></li><li><label><input type="checkbox"> <span>walidacja jest w osobnej metodzie zwracającej komunikat</span></label></li><li><label><input type="checkbox"> <span>przetestowałem każdy komunikat osobno (także przypadki graniczne: puste pole, dokładnie limit)</span></label></li><li><label><input type="checkbox"> <span>aplikacja nie zamyka się przy żadnych danych wejściowych</span></label></li></ul></section>
+<section class="sec" id="test"><h2><span class="sec-num">9.</span> Mini-test</h2><div class="quiz" data-quiz="b04"><script type="application/json">[{"q": "<p>Arkusz_01: najpierw sprawdź e-mail, potem hasła. Użytkownik podał zły e-mail <strong>i<\/strong> różne hasła. Co wyświetli poprawna aplikacja?<\/p>", "o": ["„Hasła się różnią”", "„Nieprawidłowy adres e-mail”", "oba komunikaty", "„Witaj …”"], "a": 1, "e": "<p>Łańcuch <code>else if<\/code> kończy się na pierwszym spełnionym warunku.<\/p>"}, {"q": "<p>Który warunek poprawnie sprawdza, że hasła są takie same?<\/p>", "o": ["<code>h1 == h2<\/code>", "<code>h1.equals(h2)<\/code>", "<code>h1 = h2<\/code>", "<code>h1.length() == h2.length()<\/code>"], "a": 1, "e": "<p><code>==<\/code> porównuje referencje; długość nie mówi nic o treści.<\/p>"}, {"q": "<p>Jak sprawdzić, czy e-mail zawiera znak „@”?<\/p>", "o": ["<code>email.has(\"@\")<\/code>", "<code>email.contains(\"@\")<\/code>", "<code>email == \"@\"<\/code>", "<code>email.charAt(\"@\")<\/code>"], "a": 1, "e": "<p><code>contains<\/code> zwraca <code>true<\/code>, gdy fragment występuje w tekście.<\/p>"}, {"q": "<p><code>\"06100\".substring(0, 2)<\/code> to:<\/p>", "o": ["„061”", "„06”", "„6”", "„0610”"], "a": 1, "e": "<p>Indeks końcowy nie jest wliczany: znaki 0 i 1.<\/p>"}, {"q": "<p>Numer prania ma być z przedziału 1..12. Który warunek jest poprawny?<\/p>", "o": ["<code>n &gt; 1 &amp;&amp; n &lt; 12<\/code>", "<code>n &gt;= 1 || n &lt;= 12<\/code>", "<code>n &gt;= 1 &amp;&amp; n &lt;= 12<\/code>", "<code>1 &lt;= n &lt;= 12<\/code>"], "a": 2, "e": "<p>Oba końce włącznie, oba warunki muszą być spełnione (<code>&amp;&amp;<\/code>). Zapis <code>1 &lt;= n &lt;= 12<\/code> nie kompiluje się w Javie.<\/p>"}, {"q": "<p>Gdzie najlepiej ustawić tekst „Autor: 12345678901” wyświetlany na starcie w obszarze komunikatów?<\/p>", "o": ["w <code>android:text<\/code> tego <code>TextView<\/code> w XML", "w <code>Toast<\/code>", "w tytule okna", "nigdzie — pojawia się sam"], "a": 0, "e": "<p>Tekst początkowy najprościej ustawić w XML; po kliknięciu kod go nadpisze.<\/p>"}]</script></div></section>
+<section class="sec" id="dodatkowe"><h2><span class="sec-num">10.</span> Skończyłeś wcześniej?</h2><div class="micro"><h4>Silniejszy PIN</h4><p>Dodaj warunek: PIN nie może być ciągiem rosnącym (1234, 2345 …). Komunikat „PIN jest zbyt prosty”.</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p>Dla każdego i od 1: <code>tekst.charAt(i) == tekst.charAt(i - 1) + 1</code>. Znak + 1 daje liczbę (kod znaku), porównanie z <code>char</code> działa.</p></div></details></div><div class="micro"><h4>Rejestracja konta w 12 minut</h4><p>Bez zaglądania do kodu: e-mail, hasło, powtórz hasło, przycisk ZATWIERDŹ (wyśrodkowany), obszar komunikatów (na starcie „Autor: …”). Komunikaty: brak „@” → „Nieprawidłowy adres e-mail”, różne hasła → „Hasła się różnią”, poprawnie → „Witaj &lt;e-mail&gt;”. Zmierz czas.</p></div><div class="micro"><h4>Licznik znaków</h4><p>Pod polem numeru karty wyświetlaj na bieżąco „Wpisano: n/8” podczas pisania.</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p>Potrzebujesz <code>addTextChangedListener(new TextWatcher() { … })</code> — to wykracza poza wymagania arkuszy, poszukaj przykładu w dokumentacji.</p></div></details></div></section>
+<div class="nav-bottom"><a class="btn secondary" href="blok03.html">← Blok 3</a><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button><a class="btn secondary" href="blok05.html">Blok 5 →</a></div></article></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
