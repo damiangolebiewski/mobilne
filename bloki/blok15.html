@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blok 15 — Tryb egzaminacyjny III: od pustego projektu do oddania</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../" data-page="block" data-block="b15">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html" class="active">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="block-layout"><aside class="toc no-print"><strong>Blok 15</strong><ol><li><a href="#cel">Cel</a></li><li><a href="#przypomnienie">Krótkie przypomnienie: workflow egzaminacyjny</a></li><li><a href="#przyklad">Przykład: analiza specyfikacji krok po kroku</a></li><li><a href="#mikro">Mikroćwiczenia: sprint z pamięci</a></li><li><a href="#prowadzone">Zadanie prowadzone (rozgrzewka)</a></li><li><a href="#samodzielne">Próbny egzamin — zadanie 1</a></li><li><a href="#inf04">Próbny egzamin — zadanie 2</a></li><li><a href="#checklista">Checklista</a></li><li><a href="#test">Mini-test</a></li><li><a href="#dodatkowe">Skończyłeś wcześniej?</a></li></ol><a class="skip" href="#samodzielne">Silniejszy? Przejdź od razu do zadania samodzielnego →</a><p class="small muted" style="margin-top:.8rem">Słabszy? Przypomnienie → Przykład → Mikroćwiczenia → Zadanie prowadzone (z podpowiedziami).</p></aside><article class="page"><div class="block-head"><div><div class="muted small"><a href="../index.html">Bloki</a> › Blok 15</div><h1>Blok 15. Tryb egzaminacyjny III: od pustego projektu do oddania</h1><span class="badge p3">Faza III — tryb egzaminacyjny</span> <span id="block-status" class="badge">W trakcie</span></div><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button></div>
+<p>Egzamin końcowy kursu: dwa zadania wykonywane od zera (nowy projekt, bez kopiowania z wcześniejszych lekcji), pełna procedura oddania i samoocena wg kryteriów podobnych do egzaminacyjnych.</p>
+<section class="sec" id="cel"><h2><span class="sec-num">1.</span> Cel</h2><p><strong>Po wykonaniu tego bloku będziesz potrafił:</strong></p><ul><li>utworzyć od zera projekt i zbudować w nim kompletną aplikację bez korzystania z wcześniejszego kodu,</li><li>łączyć 4–5 wzorców (lista, radio, suwak, pola wyboru, walidacja, okno komunikatu, losowanie, liczniki) w jednej aplikacji,</li><li>przygotować komplet plików do oddania w wymaganym czasie,</li><li>ocenić własne rozwiązanie wg kryteriów i wskazać tematy do powtórki przed egzaminem.</li></ul><details class="hint"><summary>Plan czasu (4 × 45 min = 180 min)</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>Przypomnienie (workflow + oddanie)</td><td>10 min</td></tr><tr><td>Przykład (samoocena)</td><td>10 min</td></tr><tr><td>Mikroćwiczenia (sprint)</td><td>15 min</td></tr><tr><td>Rozgrzewka od zera</td><td>20 min</td></tr><tr><td>Próbny egzamin — zadanie 1</td><td>60 min</td></tr><tr><td>Próbny egzamin — zadanie 2</td><td>55 min</td></tr><tr><td>Samoocena + mini-test</td><td>10 min</td></tr><tr><th>Razem</th><th>180 min</th></tr></tbody></table></div></div></details><p class="small muted">Powiązanie z arkuszami: zadanie 1: lista + pola radio + suwak + pola wyboru + walidacja tekstu + okno komunikatu (Arkusz_10 i Arkusz_01 w nowej kombinacji); zadanie 2: losowanie i liczniki (Arkusz_12) + suwak z przesunięciem (07/10) + lista historii (05) + algorytm najdłuższej serii. Oba wymagają transferu.</p></section>
+<section class="sec" id="przypomnienie"><h2><span class="sec-num">2.</span> Krótkie przypomnienie: workflow egzaminacyjny</h2><h4>Workflow egzaminacyjny — 10 kroków</h4>
+<div class="table-wrap"><table><thead><tr><th>Krok</th><th>Co robisz</th><th>Czas (z ~60 min)</th></tr></thead><tbody><tr><td>1</td><td>Przeczytaj <strong>całe</strong> zadanie (także założenia i ostatnią stronę)</td><td>3 min</td></tr><tr><td>2</td><td>Wypisz elementy interfejsu (kolejność z góry na dół, rzędy)</td><td>2 min</td></tr><tr><td>3</td><td>Wypisz dane wejściowe</td><td>1 min</td></tr><tr><td>4</td><td>Wypisz zdarzenia (co klika / przesuwa użytkownik)</td><td>1 min</td></tr><tr><td>5</td><td>Wypisz logikę (wzory, warunki, cykle, liczniki)</td><td>2 min</td></tr><tr><td>6</td><td>Wypisz wyniki (co i gdzie się zmienia)</td><td>1 min</td></tr><tr><td>7</td><td>Zbuduj interfejs w XML → uruchom</td><td>15 min</td></tr><tr><td>8</td><td>Dodaj logikę w Javie (zdarzenie po zdarzeniu, uruchamiając po każdym)</td><td>20 min</td></tr><tr><td>9</td><td>Przetestuj każdy punkt „Działanie aplikacji”, zrób zrzuty</td><td>7 min</td></tr><tr><td>10</td><td>Porównaj punkt po punkcie ze specyfikacją; spakuj <code>mobilna.zip</code>, skopiuj pliki</td><td>8 min</td></tr></tbody></table></div>
+<div class="box box-exam"><p>Zasada: <strong>najpierw działający szkielet, potem szczegóły.</strong> Aplikacja, która się uruchamia i realizuje 80% wymagań, daje więcej punktów niż „prawie gotowa”, która się nie kompiluje. Po każdej większej zmianie — uruchom.</p></div>
+<h4>Od pustego projektu — lista startowa (5 minut)</h4>
+<ol><li><em>New Project → Empty Views Activity</em>, <strong>Java</strong>, pakiet np. <code>com.example.egzamin</code>.</li><li><code>activity_main.xml</code> → tryb Code → korzeń <code>LinearLayout</code> (vertical, <code>@+id/main</code>).</li><li><code>MainActivity.java</code> → usuń linie EdgeToEdge/ViewCompat (albo zostaw <code>@+id/main</code>).</li><li>Obrazy z archiwum → <code>res/drawable</code> (nazwy: małe litery, bez myślników).</li><li>Uruchom pusty projekt w emulatorze (sprawdzisz, że środowisko działa, zanim napiszesz 200 linii).</li></ol></section>
+<section class="sec" id="przyklad"><h2><span class="sec-num">3.</span> Przykład: analiza specyfikacji krok po kroku</h2><p><strong>Samoocena — jak punktuje się część mobilną (model kursowy).</strong> Egzaminatorzy oceniają rezultaty według kryteriów z arkusza; poniższa lista naśladuje ich charakter: każdy punkt to konkretne, sprawdzalne zdanie. Po każdym próbnym egzaminie przejdź ją i policz punkty.</p>
+<div class="table-wrap"><table><thead><tr><th>Obszar</th><th>Przykładowe kryteria (po 1 pkt)</th></tr></thead><tbody><tr><td>Uruchomienie i pliki</td><td>projekt się kompiluje i uruchamia; <code>mobilna.zip</code> zawiera cały projekt; skopiowano XML i Java; zrzuty zgodne z poleceniem</td></tr><tr><td>Interfejs</td><td>wszystkie elementy istnieją; kolejność i rozkłady (pion/poziom) jak na obrazie; wymagane teksty i podpowiedzi</td></tr><tr><td>Wygląd</td><td>kolory HEX; rozmiary (tytuł największy); marginesy/padding; wyrównanie; szerokości</td></tr><tr><td>Działanie</td><td>każdy punkt „Działania aplikacji” osobno (zdarzenie → poprawny wynik), przypadki graniczne</td></tr><tr><td>Kod</td><td>znaczące nazwy; logika w metodach; brak powielonego kodu; dane w tablicach/kolekcjach, gdy tego wymaga polecenie</td></tr></tbody></table></div>
+<div class="box box-tip"><p>Przy liczeniu bądź surowy: „prawie działa” = 0 pkt za dany punkt. Każdy utracony punkt zapisz jako temat do powtórki i wróć do odpowiedniego bloku (mapa pokrycia w <code>ANALIZA_INF04_MOBILE.md</code>).</p></div></section>
+<section class="sec" id="mikro"><h2><span class="sec-num">4.</span> Mikroćwiczenia: sprint z pamięci</h2><div class="micro"><h4>Ćwiczenie 15.1 — Sprint 1 (3 min): odmiana</h4><p>Napisz metodę zwracającą „łyżeczka / łyżeczki / łyżeczek” dla n = 0..5.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-t">String</span> odmianaLyzeczki(<span class="t-k">int</span> n) {
+    <span class="t-k">if</span> (n == <span class="t-n">1</span>) <span class="t-k">return</span> <span class="t-s">"łyżeczka"</span>;
+    <span class="t-k">if</span> (n &gt;= <span class="t-n">2</span> &amp;&amp; n &lt;= <span class="t-n">4</span>) <span class="t-k">return</span> <span class="t-s">"łyżeczki"</span>;
+    <span class="t-k">return</span> <span class="t-s">"łyżeczek"</span>;
+}</code></pre></div></div></details></div><div class="micro"><h4>Ćwiczenie 15.2 — Sprint 2 (4 min): walidacja „GG:MM”</h4><p>Metoda <code>boolean czyPoprawnaGodzina(String t)</code>: długość 5, dwukropek na pozycji 2, godziny 0–23, minuty 0–59.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">boolean</span> czyPoprawnaGodzina(<span class="t-t">String</span> tekst) {
+    <span class="t-k">if</span> (tekst.length() != <span class="t-n">5</span> || tekst.charAt(<span class="t-n">2</span>) != <span class="t-s">':'</span>) <span class="t-k">return</span> <span class="t-k">false</span>;
+    <span class="t-k">try</span> {
+        <span class="t-k">int</span> g = <span class="t-t">Integer</span>.parseInt(tekst.substring(<span class="t-n">0</span>, <span class="t-n">2</span>));
+        <span class="t-k">int</span> m = <span class="t-t">Integer</span>.parseInt(tekst.substring(<span class="t-n">3</span>));
+        <span class="t-k">return</span> g &gt;= <span class="t-n">0</span> &amp;&amp; g &lt;= <span class="t-n">23</span> &amp;&amp; m &gt;= <span class="t-n">0</span> &amp;&amp; m &lt;= <span class="t-n">59</span>;
+    } <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) {
+        <span class="t-k">return</span> <span class="t-k">false</span>;
+    }
+}</code></pre></div></div></details></div><div class="micro"><h4>Ćwiczenie 15.3 — Sprint 3 (4 min): najdłuższa seria</h4><p>Masz tablicę rzutów <code>int[] r</code> (0 = orzeł, 1 = reszka). Policz najdłuższą serię orłów pod rząd.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">int</span> biezaca = <span class="t-n">0</span>, najdluzsza = <span class="t-n">0</span>;
+<span class="t-k">for</span> (<span class="t-k">int</span> x : r) {
+    <span class="t-k">if</span> (x == <span class="t-n">0</span>) {
+        biezaca++;
+        najdluzsza = <span class="t-t">Math</span>.max(najdluzsza, biezaca);
+    } <span class="t-k">else</span> {
+        biezaca = <span class="t-n">0</span>;
+    }
+}</code></pre></div></div></details></div><div class="micro"><h4>Ćwiczenie 15.4 — Sprint 4 (4 min): cena z dodatkami</h4><p>Cena bazowa z tablicy <code>ceny[wybrana]</code>, rozmiar średni +2, duży +4, każde zaznaczone pole wyboru dodaje swoją kwotę. Zapisz fragment liczący.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Zmienna <code>int cena = ceny[wybrana];</code> → <code>if (id == R.id.rbSrednia) cena += 2; else if (id == R.id.rbDuza) cena += 4;</code> → <code>if (cbMleko.isChecked()) cena += 2;</code> itd. Kolejność dodawania nie ma znaczenia, ważne, by każdy warunek był osobny (<code>if</code>, nie <code>else if</code>) dla pól wyboru.</p></div></details></div></section>
+<section class="sec" id="prowadzone"><h2><span class="sec-num">5.</span> Zadanie prowadzone (rozgrzewka)</h2><div class="task" id="b15-prowadzone">
+<div class="task-head"><h3>Rozgrzewka od zera: generator hasła (20 min)</h3><span class="meta">⏱ ok. 20 min</span></div>
+<p>Nowy, pusty projekt i stoper w ręku. Pomysł pochodzi z desktopowego Arkusza_04 (generowanie hasła z opcjami) — tu w wersji mobilnej: suwak długości i pola wyboru zestawów znaków.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:12.8px"><div class="m-t" style="font-size:20.8px;font-weight:700;text-align:center;align-self:stretch">Generator hasła</div><div class="m-row" style="align-self:stretch;align-items:center"><div class="m-t" style="">Długość:</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:33%;background:#6750A4"></div><div class="m-seek-thumb" style="left:33%;background:#6750A4"></div></div></div><div class="m-t" style="">8</div></div><div class="m-check" style=""><span class="m-cb on"></span>Wielkie litery</div><div class="m-check" style=""><span class="m-cb on"></span>Cyfry</div><div class="m-check" style=""><span class="m-cb"></span>Znaki specjalne</div><div class="m-b" style="background:#6750A4;color:#ffffff;align-self:stretch">GENERUJ</div><div class="m-t" style="background:#ECEFF1;font-size:19.2px;padding:9.6px;margin:9.6px 0px 0px 0px;text-align:center;align-self:stretch">kR7mq2Xa</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Długość 8, wielkie litery i cyfry</figcaption></figure></div>
+<ul><li>Suwak długości hasła od 4 do 16 (start 8), wartość obok suwaka.</li><li>Pola wyboru: „Wielkie litery” (domyślnie zaznaczone), „Cyfry”, „Znaki specjalne” (<code>!@#$%^&amp;*()_+-=</code>). Małe litery są zawsze w puli.</li><li>GENERUJ: hasło o wybranej długości, każdy znak losowany z puli złożonej z zaznaczonych zestawów; wynik w polu na dole (tło <code>#ECEFF1</code>, 24sp).</li><li>Zestawy znaków przechowuj jako stałe typu napisowego.</li></ul>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Zbuduj napis <code>pula</code> z małych liter i dopisuj do niego kolejne zestawy w osobnych <code>if</code> (pola wyboru są niezależne).</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Losowy znak: <code>pula.charAt(losowanie.nextInt(pula.length()))</code>. Suwak: <code>max="12"</code>, <code>progress="4"</code>, długość = <code>progress + 4</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">generujHaslo(d): pula ← małe; +wielkie jeśli zaznaczone; +cyfry…; +specjalne…
+                 haslo ← ""; powtórz d razy: haslo += losowy znak z puli
+                 zwróć haslo</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-t">String</span> generujHaslo(<span class="t-k">int</span> dlugosc) {
+    <span class="t-t">String</span> pula = <span class="t-t">MALE</span>;
+    <span class="t-k">if</span> (cbWielkie.isChecked()) pula += <span class="t-t">WIELKIE</span>;
+    <span class="t-k">if</span> (cbCyfry.isChecked()) pula += <span class="t-t">CYFRY</span>;
+    <span class="t-k">if</span> (cbSpecjalne.isChecked()) pula += <span class="t-t">SPECJALNE</span>;
+    <span class="t-t">String</span> haslo = <span class="t-s">""</span>;
+    <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; dlugosc; i++) {
+        haslo += pula.charAt(losowanie.nextInt(pula.length()));
+    }
+    <span class="t-k">return</span> haslo;
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Generator hasła"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"26sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center_vertical"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvDlugoscEtykieta"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Długość:"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;SeekBar</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbDlugosc"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:max</span>=<span class="t-s">"12"</span>
+            <span class="t-a">android:progress</span>=<span class="t-s">"4"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvDlugosc"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"8"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;CheckBox</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/cbWielkie"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:checked</span>=<span class="t-s">"true"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Wielkie litery"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;CheckBox</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/cbCyfry"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Cyfry"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;CheckBox</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/cbSpecjalne"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Znaki specjalne"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnGeneruj"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"GENERUJ"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvHaslo"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"12dp"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#ECEFF1"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"12dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"—"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"24sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">CheckBox</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">SeekBar</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> java.util.<span class="t-t">Random</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">MIN_DLUGOSC</span> = <span class="t-n">4</span>;   <span class="t-c">// suwak 0..12 → długość 4..16</span>
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-t">String</span> <span class="t-t">MALE</span> = <span class="t-s">"abcdefghijklmnopqrstuvwxyz"</span>;
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-t">String</span> <span class="t-t">WIELKIE</span> = <span class="t-s">"ABCDEFGHIJKLMNOPQRSTUVWXYZ"</span>;
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-t">String</span> <span class="t-t">CYFRY</span> = <span class="t-s">"0123456789"</span>;
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-t">String</span> <span class="t-t">SPECJALNE</span> = <span class="t-s">"!@#$%^&amp;*()_+-="</span>;
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">Random</span> losowanie = <span class="t-k">new</span> <span class="t-t">Random</span>();
+    <span class="t-k">private</span> <span class="t-t">SeekBar</span> sbDlugosc;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvDlugosc, tvHaslo;
+    <span class="t-k">private</span> <span class="t-t">CheckBox</span> cbWielkie, cbCyfry, cbSpecjalne;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        sbDlugosc = findViewById(<span class="t-t">R</span>.id.sbDlugosc);
+        tvDlugosc = findViewById(<span class="t-t">R</span>.id.tvDlugosc);
+        tvHaslo = findViewById(<span class="t-t">R</span>.id.tvHaslo);
+        cbWielkie = findViewById(<span class="t-t">R</span>.id.cbWielkie);
+        cbCyfry = findViewById(<span class="t-t">R</span>.id.cbCyfry);
+        cbSpecjalne = findViewById(<span class="t-t">R</span>.id.cbSpecjalne);
+        <span class="t-t">Button</span> btnGeneruj = findViewById(<span class="t-t">R</span>.id.btnGeneruj);
+
+        sbDlugosc.setOnSeekBarChangeListener(<span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+                tvDlugosc.setText(<span class="t-t">String</span>.valueOf(progress + <span class="t-t">MIN_DLUGOSC</span>));
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+        });
+
+        btnGeneruj.setOnClickListener(v -&gt; tvHaslo.setText(generujHaslo(sbDlugosc.getProgress() + <span class="t-t">MIN_DLUGOSC</span>)));
+    }
+
+    <span class="t-c">// każdy zaznaczony zestaw dokłada swoje znaki do puli, z której losujemy</span>
+    <span class="t-k">private</span> <span class="t-t">String</span> generujHaslo(<span class="t-k">int</span> dlugosc) {
+        <span class="t-t">String</span> pula = <span class="t-t">MALE</span>;
+        <span class="t-k">if</span> (cbWielkie.isChecked()) {
+            pula += <span class="t-t">WIELKIE</span>;
+        }
+        <span class="t-k">if</span> (cbCyfry.isChecked()) {
+            pula += <span class="t-t">CYFRY</span>;
+        }
+        <span class="t-k">if</span> (cbSpecjalne.isChecked()) {
+            pula += <span class="t-t">SPECJALNE</span>;
+        }
+        <span class="t-t">String</span> haslo = <span class="t-s">""</span>;
+        <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; dlugosc; i++) {
+            haslo += pula.charAt(losowanie.nextInt(pula.length()));
+        }
+        <span class="t-k">return</span> haslo;
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b15_prowadzone/">rozwiazania/b15_prowadzone/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b15-prowadzone">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="samodzielne"><h2><span class="sec-num">6.</span> Próbny egzamin — zadanie 1</h2><div class="task exam" id="b15-egzE">
+<div class="task-head"><h3>Próbny egzamin 5: Kawiarnia (60 min, od pustego projektu)</h3><span class="meta">⏱ ok. 60 min</span></div>
+<p><strong>Warunki próbnego egzaminu:</strong> pracuj bez zaglądania do wcześniejszych bloków i własnych projektów (wolno: ta treść, zasoby, dokumentacja Android Studio). Zmierz czas. Podpowiedzi otwieraj dopiero po upływie czasu albo gdy zupełnie utkniesz — i zapisz, z których skorzystałeś. Na koniec: zrzuty <code>mobile1.png</code>…, <code>mobilna.zip</code>, kopie plików źródłowych, <code>srodowisko.txt</code>.</p>
+<p>Za pomocą środowiska programistycznego wykonaj aplikację mobilną do zamawiania kawy i uruchom ją w emulatorze. Do wykonania zadania wykorzystaj obraz z archiwum <code>zasoby_b15-egzE.zip</code>. <strong>Rozpocznij od nowego, pustego projektu.</strong></p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>tytuł, obraz, „Wybierz kawę:”, lista 4 kaw, „Wybrano”, 3 pola radio w rzędzie, rząd cukru (napis, suwak, wartość), 2 pola wyboru, pole godziny, przycisk, autor</td></tr><tr><td>DANE</td><td>kawa (lista), rozmiar (radio), cukier 0..5, dodatki, godzina tekstem</td></tr><tr><td>ZDARZENIA</td><td>klik elementu listy, zmiana suwaka, ZAMÓW</td></tr><tr><td>LOGIKA</td><td>cena bazowa z tablicy + rozmiar + dodatki; odmiana „łyżeczka”; walidacja: kawa wybrana, godzina GG:MM (0–23, 0–59)</td></tr><tr><td>WYNIK</td><td>„Wybrano: …”, „n łyżeczek”, okno „Zamówienie” z podsumowaniem i ceną, Toast przy błędach</td></tr><tr><td>WYGLĄD</td><td>tło #FBF6EE; tytuł #4E342E biały; obraz 110dp wyśrodkowany; separator listy #8D6E63; przycisk #4E342E wyśrodkowany</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#FBF6EE;padding:0px"><div class="m-t" style="background:#4E342E;color:#fff;font-size:22.4px;padding:8px;align-self:stretch">Kawiarnia</div><div class="m-img" style="align-self:center;width:88px;height:88px"><img src="../assets/zasoby/kawa.png" alt="" style="object-fit:cover"></div><div class="m-t" style="font-weight:700;margin:0px 0px 0px 8px">Wybierz kawę:</div><div class="m-list" style="margin:0px 8px 0px 8px;align-self:stretch"><div class="m-li" style="border-bottom:1px solid #8D6E63;">Espresso — 8 zł</div><div class="m-li" style="border-bottom:1px solid #8D6E63;">Latte — 12 zł</div><div class="m-li" style="border-bottom:1px solid #8D6E63;">Cappuccino — 11 zł</div><div class="m-li" style="border-bottom:1px solid #8D6E63;">Americano — 9 zł</div></div><div class="m-t" style="margin:0px 0px 0px 8px">Wybrano: Latte</div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch"><div class="m-col" style="align-self:stretch"><div class="m-radio"><span class="m-rb"></span>Mała</div></div><div class="m-col" style="align-self:stretch"><div class="m-radio"><span class="m-rb on"></span>Średnia (+2 zł)</div></div><div class="m-col" style="align-self:stretch"><div class="m-radio"><span class="m-rb"></span>Duża (+4 zł)</div></div></div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch;align-items:center"><div class="m-t" style="">Cukier:</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:40%;background:#6750A4"></div><div class="m-seek-thumb" style="left:40%;background:#6750A4"></div></div></div><div class="m-t" style="">2 łyżeczki</div></div><div class="m-check" style="margin:0px 0px 0px 8px"><span class="m-cb on"></span>Mleko roślinne (+2 zł)</div><div class="m-check" style="margin:0px 0px 0px 8px"><span class="m-cb"></span>Na wynos (+1 zł)</div><div class="m-e" style="margin:0px 8px 0px 8px;align-self:stretch"><span>12:30</span></div><div class="m-b" style="background:#4E342E;color:#ffffff;align-self:center">ZAMÓW</div><div class="m-t" style="color:#808080;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Wypełniony formularz</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#8a847c;padding:0px"><div class="m-t" style="background:#4E342E;color:#fff;font-size:22.4px;padding:8px;align-self:stretch">Kawiarnia</div><div style="height:32px"></div><div class="m-col" style="background:#ffffff;padding:12.8px;margin:12.8px;align-self:stretch"><div class="m-t" style="font-size:14.4px;font-weight:700">Zamówienie</div><div class="m-t" style="margin:6.4px 0px 6.4px 0px">Latte, średnia, 2 łyżeczki cukru, mleko roślinne, na miejscu, odbiór 12:30, do zapłaty: 16 zł</div><div class="m-t" style="color:#6750A4;font-weight:700;text-align:right;align-self:stretch">OK</div></div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 2. Okno po wybraniu ZAMÓW</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Kawiarnia”.</li><li>Obraz <code>kawa</code>.</li><li>Napis „Wybierz kawę:” i lista: „Espresso — 8 zł”, „Latte — 12 zł”, „Cappuccino — 11 zł”, „Americano — 9 zł”.</li><li>Napis „Wybrano: —”.</li><li>Trzy pola radio w jednym rzędzie: „Mała” (domyślnie zaznaczone), „Średnia (+2 zł)”, „Duża (+4 zł)”.</li><li>Rząd: napis „Cukier:”, suwak (0–5, początkowo 0), napis „0 łyżeczek”.</li><li>Pola wyboru „Mleko roślinne (+2 zł)” i „Na wynos (+1 zł)”.</li><li>Pole edycyjne z podpowiedzią „Godzina odbioru (GG:MM)”.</li><li>Przycisk „ZAMÓW”.</li><li>Napis „Autor: ”, dalej numer zdającego.</li></ul>
+<p><strong>Działanie aplikacji:</strong></p>
+<ul><li>Kliknięcie kawy na liście wyświetla „Wybrano: &lt;nazwa&gt;”.</li><li>Przesuwanie suwaka wyświetla liczbę łyżeczek z poprawną odmianą: „0 łyżeczek”, „1 łyżeczka”, „2 łyżeczki” … „5 łyżeczek”.</li><li>Po wybraniu „ZAMÓW”:<ul><li>gdy nie wybrano kawy — <code>Toast</code> „Wybierz kawę”;</li><li>gdy godzina nie ma postaci GG:MM z godziną 00–23 i minutami 00–59 — <code>Toast</code> „Podaj godzinę w formacie GG:MM”;</li><li>w przeciwnym razie okno komunikatu z tytułem „Zamówienie” i treścią: nazwa kawy, rozmiar, cukier („n łyżeczek cukru” z odmianą), „mleko roślinne” / „mleko zwykłe”, „na wynos” / „na miejscu”, „odbiór &lt;GG:MM&gt;”, „do zapłaty: &lt;cena&gt; zł” — rozdzielone przecinkami.</li></ul></li><li>Cena = cena kawy + dopłata za rozmiar + dopłaty za zaznaczone pola wyboru.</li></ul>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs w XML; rozkład liniowy pionowy z zagnieżdżonymi rozkładami poziomymi (pola radio, cukier).</li><li>Tło strony #FBF6EE. Tytuł: tło #4E342E, biała czcionka, największa, marginesy wewnętrzne 10.</li><li>Obraz: wysokość 110, wyśrodkowany. Lista: wysokość dopasowana do liczby elementów, separator #8D6E63 widoczny.</li><li>Przycisk wyśrodkowany, tło #4E342E, biała czcionka.</li><li>Nazwy i ceny kaw w tablicach. Walidacja godziny i odmiana w osobnych metodach.</li></ul>
+<h4>Zasoby do zadania</h4><div class="res-list"><figure><a href="../assets/zasoby/kawa.png" download><img src="../assets/zasoby/kawa.png" alt="kawa.png"></a><figcaption>kawa.png</figcaption></figure></div><p class="small">Pobierz wszystkie: <a href="../materialy/zasoby_b15-egzE.zip" download>zasoby_b15-egzE.zip</a>. Obrazy skopiuj do <code>app/src/main/res/drawable</code> (nazwy: małe litery, bez spacji i myślników).</p>
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b15-egzE"><li><label><input type="checkbox"> <span>projekt utworzony od zera w trakcie egzaminu</span></label></li><li><label><input type="checkbox"> <span>lista 4 kaw z cenami; klik → „Wybrano: …”</span></label></li><li><label><input type="checkbox"> <span>odmiana: 0 łyżeczek, 1 łyżeczka, 2–4 łyżeczki, 5 łyżeczek</span></label></li><li><label><input type="checkbox"> <span>ZAMÓW bez kawy → Toast; godzina „12:3”, „25:00”, „ab:cd” → Toast</span></label></li><li><label><input type="checkbox"> <span>Latte, średnia, 2 łyżeczki, mleko roślinne, na miejscu, 12:30 → 16 zł i treść jak na obrazie 2</span></label></li><li><label><input type="checkbox"> <span>okno „Zamówienie” z przyciskiem OK</span></label></li><li><label><input type="checkbox"> <span>metody <code>czyPoprawnaGodzina</code> i <code>odmianaLyzeczki</code></span></label></li><li><label><input type="checkbox"> <span>wygląd: kolory, obraz 110dp, separator, rzędy radio i cukru</span></label></li><li><label><input type="checkbox"> <span>komplet plików do oddania</span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Plan: XML (uruchom) → lista + „Wybrano” → suwak z odmianą → ZAMÓW: walidacje → cena → treść → okno. Uruchamiaj po każdym kroku.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Pozycje listy zbuduj pętlą z dwóch tablic (<code>kawy[i] + " — " + ceny[i] + " zł"</code>), żeby cena była w jednym miejscu. Pola wyboru — osobne <code>if</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">zamow(): brak kawy → Toast; koniec
+         godzina niepoprawna → Toast; koniec
+         cena ← ceny[k]; rozmiar ← wg radio (+2 / +4); mleko +2; wynos +1
+         tresc ← kawa, rozmiar, cukier + odmiana + " cukru", mleko, wynos, "odbiór " + g, "do zapłaty: " + cena + " zł"
+         AlertDialog("Zamówienie", tresc)</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">boolean</span> czyPoprawnaGodzina(<span class="t-t">String</span> tekst) {
+    <span class="t-k">if</span> (tekst.length() != <span class="t-n">5</span> || tekst.charAt(<span class="t-n">2</span>) != <span class="t-s">':'</span>) {
+        <span class="t-k">return</span> <span class="t-k">false</span>;
+    }
+    <span class="t-k">try</span> {
+        <span class="t-k">int</span> godziny = <span class="t-t">Integer</span>.parseInt(tekst.substring(<span class="t-n">0</span>, <span class="t-n">2</span>));
+        <span class="t-k">int</span> minuty = <span class="t-t">Integer</span>.parseInt(tekst.substring(<span class="t-n">3</span>));
+        <span class="t-k">return</span> godziny &gt;= <span class="t-n">0</span> &amp;&amp; godziny &lt;= <span class="t-n">23</span> &amp;&amp; minuty &gt;= <span class="t-n">0</span> &amp;&amp; minuty &lt;= <span class="t-n">59</span>;
+    } <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) {
+        <span class="t-k">return</span> <span class="t-k">false</span>;
+    }
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#FBF6EE"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#4E342E"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Kawiarnia"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ImageView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivKawa"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"110dp"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:adjustViewBounds</span>=<span class="t-s">"true"</span>
+        <span class="t-a">android:contentDescription</span>=<span class="t-s">"Kawa"</span>
+        <span class="t-a">android:src</span>=<span class="t-s">"@drawable/kawa"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvWybierz"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Wybierz kawę:"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ListView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/lvKawy"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:divider</span>=<span class="t-s">"#8D6E63"</span>
+        <span class="t-a">android:dividerHeight</span>=<span class="t-s">"1dp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvWybrano"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Wybrano: —"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;RadioGroup</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/rgRozmiar"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbMala"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:checked</span>=<span class="t-s">"true"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Mała"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbSrednia"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Średnia (+2 zł)"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;RadioButton</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/rbDuza"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Duża (+4 zł)"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/RadioGroup</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center_vertical"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvCukierEtykieta"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Cukier:"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;SeekBar</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbCukier"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:max</span>=<span class="t-s">"5"</span>
+            <span class="t-a">android:progress</span>=<span class="t-s">"0"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvCukier"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"0 łyżeczek"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;CheckBox</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/cbMleko"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Mleko roślinne (+2 zł)"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;CheckBox</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/cbWynos"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Na wynos (+1 zł)"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etGodzina"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Godzina odbioru (GG:MM)"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"time"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnZamow"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#4E342E"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"ZAMÓW"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvAutor"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ArrayAdapter</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">CheckBox</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ListView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">RadioGroup</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">SeekBar</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Toast</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AlertDialog</span>;
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">String</span>[] kawy = {<span class="t-s">"Espresso"</span>, <span class="t-s">"Latte"</span>, <span class="t-s">"Cappuccino"</span>, <span class="t-s">"Americano"</span>};
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] ceny = {<span class="t-n">8</span>, <span class="t-n">12</span>, <span class="t-n">11</span>, <span class="t-n">9</span>};
+    <span class="t-k">private</span> <span class="t-k">int</span> wybranaKawa = -<span class="t-n">1</span>;
+
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvWybrano, tvCukier;
+    <span class="t-k">private</span> <span class="t-t">RadioGroup</span> rgRozmiar;
+    <span class="t-k">private</span> <span class="t-t">SeekBar</span> sbCukier;
+    <span class="t-k">private</span> <span class="t-t">CheckBox</span> cbMleko, cbWynos;
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etGodzina;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        <span class="t-t">ListView</span> lvKawy = findViewById(<span class="t-t">R</span>.id.lvKawy);
+        tvWybrano = findViewById(<span class="t-t">R</span>.id.tvWybrano);
+        tvCukier = findViewById(<span class="t-t">R</span>.id.tvCukier);
+        rgRozmiar = findViewById(<span class="t-t">R</span>.id.rgRozmiar);
+        sbCukier = findViewById(<span class="t-t">R</span>.id.sbCukier);
+        cbMleko = findViewById(<span class="t-t">R</span>.id.cbMleko);
+        cbWynos = findViewById(<span class="t-t">R</span>.id.cbWynos);
+        etGodzina = findViewById(<span class="t-t">R</span>.id.etGodzina);
+        <span class="t-t">Button</span> btnZamow = findViewById(<span class="t-t">R</span>.id.btnZamow);
+
+        <span class="t-t">String</span>[] pozycje = <span class="t-k">new</span> <span class="t-t">String</span>[kawy.length];
+        <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; kawy.length; i++) {
+            pozycje[i] = kawy[i] + <span class="t-s">" — "</span> + ceny[i] + <span class="t-s">" zł"</span>;
+        }
+        lvKawy.setAdapter(<span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, android.<span class="t-t">R</span>.layout.simple_list_item_1, pozycje));
+
+        lvKawy.setOnItemClickListener((parent, view, position, id) -&gt; {
+            wybranaKawa = position;
+            tvWybrano.setText(<span class="t-s">"Wybrano: "</span> + kawy[position]);
+        });
+
+        sbCukier.setOnSeekBarChangeListener(<span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+                tvCukier.setText(progress + <span class="t-s">" "</span> + odmianaLyzeczki(progress));
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+        });
+
+        btnZamow.setOnClickListener(v -&gt; zamow());
+    }
+
+    <span class="t-c">// 1 łyżeczka, 2-4 łyżeczki, 0 i 5 łyżeczek</span>
+    <span class="t-k">private</span> <span class="t-t">String</span> odmianaLyzeczki(<span class="t-k">int</span> n) {
+        <span class="t-k">if</span> (n == <span class="t-n">1</span>) {
+            <span class="t-k">return</span> <span class="t-s">"łyżeczka"</span>;
+        } <span class="t-k">else</span> <span class="t-k">if</span> (n &gt;= <span class="t-n">2</span> &amp;&amp; n &lt;= <span class="t-n">4</span>) {
+            <span class="t-k">return</span> <span class="t-s">"łyżeczki"</span>;
+        }
+        <span class="t-k">return</span> <span class="t-s">"łyżeczek"</span>;
+    }
+
+    <span class="t-k">private</span> <span class="t-k">boolean</span> czyPoprawnaGodzina(<span class="t-t">String</span> tekst) {
+        <span class="t-k">if</span> (tekst.length() != <span class="t-n">5</span> || tekst.charAt(<span class="t-n">2</span>) != <span class="t-s">':'</span>) {
+            <span class="t-k">return</span> <span class="t-k">false</span>;
+        }
+        <span class="t-k">try</span> {
+            <span class="t-k">int</span> godziny = <span class="t-t">Integer</span>.parseInt(tekst.substring(<span class="t-n">0</span>, <span class="t-n">2</span>));
+            <span class="t-k">int</span> minuty = <span class="t-t">Integer</span>.parseInt(tekst.substring(<span class="t-n">3</span>));
+            <span class="t-k">return</span> godziny &gt;= <span class="t-n">0</span> &amp;&amp; godziny &lt;= <span class="t-n">23</span> &amp;&amp; minuty &gt;= <span class="t-n">0</span> &amp;&amp; minuty &lt;= <span class="t-n">59</span>;
+        } <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) {
+            <span class="t-k">return</span> <span class="t-k">false</span>;
+        }
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> zamow() {
+        <span class="t-k">if</span> (wybranaKawa == -<span class="t-n">1</span>) {
+            <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Wybierz kawę"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+            <span class="t-k">return</span>;
+        }
+        <span class="t-t">String</span> godzina = etGodzina.getText().toString().trim();
+        <span class="t-k">if</span> (!czyPoprawnaGodzina(godzina)) {
+            <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Podaj godzinę w formacie GG:MM"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+            <span class="t-k">return</span>;
+        }
+        <span class="t-k">int</span> cena = ceny[wybranaKawa];
+        <span class="t-t">String</span> rozmiar = <span class="t-s">"mała"</span>;
+        <span class="t-k">int</span> zaznaczony = rgRozmiar.getCheckedRadioButtonId();
+        <span class="t-k">if</span> (zaznaczony == <span class="t-t">R</span>.id.rbSrednia) {
+            rozmiar = <span class="t-s">"średnia"</span>;
+            cena += <span class="t-n">2</span>;
+        } <span class="t-k">else</span> <span class="t-k">if</span> (zaznaczony == <span class="t-t">R</span>.id.rbDuza) {
+            rozmiar = <span class="t-s">"duża"</span>;
+            cena += <span class="t-n">4</span>;
+        }
+        <span class="t-k">if</span> (cbMleko.isChecked()) {
+            cena += <span class="t-n">2</span>;
+        }
+        <span class="t-k">if</span> (cbWynos.isChecked()) {
+            cena += <span class="t-n">1</span>;
+        }
+        <span class="t-k">int</span> cukier = sbCukier.getProgress();
+        <span class="t-t">String</span> tresc = kawy[wybranaKawa] + <span class="t-s">", "</span> + rozmiar + <span class="t-s">", "</span>
+                + cukier + <span class="t-s">" "</span> + odmianaLyzeczki(cukier) + <span class="t-s">" cukru, "</span>
+                + (cbMleko.isChecked() ? <span class="t-s">"mleko roślinne"</span> : <span class="t-s">"mleko zwykłe"</span>) + <span class="t-s">", "</span>
+                + (cbWynos.isChecked() ? <span class="t-s">"na wynos"</span> : <span class="t-s">"na miejscu"</span>) + <span class="t-s">", "</span>
+                + <span class="t-s">"odbiór "</span> + godzina + <span class="t-s">", do zapłaty: "</span> + cena + <span class="t-s">" zł"</span>;
+        <span class="t-k">new</span> <span class="t-t">AlertDialog</span>.<span class="t-t">Builder</span>(<span class="t-k">this</span>)
+                .setTitle(<span class="t-s">"Zamówienie"</span>)
+                .setMessage(tresc)
+                .setPositiveButton(<span class="t-s">"OK"</span>, <span class="t-k">null</span>)
+                .show();
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b15_egzE/">rozwiazania/b15_egzE/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b15-egzE">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="inf04"><h2><span class="sec-num">7.</span> Próbny egzamin — zadanie 2</h2><div class="task exam" id="b15-egzF">
+<div class="task-head"><h3>Próbny egzamin 6: Seria rzutów monetą (55 min, od pustego projektu)</h3><span class="meta">⏱ ok. 55 min</span></div>
+<p><strong>Warunki próbnego egzaminu:</strong> pracuj bez zaglądania do wcześniejszych bloków i własnych projektów (wolno: ta treść, zasoby, dokumentacja Android Studio). Zmierz czas. Podpowiedzi otwieraj dopiero po upływie czasu albo gdy zupełnie utkniesz — i zapisz, z których skorzystałeś. Na koniec: zrzuty <code>mobile1.png</code>…, <code>mobilna.zip</code>, kopie plików źródłowych, <code>srodowisko.txt</code>.</p>
+<p>Za pomocą środowiska programistycznego wykonaj aplikację mobilną symulującą serie rzutów monetą. Do wykonania zadania wykorzystaj obrazy z archiwum <code>zasoby_b15-egzF.zip</code>. <strong>Rozpocznij od nowego, pustego projektu.</strong></p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>tytuł, obraz, rząd (napis, suwak, wartość), rząd 2 przycisków, napis statystyk, napis serii, lista historii, autor</td></tr><tr><td>DANE</td><td>liczba rzutów w serii 1..20 (suwak z przesunięciem)</td></tr><tr><td>ZDARZENIA</td><td>zmiana suwaka, RZUĆ SERIĘ, RESET</td></tr><tr><td>LOGIKA</td><td>pętla n rzutów (0/1); liczniki orłów i reszek; bieżąca i najdłuższa seria orłów (ciągła między kliknięciami); wpis historii; reset wszystkiego</td></tr><tr><td>WYNIK</td><td>obraz ostatniego rzutu, „Rzuty/Orły/Reszki”, „Najdłuższa seria orłów: k”, „Seria n: rzuty x, orły y, reszki z”</td></tr><tr><td>WYGLĄD</td><td>tło #EFEBE9; tytuł #795548 biały wyśrodkowany; obraz 140dp; przyciski po równo (#795548 / #9E9E9E); separator #795548; lista wypełnia resztę</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#EFEBE9;padding:0px"><div class="m-t" style="background:#795548;color:#fff;font-size:20.8px;padding:8px;text-align:center;align-self:stretch">Seria rzutów monetą</div><div class="m-img" style="margin:8px 0px 8px 0px;height:112px;align-self:stretch"><img src="../assets/zasoby/pytajnik.png" alt="" style="object-fit:contain"></div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch;align-items:center"><div class="m-t" style="">Liczba rzutów:</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:0%;background:#6750A4"></div><div class="m-seek-thumb" style="left:0%;background:#6750A4"></div></div></div><div class="m-t" style="font-weight:700">1</div></div><div class="m-row" style="margin:8px;align-self:stretch"><div class="m-b" style="background:#795548;color:#ffffff;margin:0px 4px 0px 0px;flex:1 1 0;min-width:0">RZUĆ SERIĘ</div><div class="m-b" style="background:#9E9E9E;color:#ffffff;margin:0px 0px 0px 4px;flex:1 1 0;min-width:0">RESET</div></div><div class="m-t" style="font-size:12.8px;text-align:center;align-self:stretch">Rzuty: 0 | Orły: 0 | Reszki: 0</div><div class="m-t" style="font-weight:700;text-align:center;align-self:stretch">Najdłuższa seria orłów: 0</div><div style="height:96px"></div><div class="m-t" style="color:#808080;padding:4.8px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Stan początkowy</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#EFEBE9;padding:0px"><div class="m-t" style="background:#795548;color:#fff;font-size:20.8px;padding:8px;text-align:center;align-self:stretch">Seria rzutów monetą</div><div class="m-img" style="margin:8px 0px 8px 0px;height:112px;align-self:stretch"><img src="../assets/zasoby/moneta_orzel.png" alt="" style="object-fit:contain"></div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch;align-items:center"><div class="m-t" style="">Liczba rzutów:</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:47%;background:#6750A4"></div><div class="m-seek-thumb" style="left:47%;background:#6750A4"></div></div></div><div class="m-t" style="font-weight:700">10</div></div><div class="m-row" style="margin:8px;align-self:stretch"><div class="m-b" style="background:#795548;color:#ffffff;margin:0px 4px 0px 0px;flex:1 1 0;min-width:0">RZUĆ SERIĘ</div><div class="m-b" style="background:#9E9E9E;color:#ffffff;margin:0px 0px 0px 4px;flex:1 1 0;min-width:0">RESET</div></div><div class="m-t" style="font-size:12.8px;text-align:center;align-self:stretch">Rzuty: 15 | Orły: 8 | Reszki: 7</div><div class="m-t" style="font-weight:700;text-align:center;align-self:stretch">Najdłuższa seria orłów: 4</div><div class="m-list" style="margin:0px 8px 0px 8px;align-self:stretch"><div class="m-li" style="border-bottom:1px solid #795548;">Seria 1: rzuty 5, orły 2, reszki 3</div><div class="m-li" style="border-bottom:1px solid #795548;">Seria 2: rzuty 10, orły 6, reszki 4</div></div><div style="height:16px"></div><div class="m-t" style="color:#808080;padding:4.8px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 2. Po seriach 5 i 10 rzutów</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Seria rzutów monetą”.</li><li>Obraz monety — w stanie początkowym <code>pytajnik</code>.</li><li>Rząd: napis „Liczba rzutów:”, suwak, napis z wartością (początkowo „1”). Suwak pozwala wybrać od 1 do 20.</li><li>Przyciski „RZUĆ SERIĘ” i „RESET” obok siebie.</li><li>Napis „Rzuty: 0 | Orły: 0 | Reszki: 0”.</li><li>Napis „Najdłuższa seria orłów: 0”.</li><li>Lista historii serii.</li><li>Napis „Autor: ”, dalej numer zdającego.</li></ul>
+<p><strong>Działanie aplikacji:</strong></p>
+<ul><li>„RZUĆ SERIĘ” wykonuje tyle losowych rzutów monetą (orzeł / reszka, z równym prawdopodobieństwem), ile wskazuje suwak.</li><li>Po serii: obraz pokazuje wynik <strong>ostatniego</strong> rzutu (<code>moneta_orzel</code> / <code>moneta_reszka</code>); napis statystyk pokazuje łączne liczby rzutów, orłów i reszek od początku gry; na końcu listy pojawia się wpis „Seria &lt;n&gt;: rzuty &lt;x&gt;, orły &lt;y&gt;, reszki &lt;z&gt;”.</li><li>„Najdłuższa seria orłów” to największa liczba orłów wyrzuconych <strong>pod rząd</strong> we wszystkich dotychczasowych rzutach — seria może przechodzić z jednego kliknięcia na następne.</li><li>„RESET” zeruje wszystkie liczniki i serie, czyści listę, przywraca obraz <code>pytajnik</code> i ustawia suwak na 1.</li></ul>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs w XML; rozkład liniowy pionowy z zagnieżdżonymi rozkładami poziomymi.</li><li>Tło strony #EFEBE9. Tytuł: tło #795548, biała czcionka, największa, wyśrodkowana, marginesy wewnętrzne 10.</li><li>Obraz: wysokość 140, widoczny w całości. Przyciski równej szerokości: „RZUĆ SERIĘ” tło #795548, „RESET” tło #9E9E9E, biała czcionka.</li><li>Separator listy #795548, widoczny. Lista wypełnia wolne miejsce.</li><li>Rzucanie serią w osobnej metodzie przyjmującej liczbę rzutów.</li></ul>
+<h4>Zasoby do zadania</h4><div class="res-list"><figure><a href="../assets/zasoby/moneta_orzel.png" download><img src="../assets/zasoby/moneta_orzel.png" alt="moneta_orzel.png"></a><figcaption>moneta_orzel.png</figcaption></figure><figure><a href="../assets/zasoby/moneta_reszka.png" download><img src="../assets/zasoby/moneta_reszka.png" alt="moneta_reszka.png"></a><figcaption>moneta_reszka.png</figcaption></figure><figure><a href="../assets/zasoby/pytajnik.png" download><img src="../assets/zasoby/pytajnik.png" alt="pytajnik.png"></a><figcaption>pytajnik.png</figcaption></figure></div><p class="small">Pobierz wszystkie: <a href="../materialy/zasoby_b15-egzF.zip" download>zasoby_b15-egzF.zip</a>. Obrazy skopiuj do <code>app/src/main/res/drawable</code> (nazwy: małe litery, bez spacji i myślników).</p>
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b15-egzF"><li><label><input type="checkbox"> <span>projekt utworzony od zera w trakcie egzaminu</span></label></li><li><label><input type="checkbox"> <span>suwak: 1..20, napis obok aktualny</span></label></li><li><label><input type="checkbox"> <span>po serii obraz = ostatni rzut; statystyki łączne; wpis w historii w wymaganym formacie</span></label></li><li><label><input type="checkbox"> <span>orły + reszki = liczba rzutów w każdej serii i łącznie</span></label></li><li><label><input type="checkbox"> <span>najdłuższa seria liczona ciągle (sprawdź kilkoma seriami po 1 rzucie)</span></label></li><li><label><input type="checkbox"> <span>RESET przywraca wszystko, łącznie z obrazem i suwakiem</span></label></li><li><label><input type="checkbox"> <span>metoda <code>rzucSerie(int)</code>; stałe/zmienne o znaczących nazwach</span></label></li><li><label><input type="checkbox"> <span>komplet plików do oddania</span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Stan gry: <code>orly</code>, <code>reszki</code>, <code>biezacaSeriaOrlow</code>, <code>najdluzszaSeria</code> (pola klasy) + lista historii. Seria „przechodzi między kliknięciami”, więc bieżąca seria nie może być zmienną lokalną w metodzie.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Orzeł: <code>biezacaSeriaOrlow++</code> i <code>najdluzszaSeria = Math.max(najdluzszaSeria, biezacaSeriaOrlow)</code>. Reszka: <code>biezacaSeriaOrlow = 0</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">rzucSerie(n): orlyWSerii ← 0
+    powtórz n razy: r ← los(0/1)
+        orzeł → orly++, orlyWSerii++, biezaca++, najdluzsza ← max
+        reszka → reszki++, biezaca ← 0
+    obraz ← ostatni; historia.add(format); notify; napisy
+resetuj(): wszystkie liczniki 0; clear; notify; pytajnik; setProgress(0); napisy</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; liczbaRzutow; i++) {
+    ostatni = losowanie.nextInt(<span class="t-n">2</span>);
+    <span class="t-k">if</span> (ostatni == <span class="t-t">ORZEL</span>) {
+        orly++;
+        orlyWSerii++;
+        biezacaSeriaOrlow++;
+        najdluzszaSeria = <span class="t-t">Math</span>.max(najdluzszaSeria, biezacaSeriaOrlow);
+    } <span class="t-k">else</span> {
+        reszki++;
+        biezacaSeriaOrlow = <span class="t-n">0</span>;
+    }
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#EFEBE9"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#795548"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Seria rzutów monetą"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"26sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ImageView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivMoneta"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"140dp"</span>
+        <span class="t-a">android:layout_marginVertical</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:contentDescription</span>=<span class="t-s">"Moneta"</span>
+        <span class="t-a">android:src</span>=<span class="t-s">"@drawable/pytajnik"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center_vertical"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvLiczbaEtykieta"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Liczba rzutów:"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;SeekBar</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbLiczba"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:max</span>=<span class="t-s">"19"</span>
+            <span class="t-a">android:progress</span>=<span class="t-s">"0"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvLiczba"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnRzuc"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginEnd</span>=<span class="t-s">"5dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#795548"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"RZUĆ SERIĘ"</span>
+            <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnReset"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"5dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#9E9E9E"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"RESET"</span>
+            <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvStatystyka"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Rzuty: 0 | Orły: 0 | Reszki: 0"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"16sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvSeria"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Najdłuższa seria orłów: 0"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ListView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/lvHistoria"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"0dp"</span>
+        <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:divider</span>=<span class="t-s">"#795548"</span>
+        <span class="t-a">android:dividerHeight</span>=<span class="t-s">"1dp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvAutor"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"6dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ArrayAdapter</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ImageView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ListView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">SeekBar</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> java.util.<span class="t-t">ArrayList</span>;
+<span class="t-k">import</span> java.util.<span class="t-t">Random</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">ORZEL</span> = <span class="t-n">0</span>;
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">Random</span> losowanie = <span class="t-k">new</span> <span class="t-t">Random</span>();
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">ArrayList</span>&lt;<span class="t-t">String</span>&gt; historia = <span class="t-k">new</span> <span class="t-t">ArrayList</span>&lt;&gt;();
+    <span class="t-k">private</span> <span class="t-t">ArrayAdapter</span>&lt;<span class="t-t">String</span>&gt; adapter;
+
+    <span class="t-k">private</span> <span class="t-k">int</span> orly = <span class="t-n">0</span>;
+    <span class="t-k">private</span> <span class="t-k">int</span> reszki = <span class="t-n">0</span>;
+    <span class="t-k">private</span> <span class="t-k">int</span> biezacaSeriaOrlow = <span class="t-n">0</span>;
+    <span class="t-k">private</span> <span class="t-k">int</span> najdluzszaSeria = <span class="t-n">0</span>;
+
+    <span class="t-k">private</span> <span class="t-t">ImageView</span> ivMoneta;
+    <span class="t-k">private</span> <span class="t-t">SeekBar</span> sbLiczba;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvLiczba, tvStatystyka, tvSeria;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        ivMoneta = findViewById(<span class="t-t">R</span>.id.ivMoneta);
+        sbLiczba = findViewById(<span class="t-t">R</span>.id.sbLiczba);
+        tvLiczba = findViewById(<span class="t-t">R</span>.id.tvLiczba);
+        tvStatystyka = findViewById(<span class="t-t">R</span>.id.tvStatystyka);
+        tvSeria = findViewById(<span class="t-t">R</span>.id.tvSeria);
+        <span class="t-t">ListView</span> lvHistoria = findViewById(<span class="t-t">R</span>.id.lvHistoria);
+        <span class="t-t">Button</span> btnRzuc = findViewById(<span class="t-t">R</span>.id.btnRzuc);
+        <span class="t-t">Button</span> btnReset = findViewById(<span class="t-t">R</span>.id.btnReset);
+
+        adapter = <span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, android.<span class="t-t">R</span>.layout.simple_list_item_1, historia);
+        lvHistoria.setAdapter(adapter);
+
+        sbLiczba.setOnSeekBarChangeListener(<span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+                tvLiczba.setText(<span class="t-t">String</span>.valueOf(progress + <span class="t-n">1</span>));
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+        });
+
+        btnRzuc.setOnClickListener(v -&gt; rzucSerie(sbLiczba.getProgress() + <span class="t-n">1</span>));
+        btnReset.setOnClickListener(v -&gt; resetuj());
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> rzucSerie(<span class="t-k">int</span> liczbaRzutow) {
+        <span class="t-k">int</span> orlyWSerii = <span class="t-n">0</span>;
+        <span class="t-k">int</span> ostatni = <span class="t-t">ORZEL</span>;
+        <span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; liczbaRzutow; i++) {
+            ostatni = losowanie.nextInt(<span class="t-n">2</span>);
+            <span class="t-k">if</span> (ostatni == <span class="t-t">ORZEL</span>) {
+                orly++;
+                orlyWSerii++;
+                biezacaSeriaOrlow++;
+                najdluzszaSeria = <span class="t-t">Math</span>.max(najdluzszaSeria, biezacaSeriaOrlow);
+            } <span class="t-k">else</span> {
+                reszki++;
+                biezacaSeriaOrlow = <span class="t-n">0</span>;
+            }
+        }
+        ivMoneta.setImageResource(ostatni == <span class="t-t">ORZEL</span> ? <span class="t-t">R</span>.drawable.moneta_orzel : <span class="t-t">R</span>.drawable.moneta_reszka);
+        historia.add(<span class="t-s">"Seria "</span> + (historia.size() + <span class="t-n">1</span>) + <span class="t-s">": rzuty "</span> + liczbaRzutow
+                + <span class="t-s">", orły "</span> + orlyWSerii + <span class="t-s">", reszki "</span> + (liczbaRzutow - orlyWSerii));
+        adapter.notifyDataSetChanged();
+        pokazStatystyki();
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> pokazStatystyki() {
+        tvStatystyka.setText(<span class="t-s">"Rzuty: "</span> + (orly + reszki) + <span class="t-s">" | Orły: "</span> + orly + <span class="t-s">" | Reszki: "</span> + reszki);
+        tvSeria.setText(<span class="t-s">"Najdłuższa seria orłów: "</span> + najdluzszaSeria);
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> resetuj() {
+        orly = <span class="t-n">0</span>;
+        reszki = <span class="t-n">0</span>;
+        biezacaSeriaOrlow = <span class="t-n">0</span>;
+        najdluzszaSeria = <span class="t-n">0</span>;
+        historia.clear();
+        adapter.notifyDataSetChanged();
+        ivMoneta.setImageResource(<span class="t-t">R</span>.drawable.pytajnik);
+        sbLiczba.setProgress(<span class="t-n">0</span>);
+        pokazStatystyki();
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b15_egzF/">rozwiazania/b15_egzF/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b15-egzF">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="checklista"><h2><span class="sec-num">8.</span> Checklista</h2><p class="small muted">Sprawdź swoją aplikację z zadania INF.04 punkt po punkcie (krok 10 procedury).</p><ul class="checklist" data-key="b15-check"><li><label><input type="checkbox"> <span>oba zadania wykonałem od pustego projektu, bez otwierania wcześniejszych rozwiązań</span></label></li><li><label><input type="checkbox"> <span>zmieściłem się w czasie (zapisz: zadanie 1 … min, zadanie 2 … min)</span></label></li><li><label><input type="checkbox"> <span>policzyłem punkty samooceny (tabela w „Przykładzie”) dla obu zadań</span></label></li><li><label><input type="checkbox"> <span>wypisałem tematy do powtórki i numery bloków, do których wracam</span></label></li><li><label><input type="checkbox"> <span>mam gotowy szablon dokumentu <code>egzamin</code> i wiem, jak nazwać zrzuty</span></label></li><li><label><input type="checkbox"> <span>znam na pamięć: szkielet suwaka, adapter listy, cykl modulo, parse z try/catch, <code>equals</code></span></label></li></ul></section>
+<section class="sec" id="test"><h2><span class="sec-num">9.</span> Mini-test</h2><div class="quiz" data-quiz="b15"><script type="application/json">[{"q": "<p>Pierwsza czynność po otrzymaniu arkusza (część mobilna):<\/p>", "o": ["otwieram Android Studio i piszę XML", "czytam całe zadanie i wypisuję INTERFEJS/DANE/ZDARZENIA/LOGIKA/WYNIK/WYGLĄD", "rozpakowuję wszystkie archiwa", "robię zrzut ekranu"], "a": 1, "e": "<p>Krok 1–6 workflow: kilka minut analizy oszczędza kilkanaście minut poprawek.<\/p>"}, {"q": "<p>Wybór kilku dodatków (pola wyboru) zapisujesz jako:<\/p>", "o": ["łańcuch <code>if / else if<\/code>", "osobne instrukcje <code>if<\/code> dla każdego pola", "jeden <code>switch<\/code>", "pętlę"], "a": 1, "e": "<p>Pola wyboru są niezależne — każde może być zaznaczone jednocześnie z innymi.<\/p>"}, {"q": "<p>Najdłuższa seria ma „przechodzić między kliknięciami”. Gdzie trzymasz licznik bieżącej serii?<\/p>", "o": ["w zmiennej lokalnej metody", "w polu klasy", "w napisie na ekranie", "w XML"], "a": 1, "e": "<p>Zmienna lokalna zeruje się przy każdym wywołaniu metody.<\/p>"}, {"q": "<p>Który zestaw plików kopiujesz do folderu <code>mobilna<\/code> (oprócz <code>mobilna.zip<\/code>) w aplikacji z listą o własnym układzie elementu?<\/p>", "o": ["tylko <code>MainActivity.java<\/code>", "<code>activity_main.xml<\/code>, <code>list_item.xml<\/code>, <code>MainActivity.java<\/code>", "<code>AndroidManifest.xml<\/code>", "zrzuty ekranu"], "a": 1, "e": "<p>Wszystkie zmieniane pliki źródłowe interfejsu i logiki.<\/p>"}, {"q": "<p>Zostało 5 minut, aplikacja działa w 90%. Co robisz?<\/p>", "o": ["dopisuję brakujące 10%", "zrzuty ekranu, <code>mobilna.zip<\/code>, kopie plików, <code>srodowisko.txt<\/code> — a potem ewentualnie poprawki", "nic", "zmieniam kolory"], "a": 1, "e": "<p>Brak plików lub archiwum może kosztować więcej niż brakująca funkcja.<\/p>"}]</script></div></section>
+<section class="sec" id="dodatkowe"><h2><span class="sec-num">10.</span> Skończyłeś wcześniej?</h2><div class="micro"><h4>Powtórka wg samooceny</h4><p>Dla każdego utraconego punktu z próbnych egzaminów wróć do wskazanego bloku (mapa pokrycia w <code>ANALIZA_INF04_MOBILE.md</code>) i wykonaj jego zadanie INF.04 ponownie — tym razem na czas.</p></div><div class="micro"><h4>Arkusze z PDF na czas</h4><p>Wykonaj od zera wybrane zadania mobilne z analizowanych arkuszy (np. Arkusz_12 — gra w kości, Arkusz_13 — urządzenia domowe) w limicie 60 minut. To najlepszy sprawdzian przed egzaminem.</p></div><div class="micro"><h4>Kawiarnia — koszyk</h4><p>Rozbuduj kawiarnię: przycisk „DO KOSZYKA” dodaje pozycję do listy koszyka, a ZAMÓW podsumowuje wszystkie pozycje i łączną cenę.</p></div></section>
+<div class="nav-bottom"><a class="btn secondary" href="blok14.html">← Blok 14</a><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button><a class="btn secondary" href="../wyniki.html">Moje wyniki →</a></div></article></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
