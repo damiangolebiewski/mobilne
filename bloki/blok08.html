@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blok 8 — Suwak SeekBar: wartości na żywo</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../" data-page="block" data-block="b08">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html" class="active">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="block-layout"><aside class="toc no-print"><strong>Blok 8</strong><ol><li><a href="#cel">Cel</a></li><li><a href="#przypomnienie">Krótkie przypomnienie</a></li><li><a href="#przyklad">Przykład</a></li><li><a href="#mikro">Mikroćwiczenia</a></li><li><a href="#prowadzone">Zadanie prowadzone</a></li><li><a href="#samodzielne">Zadanie samodzielne</a></li><li><a href="#inf04">Zadanie w stylu INF.04</a></li><li><a href="#checklista">Checklista</a></li><li><a href="#test">Mini-test</a></li><li><a href="#dodatkowe">Skończyłeś wcześniej?</a></li></ol><a class="skip" href="#samodzielne">Silniejszy? Przejdź od razu do zadania samodzielnego →</a><p class="small muted" style="margin-top:.8rem">Słabszy? Przypomnienie → Przykład → Mikroćwiczenia → Zadanie prowadzone (z podpowiedziami).</p></aside><article class="page"><div class="block-head"><div><div class="muted small"><a href="../index.html">Bloki</a> › Blok 8</div><h1>Blok 8. Suwak SeekBar: wartości na żywo</h1><span class="badge p2">Faza II — łączenie umiejętności</span> <span id="block-status" class="badge">W trakcie</span></div><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button></div>
+<p>Obsługujesz suwak: odczyt wartości w trakcie przesuwania, maksimum i przesunięcie zakresu, zmiana rozmiaru czcionki, obrazu i koloru. Jeden obiekt nasłuchujący dla kilku suwaków.</p>
+<section class="sec" id="cel"><h2><span class="sec-num">1.</span> Cel</h2><p><strong>Po wykonaniu tego bloku będziesz potrafił:</strong></p><ul><li>dodać <code>SeekBar</code> z maksimum i wartością początkową oraz ułożyć go w rzędzie z napisami,</li><li>obsłużyć <code>OnSeekBarChangeListener</code> i reagować w <code>onProgressChanged</code>,</li><li>przesunąć zakres suwaka (np. 1..10 zamiast 0..9) i zmieniać maksimum z kodu (<code>setMax</code>),</li><li>zmieniać na żywo tekst, rozmiar czcionki (<code>setTextSize</code>), obraz i kolor (<code>Color.rgb</code>),</li><li>podpiąć jeden obiekt nasłuchujący do kilku suwaków.</li></ul><details class="hint"><summary>Plan czasu (4 × 45 min = 180 min)</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>Przypomnienie</td><td>15 min</td></tr><tr><td>Przykład</td><td>10 min</td></tr><tr><td>Mikroćwiczenia</td><td>25 min</td></tr><tr><td>Zadanie prowadzone</td><td>35 min</td></tr><tr><td>Zadanie samodzielne</td><td>40 min</td></tr><tr><td>Zadanie INF.04</td><td>45 min</td></tr><tr><td>Checklista + mini-test</td><td>10 min</td></tr><tr><th>Razem</th><th>180 min</th></tr></tbody></table></div></div></details><p class="small muted">Powiązanie z arkuszami: SeekBar w Arkuszach 07 (max 40, rozmiar czcionki = wartość, „Rozmiar: x”) i 10 (max 20, wartość w napisie obok, zmiana maksimum); szkielet <code>OnSeekBarChangeListener</code> podany w pomocy Arkusza_10; suwaki R, G, B — desktop Arkusz_15.</p></section>
+<section class="sec" id="przypomnienie"><h2><span class="sec-num">2.</span> Krótkie przypomnienie</h2><h4>SeekBar w XML</h4>
+<div class="code"><div class="code-bar"><span>XML</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml"><span class="t-k">&lt;SeekBar</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbRozmiar"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+    <span class="t-a">android:max</span>=<span class="t-s">"40"</span>
+    <span class="t-a">android:progress</span>=<span class="t-s">"0"</span> <span class="t-k">/&gt;</span></code></pre></div>
+<p>Wartości suwaka są zawsze <strong>całkowite</strong> od 0 do <code>max</code> (Arkusze 07 i 10: „wartość zawsze liczbą całkowitą”).</p>
+<h4>Obsługa — szkielet z pomocy arkusza</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">sbRozmiar.setOnSeekBarChangeListener(<span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+    <span class="t-a">@Override</span>
+    <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+        tvRozmiar.setText(<span class="t-s">"Rozmiar: "</span> + progress);   <span class="t-c">// tu logika</span>
+        tvCytat.setTextSize(progress);
+    }
+    <span class="t-a">@Override</span>
+    <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> seekBar) { }
+    <span class="t-a">@Override</span>
+    <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> seekBar) { }
+});</code></pre></div>
+<p>Wszystkie trzy metody muszą istnieć (to interfejs), nawet jeśli dwie są puste. Nie da się tu użyć lambdy.</p>
+<div class="box box-warn"><p>Wewnątrz klasy anonimowej <code>this</code> oznacza obiekt nasłuchujący, <strong>nie</strong> aktywność. <code>Toast.makeText(this, …)</code> się nie skompiluje — użyj <code>MainActivity.this</code>.</p></div>
+<h4>Zakres od 1, a nie od 0</h4>
+<p><code>android:min</code> działa dopiero od Androida 8 (API 26). Uniwersalnie: przesuń wartość w kodzie.</p>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-c">// zakres 1..10 → max = 9, wartość = progress + 1</span>
+<span class="t-k">int</span> osoby = sbOsoby.getProgress() + <span class="t-n">1</span>;
+<span class="t-c">// zakres -20..40 → max = 60, wartość = progress - 20</span>
+<span class="t-k">int</span> temperatura = sbTemp.getProgress() - <span class="t-n">20</span>;</code></pre></div>
+<h4>Maksimum zmieniane z kodu (Arkusz_10)</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">sbWiek.setMax(<span class="t-n">18</span>);                 <span class="t-c">// np. po wybraniu „Pies”</span>
+tvWiek.setText(<span class="t-t">String</span>.valueOf(sbWiek.getProgress()));  <span class="t-c">// bieżąca wartość mogła się zmniejszyć</span></code></pre></div>
+<h4>Kolor z liczb</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">tvPodglad.setBackgroundColor(<span class="t-t">Color</span>.rgb(r, g, b));        <span class="t-c">// 0..255 każda</span>
+<span class="t-t">String</span> hex = <span class="t-t">String</span>.format(<span class="t-s">"#%02X%02X%02X"</span>, r, g, b);    <span class="t-c">// np. "#FF8800"</span></code></pre></div>
+<p><strong>Ćwiczenie natychmiastowe:</strong> w przykładzie zmień maksimum na 60 i ustaw <code>progress="30"</code>. Czy napis „Rozmiar: 20” na starcie jest nadal prawdziwy? Popraw XML.</p></section>
+<section class="sec" id="przyklad"><h2><span class="sec-num">3.</span> Przykład</h2><p>Mechanizm z Arkusza_07: napis z wartością i rozmiar czcionki podglądu zmieniają się w trakcie przesuwania.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:16px"><div class="m-t" style="font-size:16px">Rozmiar: 32</div><div class="m-seek" style="margin:8px 0px 8px 0px;align-self:stretch"><div class="m-seek-track"><div class="m-seek-fill" style="width:80%;background:#6750A4"></div><div class="m-seek-thumb" style="left:80%;background:#6750A4"></div></div></div><div class="m-t" style="font-size:25.6px">Dzień dobry</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Suwak przesunięty do 32</figcaption></figure></div><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"20dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvWartosc"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Rozmiar: 20"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;SeekBar</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbRozmiar"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginVertical</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:max</span>=<span class="t-s">"40"</span>
+        <span class="t-a">android:progress</span>=<span class="t-s">"20"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvPodglad"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Dzień dobry"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">SeekBar</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        <span class="t-t">TextView</span> tvWartosc = findViewById(<span class="t-t">R</span>.id.tvWartosc);
+        <span class="t-t">TextView</span> tvPodglad = findViewById(<span class="t-t">R</span>.id.tvPodglad);
+        <span class="t-t">SeekBar</span> sbRozmiar = findViewById(<span class="t-t">R</span>.id.sbRozmiar);
+
+        sbRozmiar.setOnSeekBarChangeListener(<span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+                <span class="t-c">// wywoływane przy każdym ruchu suwaka — tu jest cała logika</span>
+                tvWartosc.setText(<span class="t-s">"Rozmiar: "</span> + progress);
+                tvPodglad.setTextSize(progress);   <span class="t-c">// rozmiar w sp</span>
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+                <span class="t-c">// nieużywane, ale metoda musi istnieć</span>
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+                <span class="t-c">// nieużywane</span>
+            }
+        });
+    }
+}</code></pre></div></section>
+<section class="sec" id="mikro"><h2><span class="sec-num">4.</span> Mikroćwiczenia</h2><div class="micro"><h4>Ćwiczenie 8.1 — Specyfikacja suwaka</h4><p>Arkusz_10: „Suwak … o wartości początkowej 0 i wartości maksymalnej 20”. Napisz XML.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>&lt;SeekBar android:id="@+id/sbWiek" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:max="20" android:progress="0" /&gt;</code> — w rzędzie z napisami szerokość <code>0dp</code> i waga 1.</p></div></details></div><div class="micro"><h4>Ćwiczenie 8.2 — this w klasie anonimowej</h4><p>W <code>onProgressChanged</code> chcesz pokazać <code>Toast</code>. Popraw: <code>Toast.makeText(this, "Max!", Toast.LENGTH_SHORT).show();</code></p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>Toast.makeText(MainActivity.this, "Max!", Toast.LENGTH_SHORT).show();</code> — w lambdzie <code>this</code> oznacza aktywność, w klasie anonimowej — obiekt tej klasy.</p></div></details></div><div class="micro"><h4>Ćwiczenie 8.3 — Przesunięcie zakresu</h4><p>Suwak ma pozwolić wybrać liczbę godzin od 1 do 12. Jakie <code>max</code> ustawisz i jak odczytasz liczbę godzin?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>max="11"</code>, godziny = <code>getProgress() + 1</code>. Na starcie (progress 0) napis powinien pokazywać 1.</p></div></details></div><div class="micro"><h4>Ćwiczenie 8.4 — Zmiana maksimum</h4><p>Suwak wieku ma wartość 15 i max 20. Użytkownik wybiera „Świnka morska” → <code>setMax(9)</code>. Jaką wartość pokaże suwak i co trzeba zrobić z napisem obok?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>SeekBar sam obetnie wartość do 9 (i zwykle wywoła <code>onProgressChanged</code>). Dla pewności po <code>setMax</code> odśwież napis: <code>tvWiek.setText(String.valueOf(sbWiek.getProgress()));</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 8.5 — Format HEX</h4><p>Jaki tekst da <code>String.format("#%02X%02X%02X", 255, 136, 0)</code>? Co znaczy <code>%02X</code>?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>„#FF8800”. <code>X</code> — szesnastkowo wielkimi literami, <code>02</code> — minimum 2 znaki z zerem na początku (0 → „00”).</p></div></details></div></section>
+<section class="sec" id="prowadzone"><h2><span class="sec-num">5.</span> Zadanie prowadzone</h2><div class="task" id="b08-prowadzone">
+<div class="task-head"><h3>Głośność z obrazem</h3><span class="meta">⏱ ok. 35 min</span></div>
+<p>Suwak w rzędzie z napisami (jak w Arkuszu_10), a obraz głośnika zależy od przedziału wartości.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#F5F7FA;padding:16px"><div class="m-t" style="font-size:22.4px;font-weight:700;text-align:center;align-self:stretch">Odtwarzacz</div><div class="m-img" style="height:160px;align-self:stretch"><img src="../assets/zasoby/glosnik_glosno.png" alt="" style="object-fit:contain"></div><div class="m-row" style="align-self:stretch;align-items:center"><div class="m-t" style="font-size:14.4px">Głośność:</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:80%;background:#6750A4"></div><div class="m-seek-thumb" style="left:80%;background:#6750A4"></div></div></div><div class="m-t" style="font-size:14.4px">8/10</div></div><div class="m-t" style="font-size:16px;margin:8px 0px 0px 0px;text-align:center;align-self:stretch">Głośno</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Suwak na 8</figcaption></figure></div>
+<p><strong>Działanie:</strong> suwak 0..10, start 5. Napis obok: „&lt;wartość&gt;/10”. Obraz i opis: 0 → <code>glosnik_cisza</code>, „Wyciszono”; 1–6 → <code>glosnik_cicho</code>, „Cicho”; 7–10 → <code>glosnik_glosno</code>, „Głośno”.</p>
+<p><strong>Kroki:</strong></p>
+<ol><li>XML: tytuł, <code>ImageView</code> 200dp (start <code>glosnik_cicho</code>), rząd: „Głośność:” + <code>SeekBar</code> (0dp, waga 1, max 10, progress 5) + napis „5/10”; opis pod spodem.</li><li>Java: listener z trzema metodami; w <code>onProgressChanged</code> wywołaj <code>pokazGlosnosc(progress, seekBar.getMax())</code>.</li><li><code>pokazGlosnosc</code>: napis + <code>if / else if / else</code> na przedziały.</li></ol>
+<h4>Zasoby do zadania</h4><div class="res-list"><figure><a href="../assets/zasoby/glosnik_cisza.png" download><img src="../assets/zasoby/glosnik_cisza.png" alt="glosnik_cisza.png"></a><figcaption>glosnik_cisza.png</figcaption></figure><figure><a href="../assets/zasoby/glosnik_cicho.png" download><img src="../assets/zasoby/glosnik_cicho.png" alt="glosnik_cicho.png"></a><figcaption>glosnik_cicho.png</figcaption></figure><figure><a href="../assets/zasoby/glosnik_glosno.png" download><img src="../assets/zasoby/glosnik_glosno.png" alt="glosnik_glosno.png"></a><figcaption>glosnik_glosno.png</figcaption></figure></div><p class="small">Pobierz wszystkie: <a href="../materialy/zasoby_b08-prowadzone.zip" download>zasoby_b08-prowadzone.zip</a>. Obrazy skopiuj do <code>app/src/main/res/drawable</code> (nazwy: małe litery, bez spacji i myślników).</p>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Przedziały sprawdzaj od najmniejszego: <code>== 0</code>, potem <code>&lt;= 6</code>, a <code>else</code> obsłuży resztę.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Rząd z suwakiem: napisy <code>wrap_content</code>, suwak <code>layout_width="0dp"</code> + <code>layout_weight="1"</code>, na rzędzie <code>gravity="center_vertical"</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">onProgressChanged(p): pokazGlosnosc(p, max)
+pokazGlosnosc(p, max):
+    napis ← p + "/" + max
+    jeśli p == 0 → cisza, "Wyciszono"
+    inaczej jeśli p &lt;= 6 → cicho, "Cicho"
+    inaczej → głośno, "Głośno"</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-a">@Override</span>
+<span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+    pokazGlosnosc(progress, seekBar.getMax());
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#F5F7FA"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"20dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Odtwarzacz"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ImageView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivGlosnik"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"200dp"</span>
+        <span class="t-a">android:contentDescription</span>=<span class="t-s">"Głośnik"</span>
+        <span class="t-a">android:src</span>=<span class="t-s">"@drawable/glosnik_cicho"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center_vertical"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvEtykieta"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Głośność:"</span>
+            <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;SeekBar</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbGlosnosc"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:max</span>=<span class="t-s">"10"</span>
+            <span class="t-a">android:progress</span>=<span class="t-s">"5"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvGlosnosc"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"5/10"</span>
+            <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvOpis"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Cicho"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ImageView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">SeekBar</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-t">ImageView</span> ivGlosnik;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvGlosnosc, tvOpis;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        ivGlosnik = findViewById(<span class="t-t">R</span>.id.ivGlosnik);
+        tvGlosnosc = findViewById(<span class="t-t">R</span>.id.tvGlosnosc);
+        tvOpis = findViewById(<span class="t-t">R</span>.id.tvOpis);
+        <span class="t-t">SeekBar</span> sbGlosnosc = findViewById(<span class="t-t">R</span>.id.sbGlosnosc);
+
+        sbGlosnosc.setOnSeekBarChangeListener(<span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+                pokazGlosnosc(progress, seekBar.getMax());
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+        });
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> pokazGlosnosc(<span class="t-k">int</span> poziom, <span class="t-k">int</span> maksimum) {
+        tvGlosnosc.setText(poziom + <span class="t-s">"/"</span> + maksimum);
+        <span class="t-k">if</span> (poziom == <span class="t-n">0</span>) {
+            ivGlosnik.setImageResource(<span class="t-t">R</span>.drawable.glosnik_cisza);
+            tvOpis.setText(<span class="t-s">"Wyciszono"</span>);
+        } <span class="t-k">else</span> <span class="t-k">if</span> (poziom &lt;= <span class="t-n">6</span>) {
+            ivGlosnik.setImageResource(<span class="t-t">R</span>.drawable.glosnik_cicho);
+            tvOpis.setText(<span class="t-s">"Cicho"</span>);
+        } <span class="t-k">else</span> {
+            ivGlosnik.setImageResource(<span class="t-t">R</span>.drawable.glosnik_glosno);
+            tvOpis.setText(<span class="t-s">"Głośno"</span>);
+        }
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b08_prowadzone/">rozwiazania/b08_prowadzone/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b08-prowadzone">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="samodzielne"><h2><span class="sec-num">6.</span> Zadanie samodzielne</h2><div class="task" id="b08-samodzielne">
+<div class="task-head"><h3>Mieszalnik kolorów RGB</h3><span class="meta">⏱ ok. 40 min</span></div>
+<p>Trzy suwaki sterują kolorem prostokąta — wzorzec z desktopowego Arkusza_15 przeniesiony na telefon. Wymagany <strong>jeden</strong> obiekt nasłuchujący dla trzech suwaków.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#FFF8DC;padding:12.8px"><div class="m-t" style="background:#FF8800;align-self:stretch;height:128px"></div><div class="m-t" style="font-size:19.2px;font-weight:700;margin:8px 0px 8px 0px;text-align:center;align-self:stretch">#FF8800</div><div class="m-row" style="align-self:stretch;align-items:center"><div class="m-t" style="font-size:14.4px">R</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:100%;background:#6750A4"></div><div class="m-seek-thumb" style="left:100%;background:#6750A4"></div></div></div><div class="m-t" style="width:32px">255</div></div><div class="m-row" style="align-self:stretch;align-items:center"><div class="m-t" style="font-size:14.4px">G</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:53%;background:#6750A4"></div><div class="m-seek-thumb" style="left:53%;background:#6750A4"></div></div></div><div class="m-t" style="width:32px">136</div></div><div class="m-row" style="align-self:stretch;align-items:center"><div class="m-t" style="font-size:14.4px">B</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:0%;background:#6750A4"></div><div class="m-seek-thumb" style="left:0%;background:#6750A4"></div></div></div><div class="m-t" style="width:32px">0</div></div></div><div class="m-nav">◀ ● ■</div></div><figcaption>R=255, G=136, B=0</figcaption></figure></div>
+<ul><li>Prostokąt podglądu (wys. 160dp, na całą szerokość), pod nim kod koloru w HEX, pogrubiony.</li><li>Trzy rzędy: litera (R, G, B), suwak 0..255 (start 255), wartość liczbowa w polu o stałej szerokości 40dp.</li><li>Każda zmiana któregokolwiek suwaka aktualizuje wszystkie trzy wartości, kolor prostokąta i kod HEX.</li><li>Tło ekranu Cornsilk <code>#FFF8DC</code>.</li></ul>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Utwórz obiekt <code>SeekBar.OnSeekBarChangeListener sluchacz = new …{…};</code> jako zmienną i przekaż go trzem suwakom.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>W <code>onProgressChanged</code> nie korzystaj z parametru <code>progress</code> (nie wiesz, który suwak się ruszył) — odczytaj wszystkie trzy przez <code>getProgress()</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">odswiezKolor():
+    r, g, b ← getProgress() trzech suwaków
+    trzy napisy wartości
+    podgląd.setBackgroundColor(Color.rgb(r, g, b))
+    hex ← String.format("#%02X%02X%02X", r, g, b)</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span> sluchacz = <span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+    <span class="t-a">@Override</span> <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> s, <span class="t-k">int</span> p, <span class="t-k">boolean</span> u) { odswiezKolor(); }
+    <span class="t-a">@Override</span> <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> s) { }
+    <span class="t-a">@Override</span> <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> s) { }
+};
+sbR.setOnSeekBarChangeListener(sluchacz);
+sbG.setOnSeekBarChangeListener(sluchacz);
+sbB.setOnSeekBarChangeListener(sluchacz);</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#FFF8DC"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvPodglad"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"160dp"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvHex"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginVertical</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"24sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center_vertical"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvR"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"R"</span>
+            <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;SeekBar</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbR"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:max</span>=<span class="t-s">"255"</span>
+            <span class="t-a">android:progress</span>=<span class="t-s">"255"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvWartR"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"40dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"255"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center_vertical"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvG"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"G"</span>
+            <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;SeekBar</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbG"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:max</span>=<span class="t-s">"255"</span>
+            <span class="t-a">android:progress</span>=<span class="t-s">"255"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvWartG"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"40dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"255"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center_vertical"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvB"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"B"</span>
+            <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;SeekBar</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbB"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:max</span>=<span class="t-s">"255"</span>
+            <span class="t-a">android:progress</span>=<span class="t-s">"255"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvWartB"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"40dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"255"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.graphics.<span class="t-t">Color</span>;
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">SeekBar</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-t">SeekBar</span> sbR, sbG, sbB;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvWartR, tvWartG, tvWartB, tvPodglad, tvHex;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        sbR = findViewById(<span class="t-t">R</span>.id.sbR);
+        sbG = findViewById(<span class="t-t">R</span>.id.sbG);
+        sbB = findViewById(<span class="t-t">R</span>.id.sbB);
+        tvWartR = findViewById(<span class="t-t">R</span>.id.tvWartR);
+        tvWartG = findViewById(<span class="t-t">R</span>.id.tvWartG);
+        tvWartB = findViewById(<span class="t-t">R</span>.id.tvWartB);
+        tvPodglad = findViewById(<span class="t-t">R</span>.id.tvPodglad);
+        tvHex = findViewById(<span class="t-t">R</span>.id.tvHex);
+
+        <span class="t-c">// jeden obiekt nasłuchujący dla trzech suwaków</span>
+        <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span> sluchacz = <span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+                odswiezKolor();
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+        };
+        sbR.setOnSeekBarChangeListener(sluchacz);
+        sbG.setOnSeekBarChangeListener(sluchacz);
+        sbB.setOnSeekBarChangeListener(sluchacz);
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> odswiezKolor() {
+        <span class="t-k">int</span> r = sbR.getProgress();
+        <span class="t-k">int</span> g = sbG.getProgress();
+        <span class="t-k">int</span> b = sbB.getProgress();
+        tvWartR.setText(<span class="t-t">String</span>.valueOf(r));
+        tvWartG.setText(<span class="t-t">String</span>.valueOf(g));
+        tvWartB.setText(<span class="t-t">String</span>.valueOf(b));
+        tvPodglad.setBackgroundColor(<span class="t-t">Color</span>.rgb(r, g, b));
+        tvHex.setText(<span class="t-t">String</span>.format(<span class="t-s">"#%02X%02X%02X"</span>, r, g, b));
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b08_samodzielne/">rozwiazania/b08_samodzielne/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b08-samodzielne">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="inf04"><h2><span class="sec-num">7.</span> Zadanie w stylu INF.04</h2><div class="task exam" id="b08-inf">
+<div class="task-head"><h3>Podział rachunku z napiwkiem</h3><span class="meta">⏱ ok. 45 min</span></div>
+<p>Wykonaj aplikację mobilną obliczającą napiwek i kwotę przypadającą na osobę.</p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>tytuł, pole kwoty, 2 rzędy (etykieta + suwak + wartość), przycisk, 3 napisy wyników, autor</td></tr><tr><td>DANE</td><td>kwota (liczba dziesiętna), procent 0..30 (suwak), liczba osób 1..10 (suwak z przesunięciem)</td></tr><tr><td>ZDARZENIA</td><td>zmiana każdego suwaka, kliknięcie „OBLICZ”</td></tr><tr><td>LOGIKA</td><td>napiwek = kwota·%/100; razem = kwota + napiwek; na osobę = razem / osoby; walidacja pustej i błędnej kwoty</td></tr><tr><td>WYNIK</td><td>„Napiwek: x zł”, „Razem: x zł”, „Na osobę: x zł” (2 miejsca), etykiety suwaków na żywo</td></tr><tr><td>WYGLĄD</td><td>tło #E0F2F1; tytuł #00695C biały; rzędy suwaków; przycisk #00695C wyśrodkowany; „Na osobę” 24sp pogrubiony</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#E0F2F1;padding:0px"><div class="m-t" style="background:#00695C;color:#fff;font-size:22.4px;padding:8px;align-self:stretch">Podział rachunku</div><div class="m-e" style="margin:8px;align-self:stretch"><span>240</span></div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch;align-items:center"><div class="m-t" style="font-size:14.4px">Napiwek:</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:50%;background:#00695C"></div><div class="m-seek-thumb" style="left:50%;background:#00695C"></div></div></div><div class="m-t" style="font-size:14.4px">15%</div></div><div class="m-row" style="margin:8px 8px 0px 8px;align-self:stretch;align-items:center"><div class="m-t" style="font-size:14.4px">Liczba osób:</div><div class="m-seek" style="flex:1 1 0;min-width:0"><div class="m-seek-track"><div class="m-seek-fill" style="width:33%;background:#00695C"></div><div class="m-seek-thumb" style="left:33%;background:#00695C"></div></div></div><div class="m-t" style="font-size:14.4px">4</div></div><div class="m-b" style="background:#00695C;color:#ffffff;margin:8px 0px 0px 0px;align-self:center">OBLICZ</div><div class="m-t" style="font-size:14.4px;margin:8px 0px 0px 0px;text-align:center;align-self:stretch">Napiwek: 36,00 zł</div><div class="m-t" style="font-size:14.4px;text-align:center;align-self:stretch">Razem: 276,00 zł</div><div class="m-t" style="font-size:19.2px;font-weight:700;margin:4.8px 0px 0px 0px;text-align:center;align-self:stretch">Na osobę: 69,00 zł</div><div class="m-t" style="color:#808080;margin:12.8px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Kwota 240 zł, 15%, 4 osoby</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Podział rachunku”.</li><li>Pole edycyjne z podpowiedzią „Kwota rachunku (zł)” przyjmujące liczby dziesiętne.</li><li>Rząd: napis „Napiwek:”, suwak (0..30, wartość początkowa 10), napis z wartością „10%”.</li><li>Rząd: napis „Liczba osób:”, suwak, napis z wartością „1”. Suwak pozwala wybrać liczbę osób <strong>od 1 do 10</strong>.</li><li>Przycisk „OBLICZ”.</li><li>Napisy: „Napiwek: 0,00 zł”, „Razem: 0,00 zł”, „Na osobę: 0,00 zł”.</li><li>Napis „Autor: ”, dalej numer zdającego.</li></ul>
+<p><strong>Działanie aplikacji:</strong></p>
+<ul><li>Przesuwanie suwaków na bieżąco zmienia napisy obok nich („15%”, „4”) <strong>oraz</strong> przelicza wyniki.</li><li>„OBLICZ” przelicza wyniki (np. po zmianie kwoty).</li><li>napiwek = kwota · procent / 100; razem = kwota + napiwek; na osobę = razem / liczba osób. Wyniki z dwoma miejscami po przecinku.</li><li>Gdy pole kwoty jest puste: pierwszy napis „Podaj kwotę rachunku”, pozostałe puste. Gdy kwota jest niepoprawna: „Niepoprawna kwota”. Aplikacja się nie zamyka.</li></ul>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs w XML; rozkład liniowy pionowy z zagnieżdżonymi rozkładami poziomymi dla suwaków i ich napisów; suwaki zajmują całą wolną szerokość rzędu.</li><li>Tło strony #E0F2F1; tytuł: tło #00695C, biała czcionka, największa, marginesy wewnętrzne 10. Przycisk wyśrodkowany, tło #00695C, biała czcionka.</li><li>Napis „Na osobę” pogrubiony, większy niż pozostałe wyniki. Wyniki wyśrodkowane.</li><li>Oba suwaki obsługiwane przez jeden obiekt nasłuchujący. Obliczenia w jednej metodzie.</li></ul>
+
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b08-inf"><li><label><input type="checkbox"> <span>na starcie: „10%”, „1”, wyniki 0,00 zł</span></label></li><li><label><input type="checkbox"> <span>suwak osób: skrajnie w lewo → 1, skrajnie w prawo → 10</span></label></li><li><label><input type="checkbox"> <span>240 zł, 15%, 4 osoby → 36,00 / 276,00 / 69,00 zł</span></label></li><li><label><input type="checkbox"> <span>przesunięcie suwaka przelicza wynik bez klikania OBLICZ (gdy kwota wpisana)</span></label></li><li><label><input type="checkbox"> <span>puste pole → „Podaj kwotę rachunku”; „abc” nie da się wpisać / błędna kwota → komunikat</span></label></li><li><label><input type="checkbox"> <span>jeden obiekt <code>OnSeekBarChangeListener</code> dla obu suwaków</span></label></li><li><label><input type="checkbox"> <span>rzędy suwaków: napisy <code>wrap_content</code>, suwak <code>0dp</code> + waga 1</span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Wszystko prowadzi do jednej metody <code>przelicz()</code>. Wywołują ją: listener suwaków i przycisk.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Liczba osób: <code>sbOsoby.getProgress() + 1</code> przy <code>android:max="9"</code>. Napiwek dziel przez <code>100.0</code>, nie <code>100</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">listener (oba suwaki): napis "%" ← sbNapiwek; napis osób ← liczbaOsob(); przelicz()
+przelicz():
+    tekst ← kwota (trim, przecinek → kropka)
+    jeśli pusty → "Podaj kwotę rachunku", reszta pusta, koniec
+    spróbuj: kwota; napiwek; razem; naOsobe; trzy napisy %.2f
+    błąd → "Niepoprawna kwota"</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">int</span> liczbaOsob() {
+    <span class="t-k">return</span> sbOsoby.getProgress() + <span class="t-t">MIN_OSOB</span>;   <span class="t-c">// MIN_OSOB = 1</span>
+}
+...
+<span class="t-k">double</span> napiwek = kwota * sbNapiwek.getProgress() / <span class="t-n">100.0</span>;
+<span class="t-k">double</span> naOsobe = (kwota + napiwek) / liczbaOsob();</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#E0F2F1"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#00695C"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Podział rachunku"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;EditText</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/etKwota"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:hint</span>=<span class="t-s">"Kwota rachunku (zł)"</span>
+        <span class="t-a">android:inputType</span>=<span class="t-s">"numberDecimal"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center_vertical"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvNapiwekEtykieta"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Napiwek:"</span>
+            <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;SeekBar</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbNapiwek"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:max</span>=<span class="t-s">"30"</span>
+            <span class="t-a">android:progress</span>=<span class="t-s">"10"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvProcent"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"10%"</span>
+            <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center_vertical"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvOsobyEtykieta"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Liczba osób:"</span>
+            <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;SeekBar</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/sbOsoby"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:max</span>=<span class="t-s">"9"</span>
+            <span class="t-a">android:progress</span>=<span class="t-s">"0"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvOsoby"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;Button</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnOblicz"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_gravity</span>=<span class="t-s">"center_horizontal"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#00695C"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"OBLICZ"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvNapiwek"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Napiwek: 0,00 zł"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvRazem"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Razem: 0,00 zł"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvNaOsobe"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"6dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Na osobę: 0,00 zł"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"24sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvAutor"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">SeekBar</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">static</span> <span class="t-k">final</span> <span class="t-k">int</span> <span class="t-t">MIN_OSOB</span> = <span class="t-n">1</span>;   <span class="t-c">// SeekBar zaczyna od 0, więc przesuwamy zakres o 1</span>
+
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etKwota;
+    <span class="t-k">private</span> <span class="t-t">SeekBar</span> sbNapiwek, sbOsoby;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvProcent, tvOsoby, tvNapiwek, tvRazem, tvNaOsobe;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etKwota = findViewById(<span class="t-t">R</span>.id.etKwota);
+        sbNapiwek = findViewById(<span class="t-t">R</span>.id.sbNapiwek);
+        sbOsoby = findViewById(<span class="t-t">R</span>.id.sbOsoby);
+        tvProcent = findViewById(<span class="t-t">R</span>.id.tvProcent);
+        tvOsoby = findViewById(<span class="t-t">R</span>.id.tvOsoby);
+        tvNapiwek = findViewById(<span class="t-t">R</span>.id.tvNapiwek);
+        tvRazem = findViewById(<span class="t-t">R</span>.id.tvRazem);
+        tvNaOsobe = findViewById(<span class="t-t">R</span>.id.tvNaOsobe);
+        <span class="t-t">Button</span> btnOblicz = findViewById(<span class="t-t">R</span>.id.btnOblicz);
+
+        <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span> sluchacz = <span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() {
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onProgressChanged(<span class="t-t">SeekBar</span> seekBar, <span class="t-k">int</span> progress, <span class="t-k">boolean</span> fromUser) {
+                tvProcent.setText(sbNapiwek.getProgress() + <span class="t-s">"%"</span>);
+                tvOsoby.setText(<span class="t-t">String</span>.valueOf(liczbaOsob()));
+                przelicz();
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStartTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+
+            <span class="t-a">@Override</span>
+            <span class="t-k">public</span> <span class="t-k">void</span> onStopTrackingTouch(<span class="t-t">SeekBar</span> seekBar) {
+            }
+        };
+        sbNapiwek.setOnSeekBarChangeListener(sluchacz);
+        sbOsoby.setOnSeekBarChangeListener(sluchacz);
+        btnOblicz.setOnClickListener(v -&gt; przelicz());
+    }
+
+    <span class="t-k">private</span> <span class="t-k">int</span> liczbaOsob() {
+        <span class="t-k">return</span> sbOsoby.getProgress() + <span class="t-t">MIN_OSOB</span>;
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> przelicz() {
+        <span class="t-t">String</span> tekst = etKwota.getText().toString().trim().replace(<span class="t-s">','</span>, <span class="t-s">'.'</span>);
+        <span class="t-k">if</span> (tekst.isEmpty()) {
+            tvNapiwek.setText(<span class="t-s">"Podaj kwotę rachunku"</span>);
+            tvRazem.setText(<span class="t-s">""</span>);
+            tvNaOsobe.setText(<span class="t-s">""</span>);
+            <span class="t-k">return</span>;
+        }
+        <span class="t-k">try</span> {
+            <span class="t-k">double</span> kwota = <span class="t-t">Double</span>.parseDouble(tekst);
+            <span class="t-k">double</span> napiwek = kwota * sbNapiwek.getProgress() / <span class="t-n">100.0</span>;
+            <span class="t-k">double</span> razem = kwota + napiwek;
+            <span class="t-k">double</span> naOsobe = razem / liczbaOsob();
+            tvNapiwek.setText(<span class="t-t">String</span>.format(<span class="t-s">"Napiwek: %.2f zł"</span>, napiwek));
+            tvRazem.setText(<span class="t-t">String</span>.format(<span class="t-s">"Razem: %.2f zł"</span>, razem));
+            tvNaOsobe.setText(<span class="t-t">String</span>.format(<span class="t-s">"Na osobę: %.2f zł"</span>, naOsobe));
+        } <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) {
+            tvNapiwek.setText(<span class="t-s">"Niepoprawna kwota"</span>);
+            tvRazem.setText(<span class="t-s">""</span>);
+            tvNaOsobe.setText(<span class="t-s">""</span>);
+        }
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b08_inf/">rozwiazania/b08_inf/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b08-inf">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="checklista"><h2><span class="sec-num">8.</span> Checklista</h2><p class="small muted">Sprawdź swoją aplikację z zadania INF.04 punkt po punkcie (krok 10 procedury).</p><ul class="checklist" data-key="b08-check"><li><label><input type="checkbox"> <span><code>max</code> i wartość początkowa suwaka zgodne z poleceniem; napis obok pokazuje wartość startową</span></label></li><li><label><input type="checkbox"> <span>logika w <code>onProgressChanged</code>; dwie pozostałe metody obecne (mogą być puste)</span></label></li><li><label><input type="checkbox"> <span>zakres nie od zera zrealizowany przesunięciem (<code>progress + min</code>)</span></label></li><li><label><input type="checkbox"> <span>po <code>setMax</code> odświeżam napis z bieżącą wartością</span></label></li><li><label><input type="checkbox"> <span>w klasie anonimowej używam <code>MainActivity.this</code> zamiast <code>this</code></span></label></li><li><label><input type="checkbox"> <span>suwak w rzędzie: <code>0dp</code> + <code>layout_weight="1"</code></span></label></li></ul></section>
+<section class="sec" id="test"><h2><span class="sec-num">9.</span> Mini-test</h2><div class="quiz" data-quiz="b08"><script type="application/json">[{"q": "<p>Która metoda <code>OnSeekBarChangeListener<\/code> jest wywoływana przy każdym ruchu suwaka?<\/p>", "o": ["<code>onStartTrackingTouch<\/code>", "<code>onProgressChanged<\/code>", "<code>onStopTrackingTouch<\/code>", "<code>onClick<\/code>"], "a": 1, "e": "<p>Otrzymuje bieżącą wartość w parametrze <code>progress<\/code>.<\/p>"}, {"q": "<p>Arkusz_07: „rozmiar czcionki cytatu jest zmieniany na aktualną wartość suwaka”. Kod:<\/p>", "o": ["<code>tvCytat.setTextSize(progress);<\/code>", "<code>tvCytat.setText(progress);<\/code>", "<code>tvCytat.setSize(\"progress\")<\/code>", "<code>tvCytat.textSize = progress<\/code>"], "a": 0, "e": "<p><code>setTextSize(float)<\/code> przyjmuje rozmiar w sp; <code>int<\/code> jest automatycznie rozszerzany do <code>float<\/code>.<\/p>"}, {"q": "<p>Suwak ma dawać wartości od 5 do 25. Ustawienia:<\/p>", "o": ["<code>max=25<\/code>, wartość = progress", "<code>max=20<\/code>, wartość = progress + 5", "<code>max=25<\/code>, wartość = progress − 5", "<code>min=5<\/code> zawsze działa"], "a": 1, "e": "<p>Zakres 0..20 przesunięty o 5 daje 5..25. <code>android:min<\/code> wymaga API 26.<\/p>"}, {"q": "<p>Dlaczego nie można napisać <code>sb.setOnSeekBarChangeListener(v -&gt; {...})<\/code>?<\/p>", "o": ["bo SeekBar nie ma zdarzeń", "bo interfejs ma trzy metody (lambda działa tylko dla jednej)", "bo trzeba użyć <code>setOnClickListener<\/code>", "można, to poprawne"], "a": 1, "e": "<p>Lambda zastępuje interfejs z jedną metodą abstrakcyjną, np. <code>OnClickListener<\/code>.<\/p>"}, {"q": "<p>Arkusz_10: po kliknięciu „Świnka morska” maksimum suwaka = 9. Kod:<\/p>", "o": ["<code>sbWiek.max = 9;<\/code>", "<code>sbWiek.setMax(9);<\/code>", "<code>sbWiek.setProgress(9);<\/code>", "<code>sbWiek.setLimit(9);<\/code>"], "a": 1, "e": "<p><code>setProgress<\/code> zmienia bieżącą wartość, nie maksimum.<\/p>"}, {"q": "<p><code>Color.rgb(255, 255, 0)<\/code> to kolor:<\/p>", "o": ["niebieski", "żółty", "biały", "czerwony"], "a": 1, "e": "<p>Czerwony + zielony w pełni = żółty.<\/p>"}]</script></div></section>
+<section class="sec" id="dodatkowe"><h2><span class="sec-num">10.</span> Skończyłeś wcześniej?</h2><div class="micro"><h4>Właściwości czcionki (Arkusz_07) w 15 minut</h4><p>Bez zaglądania: tytuł (tło #558B2F, biały, pogrubiony, największy), „Rozmiar: ” (średni), suwak max 40, napis cytatu, przycisk „&gt;&gt;” (wyśrodkowany, pogrubiony). Suwak: rozmiar cytatu + napis; przycisk: cykl „Dzień dobry” → „Good morning” → „Buenos dias” z tablicy. Marginesy strony 20. Zmierz czas.</p></div><div class="micro"><h4>Kopiuj kolor</h4><p>W mieszalniku RGB dodaj przycisk „ZAPISZ KOLOR” i mały prostokąt, który przyjmuje kolor dopiero po kliknięciu (jak w desktopowym Arkuszu_15). Dalsze ruchy suwaków nie zmieniają małego prostokąta.</p></div><div class="micro"><h4>Zaokrąglenie w górę</h4><p>W podziale rachunku zaokrąglaj kwotę na osobę w górę do pełnych złotych i pokaż „Każdy płaci: 70 zł”.</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p><code>(int) Math.ceil(naOsobe)</code>.</p></div></details></div></section>
+<div class="nav-bottom"><a class="btn secondary" href="blok07.html">← Blok 7</a><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button><a class="btn secondary" href="blok09.html">Blok 9 →</a></div></article></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
