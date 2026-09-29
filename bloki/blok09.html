@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blok 9 — Listy: ListView i ArrayAdapter</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../" data-page="block" data-block="b09">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html" class="active">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="block-layout"><aside class="toc no-print"><strong>Blok 9</strong><ol><li><a href="#cel">Cel</a></li><li><a href="#przypomnienie">Krótkie przypomnienie</a></li><li><a href="#przyklad">Przykład</a></li><li><a href="#mikro">Mikroćwiczenia</a></li><li><a href="#prowadzone">Zadanie prowadzone</a></li><li><a href="#samodzielne">Zadanie samodzielne</a></li><li><a href="#inf04">Zadanie w stylu INF.04</a></li><li><a href="#checklista">Checklista</a></li><li><a href="#test">Mini-test</a></li><li><a href="#dodatkowe">Skończyłeś wcześniej?</a></li></ol><a class="skip" href="#samodzielne">Silniejszy? Przejdź od razu do zadania samodzielnego →</a><p class="small muted" style="margin-top:.8rem">Słabszy? Przypomnienie → Przykład → Mikroćwiczenia → Zadanie prowadzone (z podpowiedziami).</p></aside><article class="page"><div class="block-head"><div><div class="muted small"><a href="../index.html">Bloki</a> › Blok 9</div><h1>Blok 9. Listy: ListView i ArrayAdapter</h1><span class="badge p2">Faza II — łączenie umiejętności</span> <span id="block-status" class="badge">W trakcie</span></div><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button></div>
+<p>Wyświetlasz kolekcję na liście, dopisujesz elementy z pola edycyjnego z automatycznym odświeżaniem, reagujesz na kliknięcie elementu i stosujesz własny układ elementu listy — dokładnie tak jak w pomocach z arkuszy.</p>
+<section class="sec" id="cel"><h2><span class="sec-num">1.</span> Cel</h2><p><strong>Po wykonaniu tego bloku będziesz potrafił:</strong></p><ul><li>połączyć tablicę lub <code>ArrayList&lt;String&gt;</code> z <code>ListView</code> przez <code>ArrayAdapter</code>,</li><li>dopisywać elementy do listy i odświeżać ją (<code>add</code> + <code>notifyDataSetChanged</code>),</li><li>obsłużyć kliknięcie elementu (<code>setOnItemClickListener</code>, <code>position</code>, <code>getItemAtPosition</code>),</li><li>ustawić separator (<code>divider</code>, <code>dividerHeight</code>) i własny układ elementu (<code>R.layout.list_item</code>).</li></ul><details class="hint"><summary>Plan czasu (4 × 45 min = 180 min)</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>Przypomnienie</td><td>15 min</td></tr><tr><td>Przykład</td><td>10 min</td></tr><tr><td>Mikroćwiczenia</td><td>25 min</td></tr><tr><td>Zadanie prowadzone</td><td>35 min</td></tr><tr><td>Zadanie samodzielne</td><td>35 min</td></tr><tr><td>Zadanie INF.04</td><td>50 min</td></tr><tr><td>Checklista + mini-test</td><td>10 min</td></tr><tr><th>Razem</th><th>180 min</th></tr></tbody></table></div></div></details><p class="small muted">Powiązanie z arkuszami: Arkusz_05 (kolekcja napisów jako źródło danych listy, dopisanie + odświeżenie, separator w kolorze, 3 elementy startowe z pliku) i Arkusz_10 (lista gatunków, kliknięcie elementu, wysokość wg liczby elementów). Pomoc Android Studio w arkuszach: <code>ArrayAdapter</code>, <code>setAdapter</code>, <code>notifyDataSetChanged</code>, <code>setOnItemClickListener</code>, <code>getItemAtPosition</code>.</p></section>
+<section class="sec" id="przypomnienie"><h2><span class="sec-num">2.</span> Krótkie przypomnienie</h2><h4>Trzy elementy: dane → adapter → lista</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-t">ArrayList</span>&lt;<span class="t-t">String</span>&gt; notatki = <span class="t-k">new</span> <span class="t-t">ArrayList</span>&lt;&gt;();            <span class="t-c">// 1. dane (import java.util.ArrayList)</span>
+notatki.add(<span class="t-s">"Zakupy: chleb, masło, ser"</span>);
+
+<span class="t-t">ArrayAdapter</span>&lt;<span class="t-t">String</span>&gt; adapter =                           <span class="t-c">// 2. adapter</span>
+        <span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, android.<span class="t-t">R</span>.layout.simple_list_item_1, notatki);
+
+<span class="t-t">ListView</span> lvNotatki = findViewById(<span class="t-t">R</span>.id.lvNotatki);       <span class="t-c">// 3. lista</span>
+lvNotatki.setAdapter(adapter);</code></pre></div>
+<p><code>android.R.layout.simple_list_item_1</code> to gotowy, systemowy układ jednego wiersza (zwróć uwagę na <code>android.</code> na początku).</p>
+<h4>Dopisanie elementu (Arkusz_05)</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">notatki.add(etNowy.getText().toString());   <span class="t-c">// dopisz do KOLEKCJI (na koniec)</span>
+adapter.notifyDataSetChanged();              <span class="t-c">// powiadom listę — bez tego nic się nie zmieni</span></code></pre></div>
+<div class="box box-warn"><p>Do listy, którą chcesz powiększać, użyj <code>ArrayList</code>. <code>Arrays.asList(tablica)</code> daje listę o <strong>stałym</strong> rozmiarze — <code>add</code> rzuci <code>UnsupportedOperationException</code>. Bezpiecznie: <code>new ArrayList&lt;&gt;(Arrays.asList("a", "b", "c"))</code>.</p></div>
+<h4>Kliknięcie elementu (Arkusz_10)</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">lvGatunki.setOnItemClickListener((parent, view, position, id) -&gt; {
+    <span class="t-t">String</span> wybrany = (<span class="t-t">String</span>) parent.getItemAtPosition(position);   <span class="t-c">// lub gatunki[position]</span>
+    ...
+});</code></pre></div>
+<p><code>position</code> to indeks klikniętego elementu (od 0) — pasuje do indeksów tablic równoległych.</p>
+<h4>Wygląd listy</h4>
+<div class="table-wrap"><table><thead><tr><th>Wymaganie</th><th>XML</th></tr></thead><tbody><tr><td>separator w kolorze Crimson, widoczny</td><td><code>android:divider="#DC143C"</code> + <code>android:dividerHeight="2dp"</code></td></tr><tr><td>„wysokość dopasowana do liczby elementów”</td><td><code>android:layout_height="wrap_content"</code></td></tr><tr><td>lista wypełnia resztę ekranu</td><td><code>android:layout_height="0dp"</code> + <code>android:layout_weight="1"</code></td></tr></tbody></table></div>
+<h4>Własny układ elementu (jak w pomocy z arkusza)</h4>
+<p>Plik <code>res/layout/list_item.xml</code> (prawy przycisk na <code>layout</code> → <em>New → Layout Resource File</em>):</p>
+<div class="code"><div class="code-bar"><span>XML</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml"><span class="t-k">&lt;TextView</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvElement"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+    <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span></code></pre></div>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">adapter = <span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, <span class="t-t">R</span>.layout.list_item, <span class="t-t">R</span>.id.tvElement, lektury);</code></pre></div>
+<p><strong>Ćwiczenie natychmiastowe:</strong> w przykładzie dodaj piąte miasto do tablicy i uruchom. Potem zmień <code>layout_height</code> listy na <code>0dp</code> z wagą 1 — co się zmieniło?</p></section>
+<section class="sec" id="przyklad"><h2><span class="sec-num">3.</span> Przykład</h2><p>Lista z tablicy i reakcja na kliknięcie elementu. Numer pozycji dla człowieka to <code>position + 1</code>.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:12.8px"><div class="m-t" style="font-size:17.6px">Wybrano: Warszawa (pozycja 3)</div><div class="m-list" style="align-self:stretch"><div class="m-li" style="border-bottom:1px solid #dddddd;">Pułtusk</div><div class="m-li" style="border-bottom:1px solid #dddddd;">Ciechanów</div><div class="m-li" style="border-bottom:1px solid #dddddd;">Warszawa</div><div class="m-li" style="border-bottom:1px solid #dddddd;">Płock</div></div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po kliknięciu „Warszawa”</figcaption></figure></div><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvWybor"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Wybierz miasto"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"22sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ListView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/lvMiasta"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ArrayAdapter</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ListView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">String</span>[] miasta = {<span class="t-s">"Pułtusk"</span>, <span class="t-s">"Ciechanów"</span>, <span class="t-s">"Warszawa"</span>, <span class="t-s">"Płock"</span>};
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        <span class="t-t">TextView</span> tvWybor = findViewById(<span class="t-t">R</span>.id.tvWybor);
+        <span class="t-t">ListView</span> lvMiasta = findViewById(<span class="t-t">R</span>.id.lvMiasta);
+
+        <span class="t-c">// dane (tablica) -&gt; adapter -&gt; lista na ekranie</span>
+        <span class="t-t">ArrayAdapter</span>&lt;<span class="t-t">String</span>&gt; adapter = <span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, android.<span class="t-t">R</span>.layout.simple_list_item_1, miasta);
+        lvMiasta.setAdapter(adapter);
+
+        <span class="t-c">// kliknięcie elementu: position = indeks w tablicy (od 0)</span>
+        lvMiasta.setOnItemClickListener((parent, view, position, id) -&gt; {
+            <span class="t-t">String</span> miasto = (<span class="t-t">String</span>) parent.getItemAtPosition(position);
+            tvWybor.setText(<span class="t-s">"Wybrano: "</span> + miasto + <span class="t-s">" (pozycja "</span> + (position + <span class="t-n">1</span>) + <span class="t-s">")"</span>);
+        });
+    }
+}</code></pre></div></section>
+<section class="sec" id="mikro"><h2><span class="sec-num">4.</span> Mikroćwiczenia</h2><div class="micro"><h4>Ćwiczenie 9.1 — Zapisz adapter</h4><p>Masz <code>String[] gatunki = {"Pies", "Kot", "Świnka morska"};</code> i <code>ListView lvGatunki</code>. Napisz dwie linie, które wyświetlą gatunki na liście.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-t">ArrayAdapter</span>&lt;<span class="t-t">String</span>&gt; adapter = <span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, android.<span class="t-t">R</span>.layout.simple_list_item_1, gatunki);
+lvGatunki.setAdapter(adapter);</code></pre></div></div></details></div><div class="micro"><h4>Ćwiczenie 9.2 — Dlaczego lista się nie zmienia?</h4><p>Po kliknięciu DODAJ kod wykonuje <code>notatki.add(tekst);</code>. W <code>Logcat</code> nie ma błędu, ale na liście nie pojawia się nowy element. Co dopisać?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>adapter.notifyDataSetChanged();</code> — adapter musi być polem klasy, żeby był dostępny w obsłudze przycisku.</p></div></details></div><div class="micro"><h4>Ćwiczenie 9.3 — Stały rozmiar</h4><p><code>List&lt;String&gt; lista = Arrays.asList("a", "b"); lista.add("c");</code> — co się stanie? Jak to naprawić?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Wyjątek <code>UnsupportedOperationException</code> (lista stałego rozmiaru). Naprawa: <code>ArrayList&lt;String&gt; lista = new ArrayList&lt;&gt;(Arrays.asList("a", "b"));</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 9.4 — Tablice równoległe</h4><p>Lista gatunków „Pies”, „Kot”, „Świnka morska”, maksymalne wieki 18, 20, 9 (Arkusz_10). Po kliknięciu ustaw maksimum suwaka <code>sbWiek</code>. Napisz obsługę bez <code>if</code>.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] maksWiek = {<span class="t-n">18</span>, <span class="t-n">20</span>, <span class="t-n">9</span>};
+...
+lvGatunki.setOnItemClickListener((parent, view, position, id) -&gt; {
+    sbWiek.setMax(maksWiek[position]);
+    tvWiek.setText(<span class="t-t">String</span>.valueOf(sbWiek.getProgress()));
+});</code></pre></div></div></details></div><div class="micro"><h4>Ćwiczenie 9.5 — Separator</h4><p>Arkusz_05: „kolor separatora Crimson, separator jest widoczny (np. poprzez ustawienie wysokości separatora)”. Dopisz atrybuty <code>ListView</code>.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>android:divider="#DC143C"</code> i <code>android:dividerHeight="2dp"</code> (sam kolor bez wysokości może dać niewidoczną linię).</p></div></details></div></section>
+<section class="sec" id="prowadzone"><h2><span class="sec-num">5.</span> Zadanie prowadzone</h2><div class="task" id="b09-prowadzone">
+<div class="task-head"><h3>Lista zakupów</h3><span class="meta">⏱ ok. 35 min</span></div>
+<p>Mechanizm z Arkusza_05 w innym kontekście: pole i przycisk w jednym rzędzie, lista z separatorem, licznik pozycji. Dodatkowo — walidacja pustego pola.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:0px"><div class="m-t" style="background:#EF6C00;color:#fff;font-size:22.4px;padding:8px;align-self:stretch">Lista zakupów</div><div class="m-row" style="margin:8px;align-self:stretch;align-items:center"><div class="m-e" style="flex:1 1 0;min-width:0;align-self:stretch"><span class="m-hint" style="">Produkt</span></div><div class="m-b" style="background:#EF6C00;color:#ffffff;align-self:flex-start">DODAJ</div></div><div class="m-t" style="margin:0px 0px 0px 8px">Pozycji: 3</div><div class="m-list" style="align-self:stretch"><div class="m-li" style="border-bottom:1px solid #EF6C00;">chleb</div><div class="m-li" style="border-bottom:1px solid #EF6C00;">mleko</div><div class="m-li" style="border-bottom:1px solid #EF6C00;">jabłka</div></div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po dodaniu „jabłka”</figcaption></figure></div>
+<p><strong>Działanie:</strong> na starcie lista zawiera „chleb” i „mleko”, napis „Pozycji: 2”. DODAJ dopisuje produkt na koniec listy, czyści pole i aktualizuje licznik. Puste pole → <code>Toast</code> „Wpisz nazwę produktu”, lista bez zmian.</p>
+<p><strong>Kroki:</strong></p>
+<ol><li>XML: tytuł (<code>#EF6C00</code>), rząd [pole (0dp, waga 1) + przycisk DODAJ], napis licznika, <code>ListView</code> wypełniający resztę ekranu z separatorem <code>#EF6C00</code> 1dp.</li><li>Java: pola <code>ArrayList&lt;String&gt; zakupy</code>, <code>ArrayAdapter&lt;String&gt; adapter</code>.</li><li>W <code>onCreate</code>: dwa elementy startowe, adapter, <code>setAdapter</code>.</li><li>DODAJ: odczyt, walidacja, <code>add</code>, <code>notifyDataSetChanged</code>, czyszczenie, licznik (<code>zakupy.size()</code>).</li></ol>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Adapter musisz wywołać w obsłudze przycisku — zadeklaruj go jako pole klasy, nie zmienną lokalną w <code>onCreate</code>.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Kolejność w DODAJ: zmień dane → <code>notifyDataSetChanged()</code> → wyczyść pole → licznik. Czyszczenie: <code>etProdukt.setText("")</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">pola: zakupy = new ArrayList&lt;&gt;(), adapter, etProdukt, tvLiczba
+onCreate: zakupy.add("chleb"); zakupy.add("mleko"); adapter; setAdapter
+DODAJ: produkt ← pole.trim()
+       jeśli pusty → Toast; koniec
+       zakupy.add(produkt); adapter.notifyDataSetChanged()
+       pole ← ""; licznik ← "Pozycji: " + zakupy.size()</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">btnDodaj.setOnClickListener(v -&gt; {
+    <span class="t-t">String</span> produkt = etProdukt.getText().toString().trim();
+    <span class="t-k">if</span> (produkt.isEmpty()) {
+        <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Wpisz nazwę produktu"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+        <span class="t-k">return</span>;
+    }
+    zakupy.add(produkt);
+    adapter.notifyDataSetChanged();
+    etProdukt.setText(<span class="t-s">""</span>);
+    tvLiczba.setText(<span class="t-s">"Pozycji: "</span> + zakupy.size());
+});</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#EF6C00"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Lista zakupów"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;EditText</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/etProdukt"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:hint</span>=<span class="t-s">"Produkt"</span>
+            <span class="t-a">android:inputType</span>=<span class="t-s">"text"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnDodaj"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#EF6C00"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"DODAJ"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvLiczba"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Pozycji: 2"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ListView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/lvZakupy"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"0dp"</span>
+        <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+        <span class="t-a">android:divider</span>=<span class="t-s">"#EF6C00"</span>
+        <span class="t-a">android:dividerHeight</span>=<span class="t-s">"1dp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ArrayAdapter</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ListView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Toast</span>;
+
+<span class="t-k">import</span> java.util.<span class="t-t">ArrayList</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">ArrayList</span>&lt;<span class="t-t">String</span>&gt; zakupy = <span class="t-k">new</span> <span class="t-t">ArrayList</span>&lt;&gt;();
+    <span class="t-k">private</span> <span class="t-t">ArrayAdapter</span>&lt;<span class="t-t">String</span>&gt; adapter;
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etProdukt;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvLiczba;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etProdukt = findViewById(<span class="t-t">R</span>.id.etProdukt);
+        tvLiczba = findViewById(<span class="t-t">R</span>.id.tvLiczba);
+        <span class="t-t">ListView</span> lvZakupy = findViewById(<span class="t-t">R</span>.id.lvZakupy);
+        <span class="t-t">Button</span> btnDodaj = findViewById(<span class="t-t">R</span>.id.btnDodaj);
+
+        zakupy.add(<span class="t-s">"chleb"</span>);
+        zakupy.add(<span class="t-s">"mleko"</span>);
+        adapter = <span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, android.<span class="t-t">R</span>.layout.simple_list_item_1, zakupy);
+        lvZakupy.setAdapter(adapter);
+
+        btnDodaj.setOnClickListener(v -&gt; {
+            <span class="t-t">String</span> produkt = etProdukt.getText().toString().trim();
+            <span class="t-k">if</span> (produkt.isEmpty()) {
+                <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Wpisz nazwę produktu"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+                <span class="t-k">return</span>;
+            }
+            zakupy.add(produkt);             <span class="t-c">// 1. zmiana danych</span>
+            adapter.notifyDataSetChanged();  <span class="t-c">// 2. powiadomienie listy</span>
+            etProdukt.setText(<span class="t-s">""</span>);           <span class="t-c">// 3. porządek w formularzu</span>
+            tvLiczba.setText(<span class="t-s">"Pozycji: "</span> + zakupy.size());
+        });
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b09_prowadzone/">rozwiazania/b09_prowadzone/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b09-prowadzone">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="samodzielne"><h2><span class="sec-num">6.</span> Zadanie samodzielne</h2><div class="task" id="b09-samodzielne">
+<div class="task-head"><h3>Kursy wakacyjne — szczegóły po kliknięciu</h3><span class="meta">⏱ ok. 35 min</span></div>
+<p>Lista stała (z tablicy), a kliknięcie pokazuje dane z tablic równoległych i wynik obliczenia.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:12.8px"><div class="m-t" style="font-size:22.4px;font-weight:700">Kursy wakacyjne</div><div class="m-list" style="margin:8px 0px 8px 0px;align-self:stretch"><div class="m-li" style="border-bottom:2px solid #1D4F91;">Python od zera</div><div class="m-li" style="border-bottom:2px solid #1D4F91;">Tworzenie stron WWW</div><div class="m-li" style="border-bottom:2px solid #1D4F91;">Aplikacje mobilne</div><div class="m-li" style="border-bottom:2px solid #1D4F91;">Sieci komputerowe</div></div><div class="m-t" style="background:#E8EEFB;font-size:14.4px;padding:9.6px;align-self:stretch">Aplikacje mobilne<br>40 godzin, 600 zł (15,00 zł/h)</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po kliknięciu 3. kursu</figcaption></figure></div>
+<ul><li>Kursy: „Python od zera” (20 h, 300 zł), „Tworzenie stron WWW” (30 h, 450 zł), „Aplikacje mobilne” (40 h, 600 zł), „Sieci komputerowe” (25 h, 380 zł).</li><li>Lista o wysokości dopasowanej do liczby elementów, separator <code>#1D4F91</code> 2dp.</li><li>Pod listą pole szczegółów (tło <code>#E8EEFB</code>, padding 12dp), na starcie „Kliknij kurs, aby zobaczyć szczegóły”.</li><li>Po kliknięciu: nazwa kursu, a w nowej linii „&lt;h&gt; godzin, &lt;cena&gt; zł (&lt;cena/h&gt; zł/h)” z dwoma miejscami po przecinku.</li></ul>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Trzy tablice (<code>String[]</code>, <code>int[]</code>, <code>int[]</code>) o tych samych indeksach. W obsłudze kliknięcia używasz <code>position</code>.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Nowa linia w tekście: <code>\n</code>. Dzielenie z ułamkiem: <code>(double) ceny[position] / godziny[position]</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">kliknięcie(position):
+    zaGodzine ← cena[position] / godziny[position] (double)
+    tekst ← nazwa + "\n" + godziny + " godzin, " + cena + " zł (" + format(zaGodzine) + " zł/h)"</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">lvKursy.setOnItemClickListener((parent, view, position, id) -&gt; {
+    <span class="t-k">double</span> zaGodzine = (<span class="t-k">double</span>) ceny[position] / godziny[position];
+    tvSzczegoly.setText(<span class="t-t">String</span>.format(<span class="t-s">"%s\n%d godzin, %d zł (%.2f zł/h)"</span>,
+            kursy[position], godziny[position], ceny[position], zaGodzine));
+});</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Kursy wakacyjne"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ListView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/lvKursy"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginVertical</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:divider</span>=<span class="t-s">"#1D4F91"</span>
+        <span class="t-a">android:dividerHeight</span>=<span class="t-s">"2dp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvSzczegoly"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#E8EEFB"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"12dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Kliknij kurs, aby zobaczyć szczegóły"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ArrayAdapter</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ListView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">String</span>[] kursy = {<span class="t-s">"Python od zera"</span>, <span class="t-s">"Tworzenie stron WWW"</span>, <span class="t-s">"Aplikacje mobilne"</span>, <span class="t-s">"Sieci komputerowe"</span>};
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] godziny = {<span class="t-n">20</span>, <span class="t-n">30</span>, <span class="t-n">40</span>, <span class="t-n">25</span>};
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] ceny = {<span class="t-n">300</span>, <span class="t-n">450</span>, <span class="t-n">600</span>, <span class="t-n">380</span>};
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        <span class="t-t">ListView</span> lvKursy = findViewById(<span class="t-t">R</span>.id.lvKursy);
+        <span class="t-t">TextView</span> tvSzczegoly = findViewById(<span class="t-t">R</span>.id.tvSzczegoly);
+
+        <span class="t-t">ArrayAdapter</span>&lt;<span class="t-t">String</span>&gt; adapter = <span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, android.<span class="t-t">R</span>.layout.simple_list_item_1, kursy);
+        lvKursy.setAdapter(adapter);
+
+        lvKursy.setOnItemClickListener((parent, view, position, id) -&gt; {
+            <span class="t-k">double</span> zaGodzine = (<span class="t-k">double</span>) ceny[position] / godziny[position];
+            tvSzczegoly.setText(<span class="t-t">String</span>.format(<span class="t-s">"%s\n%d godzin, %d zł (%.2f zł/h)"</span>,
+                    kursy[position], godziny[position], ceny[position], zaGodzine));
+        });
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b09_samodzielne/">rozwiazania/b09_samodzielne/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b09-samodzielne">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="inf04"><h2><span class="sec-num">7.</span> Zadanie w stylu INF.04</h2><div class="task exam" id="b09-inf">
+<div class="task-head"><h3>Moje lektury</h3><span class="meta">⏱ ok. 50 min</span></div>
+<p>Wykonaj aplikację mobilną do prowadzenia listy lektur. Dane początkowe zapisano w pliku <code>lektury.txt</code> w archiwum <code>zasoby_b09-inf.zip</code>.</p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>tytuł; rząd: pole + przycisk DODAJ; napis liczby; napis „Wybrano”; lista (własny układ elementu); autor</td></tr><tr><td>DANE</td><td>tytuł lektury wpisany w polu; kliknięty element listy</td></tr><tr><td>ZDARZENIA</td><td>kliknięcie DODAJ; kliknięcie elementu listy</td></tr><tr><td>LOGIKA</td><td>ArrayList + adapter z R.layout.list_item; walidacja: puste pole, duplikat (contains); dopisanie + notifyDataSetChanged</td></tr><tr><td>WYNIK</td><td>nowy element na końcu listy, „Liczba lektur: n”, „Wybrano: &lt;tytuł&gt; (pozycja n)”, Toast przy błędzie</td></tr><tr><td>WYGLĄD</td><td>tło #EFEBE9; tytuł #4E342E biały; przycisk #8D6E63; separator #8D6E63 2dp; element listy 18sp, padding 10, kolor #3E2723</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#EFEBE9;padding:0px"><div class="m-t" style="background:#4E342E;color:#fff;font-size:22.4px;padding:8px;align-self:stretch">Moje lektury</div><div class="m-row" style="margin:8px;align-self:stretch;align-items:center"><div class="m-e" style="flex:1 1 0;min-width:0;align-self:stretch"><span class="m-hint" style="">Tytuł lektury</span></div><div class="m-b" style="background:#8D6E63;color:#ffffff;align-self:flex-start">DODAJ</div></div><div class="m-t" style="font-weight:700;margin:0px 0px 0px 8px">Liczba lektur: 3</div><div class="m-t" style="margin:0px 8px 0px 8px">Wybrano: —</div><div class="m-list" style="font-size:14.4px;margin:8px 0px 0px 0px;align-self:stretch"><div class="m-li" style="border-bottom:2px solid #8D6E63;color:#3E2723">Pan Tadeusz</div><div class="m-li" style="border-bottom:2px solid #8D6E63;color:#3E2723">Lalka</div><div class="m-li" style="border-bottom:2px solid #8D6E63;color:#3E2723">Zbrodnia i kara</div></div><div class="m-t" style="color:#808080;margin:112px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Stan początkowy</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#EFEBE9;padding:0px"><div class="m-t" style="background:#4E342E;color:#fff;font-size:22.4px;padding:8px;align-self:stretch">Moje lektury</div><div class="m-row" style="margin:8px;align-self:stretch;align-items:center"><div class="m-e" style="flex:1 1 0;min-width:0;align-self:stretch"><span class="m-hint" style="">Tytuł lektury</span></div><div class="m-b" style="background:#8D6E63;color:#ffffff;align-self:flex-start">DODAJ</div></div><div class="m-t" style="font-weight:700;margin:0px 0px 0px 8px">Liczba lektur: 4</div><div class="m-t" style="margin:0px 8px 0px 8px">Wybrano: Lalka (pozycja 2)</div><div class="m-list" style="font-size:14.4px;margin:8px 0px 0px 0px;align-self:stretch"><div class="m-li" style="border-bottom:2px solid #8D6E63;color:#3E2723">Pan Tadeusz</div><div class="m-li" style="border-bottom:2px solid #8D6E63;color:#3E2723">Lalka</div><div class="m-li" style="border-bottom:2px solid #8D6E63;color:#3E2723">Zbrodnia i kara</div><div class="m-li" style="border-bottom:2px solid #8D6E63;color:#3E2723">Quo vadis</div></div><div class="m-t" style="color:#808080;margin:80px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 2. Dodano „Quo vadis”, kliknięto „Lalka”</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Moje lektury”.</li><li>Pole edycyjne z podpowiedzią „Tytuł lektury” i przycisk „DODAJ” w jednym rzędzie.</li><li>Napis „Liczba lektur: 3”.</li><li>Napis „Wybrano: —”.</li><li>Lista (element widoku listy).</li><li>Napis „Autor: ”, dalej numer zdającego (na dole ekranu).</li></ul>
+<p><strong>Działanie aplikacji:</strong></p>
+<ul><li>W stanie początkowym lista zawiera 3 lektury z pliku <code>lektury.txt</code> (można je wpisać do kodu).</li><li>Po wybraniu „DODAJ” tytuł z pola jest dopisywany jako <strong>ostatni</strong> element listy, lista odświeża się automatycznie, pole jest czyszczone, a napis liczby lektur jest aktualizowany.</li><li>Jeżeli pole jest puste — komunikat w oknie <code>Toast</code> „Wpisz tytuł lektury”. Jeżeli taki tytuł już jest na liście — <code>Toast</code> „Ta lektura już jest na liście”. W obu przypadkach lista się nie zmienia.</li><li>Kliknięcie elementu listy wyświetla „Wybrano: &lt;tytuł&gt; (pozycja &lt;n&gt;)”, gdzie n liczone jest od 1.</li></ul>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs w XML; rozkład liniowy pionowy z zagnieżdżonym rozkładem poziomym dla pola i przycisku; pole zajmuje całą wolną szerokość rzędu.</li><li>Lektury zapisane w kolekcji <code>ArrayList&lt;String&gt;</code> połączonej z listą jako jej źródło danych.</li><li>Element listy zdefiniowany we własnym pliku układu <code>list_item.xml</code>: czcionka 18, marginesy wewnętrzne 10, kolor #3E2723.</li><li>Tło strony #EFEBE9; tytuł: tło #4E342E, biała czcionka, największa, marginesy wewnętrzne 10. Przycisk: tło #8D6E63, biała czcionka.</li><li>Separator listy koloru #8D6E63, wysokość 2. Lista wypełnia wolną przestrzeń między napisami a podpisem autora.</li></ul>
+<h4>Zasoby do zadania</h4><div class="res-list"><figure><a href="../assets/zasoby/lektury.txt" download>📄 lektury.txt</a></figure></div><p class="small">Pobierz wszystkie: <a href="../materialy/zasoby_b09-inf.zip" download>zasoby_b09-inf.zip</a>. Obrazy skopiuj do <code>app/src/main/res/drawable</code> (nazwy: małe litery, bez spacji i myślników).</p>
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b09-inf"><li><label><input type="checkbox"> <span>na starcie 3 lektury, „Liczba lektur: 3”, „Wybrano: —”</span></label></li><li><label><input type="checkbox"> <span>dodanie „Quo vadis” → ostatni element, pole wyczyszczone, „Liczba lektur: 4”</span></label></li><li><label><input type="checkbox"> <span>puste pole → Toast; „Lalka” ponownie → Toast o duplikacie; lista bez zmian</span></label></li><li><label><input type="checkbox"> <span>kliknięcie drugiego elementu → „Wybrano: Lalka (pozycja 2)”</span></label></li><li><label><input type="checkbox"> <span>istnieje <code>res/layout/list_item.xml</code>, adapter używa <code>R.layout.list_item</code> i <code>R.id.tvElement</code></span></label></li><li><label><input type="checkbox"> <span>separator #8D6E63 2dp; lista wypełnia wolne miejsce (0dp + waga 1); autor na dole</span></label></li><li><label><input type="checkbox"> <span><code>ArrayList</code>, a nie <code>Arrays.asList</code> bez opakowania</span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Zacznij od <code>list_item.xml</code> i adaptera z czterema argumentami — bez tego lista nie wyświetli się w wymaganym stylu.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Duplikat: <code>lektury.contains(tytul)</code>. Lista startowa: <code>new ArrayList&lt;&gt;(Arrays.asList("Pan Tadeusz", "Lalka", "Zbrodnia i kara"))</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">DODAJ → dodajLekture():
+    tytul ← pole.trim()
+    jeśli pusty → Toast "Wpisz tytuł lektury"
+    inaczej jeśli lektury.contains(tytul) → Toast "Ta lektura już jest na liście"
+    inaczej → add; notifyDataSetChanged; wyczyść pole; licznik
+klik elementu(position) → "Wybrano: " + lektury.get(position) + " (pozycja " + (position+1) + ")"</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">adapter = <span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, <span class="t-t">R</span>.layout.list_item, <span class="t-t">R</span>.id.tvElement, lektury);
+lvLektury.setAdapter(adapter);
+lvLektury.setOnItemClickListener((parent, view, position, id) -&gt;
+        tvWybrano.setText(<span class="t-s">"Wybrano: "</span> + lektury.get(position) + <span class="t-s">" (pozycja "</span> + (position + <span class="t-n">1</span>) + <span class="t-s">")"</span>));</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#EFEBE9"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#4E342E"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Moje lektury"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;EditText</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/etTytul"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:hint</span>=<span class="t-s">"Tytuł lektury"</span>
+            <span class="t-a">android:inputType</span>=<span class="t-s">"text"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnDodaj"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#8D6E63"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"DODAJ"</span>
+            <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvLiczba"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Liczba lektur: 3"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvWybrano"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Wybrano: —"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ListView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/lvLektury"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"0dp"</span>
+        <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:divider</span>=<span class="t-s">"#8D6E63"</span>
+        <span class="t-a">android:dividerHeight</span>=<span class="t-s">"2dp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvAutor"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"6dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>res/layout/list_item.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;TextView</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvElement"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+    <span class="t-a">android:textColor</span>=<span class="t-s">"#3E2723"</span>
+    <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ArrayAdapter</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">EditText</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ListView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Toast</span>;
+
+<span class="t-k">import</span> java.util.<span class="t-t">ArrayList</span>;
+<span class="t-k">import</span> java.util.<span class="t-t">Arrays</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-c">// dane początkowe skopiowane z pliku lektury.txt</span>
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">ArrayList</span>&lt;<span class="t-t">String</span>&gt; lektury = <span class="t-k">new</span> <span class="t-t">ArrayList</span>&lt;&gt;(<span class="t-t">Arrays</span>.asList(<span class="t-s">"Pan Tadeusz"</span>, <span class="t-s">"Lalka"</span>, <span class="t-s">"Zbrodnia i kara"</span>));
+    <span class="t-k">private</span> <span class="t-t">ArrayAdapter</span>&lt;<span class="t-t">String</span>&gt; adapter;
+
+    <span class="t-k">private</span> <span class="t-t">EditText</span> etTytul;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvLiczba, tvWybrano;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        etTytul = findViewById(<span class="t-t">R</span>.id.etTytul);
+        tvLiczba = findViewById(<span class="t-t">R</span>.id.tvLiczba);
+        tvWybrano = findViewById(<span class="t-t">R</span>.id.tvWybrano);
+        <span class="t-t">ListView</span> lvLektury = findViewById(<span class="t-t">R</span>.id.lvLektury);
+        <span class="t-t">Button</span> btnDodaj = findViewById(<span class="t-t">R</span>.id.btnDodaj);
+
+        <span class="t-c">// własny układ elementu listy: R.layout.list_item, w nim TextView o id tvElement</span>
+        adapter = <span class="t-k">new</span> <span class="t-t">ArrayAdapter</span>&lt;&gt;(<span class="t-k">this</span>, <span class="t-t">R</span>.layout.list_item, <span class="t-t">R</span>.id.tvElement, lektury);
+        lvLektury.setAdapter(adapter);
+
+        btnDodaj.setOnClickListener(v -&gt; dodajLekture());
+
+        lvLektury.setOnItemClickListener((parent, view, position, id) -&gt;
+                tvWybrano.setText(<span class="t-s">"Wybrano: "</span> + lektury.get(position) + <span class="t-s">" (pozycja "</span> + (position + <span class="t-n">1</span>) + <span class="t-s">")"</span>));
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> dodajLekture() {
+        <span class="t-t">String</span> tytul = etTytul.getText().toString().trim();
+        <span class="t-k">if</span> (tytul.isEmpty()) {
+            <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Wpisz tytuł lektury"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+        } <span class="t-k">else</span> <span class="t-k">if</span> (lektury.contains(tytul)) {
+            <span class="t-t">Toast</span>.makeText(<span class="t-k">this</span>, <span class="t-s">"Ta lektura już jest na liście"</span>, <span class="t-t">Toast</span>.<span class="t-t">LENGTH_SHORT</span>).show();
+        } <span class="t-k">else</span> {
+            lektury.add(tytul);
+            adapter.notifyDataSetChanged();
+            etTytul.setText(<span class="t-s">""</span>);
+            tvLiczba.setText(<span class="t-s">"Liczba lektur: "</span> + lektury.size());
+        }
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b09_inf/">rozwiazania/b09_inf/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b09-inf">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="checklista"><h2><span class="sec-num">8.</span> Checklista</h2><p class="small muted">Sprawdź swoją aplikację z zadania INF.04 punkt po punkcie (krok 10 procedury).</p><ul class="checklist" data-key="b09-check"><li><label><input type="checkbox"> <span>dane listy w <code>ArrayList</code> (gdy dopisujemy) lub tablicy (gdy lista stała)</span></label></li><li><label><input type="checkbox"> <span>adapter jest polem klasy, jeśli używam go poza <code>onCreate</code></span></label></li><li><label><input type="checkbox"> <span>po każdej zmianie kolekcji wywołuję <code>notifyDataSetChanged()</code></span></label></li><li><label><input type="checkbox"> <span>w kliknięciu elementu korzystam z <code>position</code> (od 0)</span></label></li><li><label><input type="checkbox"> <span>separator: <code>divider</code> + <code>dividerHeight</code></span></label></li><li><label><input type="checkbox"> <span>wysokość listy zgodna z poleceniem (<code>wrap_content</code> lub <code>0dp</code> + waga)</span></label></li><li><label><input type="checkbox"> <span>własny układ elementu: plik w <code>res/layout</code> i poprawne id <code>TextView</code> w adapterze</span></label></li></ul></section>
+<section class="sec" id="test"><h2><span class="sec-num">9.</span> Mini-test</h2><div class="quiz" data-quiz="b09"><script type="application/json">[{"q": "<p>Co wyświetla elementy kolekcji w <code>ListView<\/code>?<\/p>", "o": ["<code>setText<\/code>", "<code>ArrayAdapter<\/code> ustawiony przez <code>setAdapter<\/code>", "<code>setItems<\/code>", "pętla <code>for<\/code> z <code>addView<\/code>"], "a": 1, "e": "<p>Adapter tłumaczy każdy element kolekcji na wiersz listy.<\/p>"}, {"q": "<p>Arkusz_05: „widok listy jest automatycznie odświeżany” po dopisaniu. Co wywołać po <code>add<\/code>?<\/p>", "o": ["<code>lv.refresh()<\/code>", "<code>adapter.notifyDataSetChanged()<\/code>", "<code>setContentView<\/code> ponownie", "<code>lv.invalidate()<\/code>"], "a": 1, "e": "<p>To metoda z pomocy do arkusza: powiadamia widok o zmianie danych.<\/p>"}, {"q": "<p>Użytkownik klika trzeci element listy. Wartość <code>position<\/code>:<\/p>", "o": ["3", "2", "1", "0"], "a": 1, "e": "<p>Indeksy od 0.<\/p>"}, {"q": "<p>Która lista pozwoli na <code>add<\/code>?<\/p>", "o": ["<code>Arrays.asList(\"a\",\"b\")<\/code>", "<code>new ArrayList&lt;&gt;(Arrays.asList(\"a\",\"b\"))<\/code>", "<code>new String[]{\"a\",\"b\"}<\/code>", "<code>List.of(\"a\",\"b\")<\/code>"], "a": 1, "e": "<p><code>Arrays.asList<\/code> i <code>List.of<\/code> mają stały rozmiar; tablica nie ma <code>add<\/code>.<\/p>"}, {"q": "<p>Konstruktor <code>new ArrayAdapter&lt;&gt;(this, R.layout.list_item, R.id.tvElement, lista)<\/code> — czym jest <code>R.id.tvElement<\/code>?<\/p>", "o": ["id listy w <code>activity_main.xml<\/code>", "id <code>TextView<\/code> w pliku <code>list_item.xml<\/code>, do którego trafia tekst elementu", "id aktywności", "nazwa pliku"], "a": 1, "e": "<p>Tak opisuje to pomoc w arkuszu: „textView1 jest id kontrolki w tym rozkładzie”.<\/p>"}, {"q": "<p>„Cechy listy: wysokość dopasowana do liczby elementów” (Arkusz_10):<\/p>", "o": ["<code>layout_height=\"match_parent\"<\/code>", "<code>layout_height=\"wrap_content\"<\/code>", "<code>layout_height=\"0dp\"<\/code> + waga", "<code>android:lines=\"3\"<\/code>"], "a": 1, "e": "<p><code>wrap_content<\/code> — lista ma tyle wysokości, ile potrzebują elementy.<\/p>"}]</script></div></section>
+<section class="sec" id="dodatkowe"><h2><span class="sec-num">10.</span> Skończyłeś wcześniej?</h2><div class="micro"><h4>Usuwanie długim przytrzymaniem</h4><p>Dodaj do listy lektur usuwanie elementu po przytrzymaniu (i aktualizację licznika).</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p><code>lvLektury.setOnItemLongClickListener((parent, view, position, id) -&gt; { lektury.remove(position); adapter.notifyDataSetChanged(); …; return true; });</code></p></div></details></div><div class="micro"><h4>Notatki z Arkusza_05 w 12 minut</h4><p>Pole z podpowiedzią „Nowy element” + przycisk „DODAJ” (Crimson, biała czcionka) w rzędzie, lista z separatorem Crimson, 3 notatki startowe. Zmierz czas.</p></div><div class="micro"><h4>Sortowanie</h4><p>Dodaj przycisk „SORTUJ A–Z”.</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p><code>Collections.sort(lektury); adapter.notifyDataSetChanged();</code> — import <code>java.util.Collections</code>.</p></div></details></div></section>
+<div class="nav-bottom"><a class="btn secondary" href="blok08.html">← Blok 8</a><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button><a class="btn secondary" href="blok10.html">Blok 10 →</a></div></article></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
