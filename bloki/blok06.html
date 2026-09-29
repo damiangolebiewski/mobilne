@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blok 6 — Obrazy i zasoby graficzne</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../" data-page="block" data-block="b06">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html" class="active">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="block-layout"><aside class="toc no-print"><strong>Blok 6</strong><ol><li><a href="#cel">Cel</a></li><li><a href="#przypomnienie">Krótkie przypomnienie</a></li><li><a href="#przyklad">Przykład</a></li><li><a href="#mikro">Mikroćwiczenia</a></li><li><a href="#prowadzone">Zadanie prowadzone</a></li><li><a href="#samodzielne">Zadanie samodzielne</a></li><li><a href="#inf04">Zadanie w stylu INF.04</a></li><li><a href="#checklista">Checklista</a></li><li><a href="#test">Mini-test</a></li><li><a href="#dodatkowe">Skończyłeś wcześniej?</a></li></ol><a class="skip" href="#samodzielne">Silniejszy? Przejdź od razu do zadania samodzielnego →</a><p class="small muted" style="margin-top:.8rem">Słabszy? Przypomnienie → Przykład → Mikroćwiczenia → Zadanie prowadzone (z podpowiedziami).</p></aside><article class="page"><div class="block-head"><div><div class="muted small"><a href="../index.html">Bloki</a> › Blok 6</div><h1>Blok 6. Obrazy i zasoby graficzne</h1><span class="badge p2">Faza II — łączenie umiejętności</span> <span id="block-status" class="badge">W trakcie</span></div><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button></div>
+<p>Dodajesz obrazy z archiwum do projektu, wyświetlasz je w ImageView o zadanych wymiarach i zmieniasz z kodu. Budujesz galerię z przewijaniem w obie strony na tablicach równoległych.</p>
+<section class="sec" id="cel"><h2><span class="sec-num">1.</span> Cel</h2><p><strong>Po wykonaniu tego bloku będziesz potrafił:</strong></p><ul><li>skopiować obrazy do <code>res/drawable</code> z poprawnymi nazwami i użyć ich w XML (<code>@drawable/…</code>) i w Javie (<code>R.drawable.…</code>),</li><li>ustawić wymiary i dopasowanie obrazu (<code>layout_height</code>, <code>scaleType</code>, <code>adjustViewBounds</code>),</li><li>zmienić obraz w reakcji na zdarzenie (<code>setImageResource</code>),</li><li>przechowywać obrazy i opisy w tablicach równoległych i przechodzić po nich cyklicznie w przód i w tył.</li></ul><details class="hint"><summary>Plan czasu (4 × 45 min = 180 min)</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>Przypomnienie</td><td>15 min</td></tr><tr><td>Przykład</td><td>10 min</td></tr><tr><td>Mikroćwiczenia</td><td>25 min</td></tr><tr><td>Zadanie prowadzone</td><td>35 min</td></tr><tr><td>Zadanie samodzielne</td><td>35 min</td></tr><tr><td>Zadanie INF.04</td><td>50 min</td></tr><tr><td>Checklista + mini-test</td><td>10 min</td></tr><tr><th>Razem</th><th>180 min</th></tr></tbody></table></div></div></details><p class="small muted">Powiązanie z arkuszami: obrazy z archiwum w zasobach — Arkusze 02, 12, 13; obraz na całą szerokość — 02; wysokości 60 i 150 — 12, 13; obraz zmieniany z kodu (tablica identyfikatorów) — 12; nawigacja poprzedni/następny — desktop Arkusz_11.</p></section>
+<section class="sec" id="przypomnienie"><h2><span class="sec-num">2.</span> Krótkie przypomnienie</h2><h4>Obraz z archiwum → projekt</h4>
+<ol><li>Rozpakuj archiwum (na egzaminie jest zabezpieczone hasłem podanym w arkuszu).</li><li>Skopiuj pliki (Ctrl+C) i wklej w Android Studio na folder <strong>res → drawable</strong> (Ctrl+V) → wybierz katalog <code>drawable</code> (bez dopisku <code>-v24</code>).</li><li><strong>Nazwa zasobu</strong>: tylko małe litery, cyfry i <code>_</code>, zaczyna się literą. <code>obraz.jpg</code> → OK; <code>Obraz 1.JPG</code>, <code>000-zdjecie.jpg</code>, <code>pralka-1.jpg</code> → błąd budowania. Zmień nazwę: prawy przycisk → <em>Refactor → Rename</em> (Shift+F6).</li><li>W XML: <code>@drawable/obraz</code> (bez rozszerzenia). W Javie: <code>R.drawable.obraz</code>.</li></ol>
+<h4>ImageView</h4>
+<div class="code"><div class="code-bar"><span>XML</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml"><span class="t-k">&lt;ImageView</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivObraz"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"150dp"</span>
+    <span class="t-a">android:src</span>=<span class="t-s">"@drawable/obraz"</span>
+    <span class="t-a">android:scaleType</span>=<span class="t-s">"centerCrop"</span>
+    <span class="t-a">android:contentDescription</span>=<span class="t-s">"Opis obrazu"</span> <span class="t-k">/&gt;</span></code></pre></div>
+<div class="table-wrap"><table><thead><tr><th><code>scaleType</code></th><th>Efekt</th><th>Kiedy</th></tr></thead><tbody><tr><td><code>centerCrop</code></td><td>wypełnia cały obszar, przycina brzegi</td><td>„obraz wypełnia całą szerokość strony” (Arkusz_02)</td></tr><tr><td><code>fitCenter</code> (domyślny)</td><td>cały obraz widoczny, mogą zostać paski</td><td>ikony, kości, „obrazy widoczne w całości” (Arkusz_12)</td></tr><tr><td><code>fitXY</code></td><td>rozciąga bez zachowania proporcji</td><td>rzadko — zniekształca</td></tr></tbody></table></div>
+<p><code>android:adjustViewBounds="true"</code> + <code>layout_height="wrap_content"</code> → wysokość wynika z proporcji obrazu.</p>
+<h4>Zmiana obrazu z kodu</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">ivObraz.setImageResource(<span class="t-t">R</span>.drawable.deszcz);</code></pre></div>
+<h4>Tablice równoległe i cykl w obie strony</h4>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] obrazy = {<span class="t-t">R</span>.drawable.gory, <span class="t-t">R</span>.drawable.las, <span class="t-t">R</span>.drawable.jezioro};
+<span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">String</span>[] nazwy = {<span class="t-s">"Góry"</span>, <span class="t-s">"Las"</span>, <span class="t-s">"Jezioro"</span>};
+<span class="t-k">private</span> <span class="t-k">int</span> indeks = <span class="t-n">0</span>;
+
+<span class="t-c">// następny: 0 → 1 → 2 → 0</span>
+indeks = (indeks + <span class="t-n">1</span>) % obrazy.length;
+<span class="t-c">// poprzedni: 0 → 2 → 1 → 0   (+ długość, żeby nie było liczby ujemnej)</span>
+indeks = (indeks - <span class="t-n">1</span> + obrazy.length) % obrazy.length;
+
+ivObraz.setImageResource(obrazy[indeks]);
+tvNazwa.setText(nazwy[indeks]);</code></pre></div>
+<div class="box box-warn"><p><code>R.drawable.gory</code> to <strong>liczba</strong> (<code>int</code>), nie tekst. Tablica obrazów ma typ <code>int[]</code>, a parametr metody — <code>int</code>.</p></div>
+<p><strong>Ćwiczenie natychmiastowe:</strong> skopiuj <code>slonce.png</code> i <code>deszcz.png</code> (zasoby przykładu) do projektu i uruchom przykład. Potem zmień <code>scaleType</code> na <code>fitCenter</code> i porównaj.</p></section>
+<section class="sec" id="przyklad"><h2><span class="sec-num">3.</span> Przykład</h2><p>Obraz na całą szerokość i dwa przyciski, które go podmieniają. Zasoby: <code>slonce.png</code>, <code>deszcz.png</code> (w zasobach zadania prowadzonego).</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:0px"><div class="m-img" style="height:160px;align-self:stretch"><img src="../assets/zasoby/deszcz.png" alt="" style="object-fit:cover"></div><div class="m-row" style="align-self:stretch"><div class="m-b" style="background:#6750A4;color:#ffffff;flex:1 1 0;min-width:0">SŁOŃCE</div><div class="m-b" style="background:#6750A4;color:#ffffff;flex:1 1 0;min-width:0">DESZCZ</div></div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po kliknięciu „DESZCZ”</figcaption></figure></div><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;ImageView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivObraz"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"200dp"</span>
+        <span class="t-a">android:contentDescription</span>=<span class="t-s">"Pogoda"</span>
+        <span class="t-a">android:scaleType</span>=<span class="t-s">"centerCrop"</span>
+        <span class="t-a">android:src</span>=<span class="t-s">"@drawable/slonce"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnSlonce"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"SŁOŃCE"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnDeszcz"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"DESZCZ"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ImageView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        <span class="t-t">ImageView</span> ivObraz = findViewById(<span class="t-t">R</span>.id.ivObraz);
+        <span class="t-t">Button</span> btnSlonce = findViewById(<span class="t-t">R</span>.id.btnSlonce);
+        <span class="t-t">Button</span> btnDeszcz = findViewById(<span class="t-t">R</span>.id.btnDeszcz);
+
+        <span class="t-c">// plik res/drawable/deszcz.png  -&gt;  identyfikator R.drawable.deszcz</span>
+        btnSlonce.setOnClickListener(v -&gt; ivObraz.setImageResource(<span class="t-t">R</span>.drawable.slonce));
+        btnDeszcz.setOnClickListener(v -&gt; ivObraz.setImageResource(<span class="t-t">R</span>.drawable.deszcz));
+    }
+}</code></pre></div></section>
+<section class="sec" id="mikro"><h2><span class="sec-num">4.</span> Mikroćwiczenia</h2><div class="micro"><h4>Ćwiczenie 6.1 — Poprawne nazwy</h4><p>Które pliki można wkleić do <code>drawable</code> bez zmiany nazwy? <code>pralka.jpg</code>, <code>Odkurzacz.jpg</code>, <code>question.jpg</code>, <code>kosc-1.png</code>, <code>1.png</code>, <code>obraz_2.png</code>, <code>000-zdjecie.jpg</code>. Zaproponuj nowe nazwy dla błędnych.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Poprawne: <code>pralka.jpg</code>, <code>question.jpg</code>, <code>obraz_2.png</code>. Zmień: <code>Odkurzacz.jpg</code> → <code>odkurzacz.jpg</code>, <code>kosc-1.png</code> → <code>kosc1.png</code> lub <code>kosc_1.png</code>, <code>1.png</code> → <code>kosc1.png</code>, <code>000-zdjecie.jpg</code> → <code>zdjecie_000.jpg</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 6.2 — Specyfikacja obrazu</h4><p>Napisz <code>ImageView</code> wg Arkusza_13: obraz <code>pralka</code>, wysokość 150, marginesy lewy, prawy i dolny 20, górny 0.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>XML</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml"><span class="t-k">&lt;ImageView</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivPralka"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"150dp"</span>
+    <span class="t-a">android:adjustViewBounds</span>=<span class="t-s">"true"</span>
+    <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"20dp"</span>
+    <span class="t-a">android:layout_marginEnd</span>=<span class="t-s">"20dp"</span>
+    <span class="t-a">android:layout_marginBottom</span>=<span class="t-s">"20dp"</span>
+    <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"0dp"</span>
+    <span class="t-a">android:src</span>=<span class="t-s">"@drawable/pralka"</span>
+    <span class="t-a">android:contentDescription</span>=<span class="t-s">"Pralka"</span> <span class="t-k">/&gt;</span></code></pre></div></div></details></div><div class="micro"><h4>Ćwiczenie 6.3 — Pięć obrazów w rzędzie</h4><p>Arkusz_12: „pięć obrazów … widoczne w całości, nie stykają się, wypełniają całą szerokość; wysokość 60, marginesy 9”. Jakie atrybuty ma każdy <code>ImageView</code>?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p><code>layout_width="0dp"</code>, <code>layout_weight="1"</code>, <code>layout_height="60dp"</code>, <code>layout_margin="9dp"</code>, <code>scaleType="fitCenter"</code> (widoczne w całości), <code>src="@drawable/question"</code>. Wszystkie w poziomym <code>LinearLayout</code> (tło białe).</p></div></details></div><div class="micro"><h4>Ćwiczenie 6.4 — Przewidź indeks</h4><p>Tablica ma 4 elementy, <code>indeks = 0</code>. Kliknięcia: poprzedni, poprzedni, następny, następny, następny. Jaki jest indeks po każdym kliknięciu?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>3, 2, 3, 0, 1. Wzór wstecz: <code>(i - 1 + 4) % 4</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 6.5 — Znajdź błąd</h4><p><code>String[] obrazy = {R.drawable.gory, R.drawable.las};</code> — dlaczego się nie kompiluje?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Identyfikatory zasobów są liczbami. Poprawnie: <code>int[] obrazy = {R.drawable.gory, R.drawable.las};</code>.</p></div></details></div></section>
+<section class="sec" id="prowadzone"><h2><span class="sec-num">5.</span> Zadanie prowadzone</h2><div class="task" id="b06-prowadzone">
+<div class="task-head"><h3>Pogoda na jutro</h3><span class="meta">⏱ ok. 35 min</span></div>
+<p>Cztery przyciski zmieniają obraz i opis pogody. Jedna metoda z dwoma parametrami obsługuje wszystkie przyciski.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#F5F9FF;padding:0px"><div class="m-t" style="background:#1565C0;color:#fff;font-size:22.4px;padding:8px;align-self:stretch">Pogoda na jutro</div><div class="m-img" style="margin:8px;height:160px;align-self:stretch"><img src="../assets/zasoby/deszcz.png" alt="" style="object-fit:contain"></div><div class="m-t" style="font-size:16px;text-align:center;align-self:stretch">Deszcz — weź parasol</div><div class="m-row" style="margin:8px 8px 0px 8px;align-self:stretch"><div class="m-b" style="background:#1565C0;color:#ffffff;margin:3.2px;flex:1 1 0;min-width:0">SŁOŃCE</div><div class="m-b" style="background:#1565C0;color:#ffffff;margin:3.2px;flex:1 1 0;min-width:0">CHMURY</div></div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch"><div class="m-b" style="background:#1565C0;color:#ffffff;margin:3.2px;flex:1 1 0;min-width:0">DESZCZ</div><div class="m-b" style="background:#1565C0;color:#ffffff;margin:3.2px;flex:1 1 0;min-width:0">ŚNIEG</div></div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po kliknięciu „DESZCZ”</figcaption></figure></div>
+<p><strong>Działanie:</strong> SŁOŃCE → <code>slonce</code>, „Słonecznie — weź okulary”; CHMURY → <code>chmury</code>, „Zachmurzenie — przyda się bluza”; DESZCZ → <code>deszcz</code>, „Deszcz — weź parasol”; ŚNIEG → <code>snieg</code>, „Śnieg — czapka i rękawiczki”. Na starcie widać słońce.</p>
+<p><strong>Kroki:</strong></p>
+<ol><li>Skopiuj 4 obrazy do <code>res/drawable</code>.</li><li>XML: tytuł, <code>ImageView</code> (wys. 200dp, margines 10dp, <code>fitCenter</code>, obraz startowy <code>slonce</code>), napis opisu, <strong>dwa rzędy</strong> po dwa przyciski (cztery w jednym rzędzie się nie mieszczą).</li><li>Java: metoda <code>pokaz(int obraz, String opis)</code>.</li><li>Cztery obsługi przycisków w jednej linii każda.</li></ol>
+<h4>Zasoby do zadania</h4><div class="res-list"><figure><a href="../assets/zasoby/slonce.png" download><img src="../assets/zasoby/slonce.png" alt="slonce.png"></a><figcaption>slonce.png</figcaption></figure><figure><a href="../assets/zasoby/chmury.png" download><img src="../assets/zasoby/chmury.png" alt="chmury.png"></a><figcaption>chmury.png</figcaption></figure><figure><a href="../assets/zasoby/deszcz.png" download><img src="../assets/zasoby/deszcz.png" alt="deszcz.png"></a><figcaption>deszcz.png</figcaption></figure><figure><a href="../assets/zasoby/snieg.png" download><img src="../assets/zasoby/snieg.png" alt="snieg.png"></a><figcaption>snieg.png</figcaption></figure></div><p class="small">Pobierz wszystkie: <a href="../materialy/zasoby_b06-prowadzone.zip" download>zasoby_b06-prowadzone.zip</a>. Obrazy skopiuj do <code>app/src/main/res/drawable</code> (nazwy: małe litery, bez spacji i myślników).</p>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Metoda <code>pokaz</code> ustawia dwie rzeczy: obraz i tekst. Każdy przycisk wywołuje ją z innymi argumentami.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Obsługa: <code>btnDeszcz.setOnClickListener(v -&gt; pokaz(R.drawable.deszcz, "Deszcz — weź parasol"));</code></p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">pokaz(obraz: int, opis: String):
+    ivPogoda.setImageResource(obraz)
+    tvOpis.setText(opis)</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">void</span> pokaz(<span class="t-k">int</span> obraz, <span class="t-t">String</span> opis) {
+    ivPogoda.setImageResource(obraz);
+    tvOpis.setText(opis);
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#F5F9FF"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#1565C0"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Pogoda na jutro"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ImageView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivPogoda"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"200dp"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:contentDescription</span>=<span class="t-s">"Ikona pogody"</span>
+        <span class="t-a">android:scaleType</span>=<span class="t-s">"fitCenter"</span>
+        <span class="t-a">android:src</span>=<span class="t-s">"@drawable/slonce"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvOpis"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Słonecznie — weź okulary"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnSlonce"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"4dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#1565C0"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"SŁOŃCE"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnChmury"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"4dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#1565C0"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"CHMURY"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnDeszcz"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"4dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#1565C0"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"DESZCZ"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnSnieg"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_margin</span>=<span class="t-s">"4dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#1565C0"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"ŚNIEG"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ImageView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-t">ImageView</span> ivPogoda;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvOpis;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        ivPogoda = findViewById(<span class="t-t">R</span>.id.ivPogoda);
+        tvOpis = findViewById(<span class="t-t">R</span>.id.tvOpis);
+        <span class="t-t">Button</span> btnSlonce = findViewById(<span class="t-t">R</span>.id.btnSlonce);
+        <span class="t-t">Button</span> btnChmury = findViewById(<span class="t-t">R</span>.id.btnChmury);
+        <span class="t-t">Button</span> btnDeszcz = findViewById(<span class="t-t">R</span>.id.btnDeszcz);
+        <span class="t-t">Button</span> btnSnieg = findViewById(<span class="t-t">R</span>.id.btnSnieg);
+
+        btnSlonce.setOnClickListener(v -&gt; pokaz(<span class="t-t">R</span>.drawable.slonce, <span class="t-s">"Słonecznie — weź okulary"</span>));
+        btnChmury.setOnClickListener(v -&gt; pokaz(<span class="t-t">R</span>.drawable.chmury, <span class="t-s">"Zachmurzenie — przyda się bluza"</span>));
+        btnDeszcz.setOnClickListener(v -&gt; pokaz(<span class="t-t">R</span>.drawable.deszcz, <span class="t-s">"Deszcz — weź parasol"</span>));
+        btnSnieg.setOnClickListener(v -&gt; pokaz(<span class="t-t">R</span>.drawable.snieg, <span class="t-s">"Śnieg — czapka i rękawiczki"</span>));
+    }
+
+    <span class="t-c">// parametr typu int, bo identyfikator zasobu z klasy R to liczba</span>
+    <span class="t-k">private</span> <span class="t-k">void</span> pokaz(<span class="t-k">int</span> obraz, <span class="t-t">String</span> opis) {
+        ivPogoda.setImageResource(obraz);
+        tvOpis.setText(opis);
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b06_prowadzone/">rozwiazania/b06_prowadzone/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b06-prowadzone">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="samodzielne"><h2><span class="sec-num">6.</span> Zadanie samodzielne</h2><div class="task" id="b06-samodzielne">
+<div class="task-head"><h3>Galeria planet ← →</h3><span class="meta">⏱ ok. 35 min</span></div>
+<p>Galeria z przewijaniem w obie strony z „zawijaniem” (po ostatniej pierwsza, przed pierwszą ostatnia) — ten sam mechanizm co w desktopowym Arkuszu_11.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#0F1428;padding:0px"><div class="m-img" style="height:208px;align-self:stretch"><img src="../assets/zasoby/ziemia.png" alt="" style="object-fit:cover"></div><div class="m-t" style="color:#fff;font-size:19.2px;margin:12.8px;text-align:center;align-self:stretch">Planeta 3/4: Ziemia</div><div class="m-row" style="margin:0px 12.8px 0px 12.8px;align-self:stretch"><div class="m-b" style="background:#6750A4;color:#ffffff;margin:0px 6.4px 0px 0px;flex:1 1 0;min-width:0">&lt;</div><div class="m-b" style="background:#6750A4;color:#ffffff;margin:0px 0px 0px 6.4px;flex:1 1 0;min-width:0">&gt;</div></div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Po dwóch kliknięciach „&gt;”</figcaption></figure></div>
+<ul><li>Kolejność: Merkury, Wenus, Ziemia, Mars. Napis: „Planeta &lt;nr&gt;/&lt;liczba&gt;: &lt;nazwa&gt;”.</li><li>„&gt;” pokazuje następną, po Marsie — Merkurego. „&lt;” pokazuje poprzednią, przed Merkurym — Marsa.</li><li>Obraz na całą szerokość, wysokość 260dp, wypełniony (przycięty). Tło ekranu <code>#0F1428</code>, biały napis.</li><li>Obrazy i nazwy w <strong>tablicach</strong>, bez <code>if</code>/<code>switch</code> na każdą planetę. Liczba planet nie może być wpisana na sztywno (użyj <code>length</code>).</li><li>W XML znak „&lt;” zapisz jako <code>&amp;lt;</code>, a „&gt;” jako <code>&amp;gt;</code>.</li></ul>
+<h4>Zasoby do zadania</h4><div class="res-list"><figure><a href="../assets/zasoby/merkury.png" download><img src="../assets/zasoby/merkury.png" alt="merkury.png"></a><figcaption>merkury.png</figcaption></figure><figure><a href="../assets/zasoby/wenus.png" download><img src="../assets/zasoby/wenus.png" alt="wenus.png"></a><figcaption>wenus.png</figcaption></figure><figure><a href="../assets/zasoby/ziemia.png" download><img src="../assets/zasoby/ziemia.png" alt="ziemia.png"></a><figcaption>ziemia.png</figcaption></figure><figure><a href="../assets/zasoby/mars.png" download><img src="../assets/zasoby/mars.png" alt="mars.png"></a><figcaption>mars.png</figcaption></figure></div><p class="small">Pobierz wszystkie: <a href="../materialy/zasoby_b06-samodzielne.zip" download>zasoby_b06-samodzielne.zip</a>. Obrazy skopiuj do <code>app/src/main/res/drawable</code> (nazwy: małe litery, bez spacji i myślników).</p>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Potrzebujesz dwóch tablic (<code>int[]</code> i <code>String[]</code>) oraz pola <code>indeks</code>. Oba przyciski zmieniają indeks i wywołują tę samą metodę pokazującą.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Następny: <code>(indeks + 1) % obrazy.length</code>; poprzedni: <code>(indeks - 1 + obrazy.length) % obrazy.length</code>. Numer dla człowieka to <code>indeks + 1</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">pokaz():
+    obraz ← obrazy[indeks]
+    napis ← "Planeta " + (indeks+1) + "/" + długość + ": " + nazwy[indeks]
+onCreate: … ; pokaz()   ← ustawia stan początkowy</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">btnPoprzednia.setOnClickListener(v -&gt; {
+    indeks = (indeks - <span class="t-n">1</span> + obrazy.length) % obrazy.length;
+    pokaz();
+});</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#0F1428"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;ImageView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivPlaneta"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"260dp"</span>
+        <span class="t-a">android:contentDescription</span>=<span class="t-s">"Planeta"</span>
+        <span class="t-a">android:scaleType</span>=<span class="t-s">"centerCrop"</span>
+        <span class="t-a">android:src</span>=<span class="t-s">"@drawable/merkury"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvNazwa"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Planeta 1/4: Merkury"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"24sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnPoprzednia"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginEnd</span>=<span class="t-s">"8dp"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"&amp;lt;"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnNastepna"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"8dp"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"&amp;gt;"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ImageView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-c">// tablice równoległe: ten sam indeks = ta sama planeta</span>
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] obrazy = {<span class="t-t">R</span>.drawable.merkury, <span class="t-t">R</span>.drawable.wenus, <span class="t-t">R</span>.drawable.ziemia, <span class="t-t">R</span>.drawable.mars};
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">String</span>[] nazwy = {<span class="t-s">"Merkury"</span>, <span class="t-s">"Wenus"</span>, <span class="t-s">"Ziemia"</span>, <span class="t-s">"Mars"</span>};
+    <span class="t-k">private</span> <span class="t-k">int</span> indeks = <span class="t-n">0</span>;
+
+    <span class="t-k">private</span> <span class="t-t">ImageView</span> ivPlaneta;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvNazwa;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        ivPlaneta = findViewById(<span class="t-t">R</span>.id.ivPlaneta);
+        tvNazwa = findViewById(<span class="t-t">R</span>.id.tvNazwa);
+        <span class="t-t">Button</span> btnPoprzednia = findViewById(<span class="t-t">R</span>.id.btnPoprzednia);
+        <span class="t-t">Button</span> btnNastepna = findViewById(<span class="t-t">R</span>.id.btnNastepna);
+
+        btnNastepna.setOnClickListener(v -&gt; {
+            indeks = (indeks + <span class="t-n">1</span>) % obrazy.length;                    <span class="t-c">// 3 -&gt; 0</span>
+            pokaz();
+        });
+        btnPoprzednia.setOnClickListener(v -&gt; {
+            indeks = (indeks - <span class="t-n">1</span> + obrazy.length) % obrazy.length;   <span class="t-c">// 0 -&gt; 3</span>
+            pokaz();
+        });
+        pokaz();
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> pokaz() {
+        ivPlaneta.setImageResource(obrazy[indeks]);
+        tvNazwa.setText(<span class="t-s">"Planeta "</span> + (indeks + <span class="t-n">1</span>) + <span class="t-s">"/"</span> + obrazy.length + <span class="t-s">": "</span> + nazwy[indeks]);
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b06_samodzielne/">rozwiazania/b06_samodzielne/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b06-samodzielne">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="inf04"><h2><span class="sec-num">7.</span> Zadanie w stylu INF.04</h2><div class="task exam" id="b06-inf">
+<div class="task-head"><h3>Przewodnik po szlakach</h3><span class="meta">⏱ ok. 50 min</span></div>
+<p>Wykonaj aplikację mobilną będącą fragmentem przewodnika turystycznego. Do wykonania zadania wykorzystaj obrazy z archiwum <code>zasoby_b06-inf.zip</code>.</p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>tytuł, obraz, nazwa szlaku, opis, 2 przyciski w rzędzie, rząd: przycisk POLUB + napis polubień, autor</td></tr><tr><td>DANE</td><td>brak pól — dane szlaków w tablicach w kodzie</td></tr><tr><td>ZDARZENIA</td><td>POPRZEDNI, NASTĘPNY, POLUB</td></tr><tr><td>LOGIKA</td><td>indeks cykliczny w obie strony; osobny licznik polubień dla każdego szlaku (tablica int[])</td></tr><tr><td>WYNIK</td><td>obraz, nazwa, opis i „Polubienia: n” bieżącego szlaku</td></tr><tr><td>WYGLĄD</td><td>tło #F1F8E9; tytuł #2E7D32 biały; obraz 180dp na całą szerokość, przycięty; nazwa 22sp pogrubiona; opis szary; przyciski #2E7D32; POLUB #F9A825 czarny; napis polubień do prawej</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#F1F8E9;padding:0px"><div class="m-t" style="background:#2E7D32;color:#fff;font-size:22.4px;padding:8px;align-self:stretch">Szlaki turystyczne</div><div class="m-img" style="height:144px;align-self:stretch"><img src="../assets/zasoby/gory.png" alt="" style="object-fit:cover"></div><div class="m-t" style="font-size:17.6px;font-weight:700;margin:8px 0px 0px 8px">Szlak graniowy</div><div class="m-t" style="color:#808080;margin:0px 8px 0px 8px">12 km, trudny, piękne widoki ze szczytu</div><div class="m-row" style="margin:8px;align-self:stretch"><div class="m-b" style="background:#2E7D32;color:#ffffff;margin:0px 4px 0px 0px;flex:1 1 0;min-width:0">POPRZEDNI</div><div class="m-b" style="background:#2E7D32;color:#ffffff;margin:0px 0px 0px 4px;flex:1 1 0;min-width:0">NASTĘPNY</div></div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch;align-items:center"><div class="m-b" style="background:#F9A825;color:#000;align-self:flex-start">POLUB</div><div class="m-t" style="font-size:14.4px;text-align:right;flex:1 1 0;min-width:0">Polubienia: 0</div></div><div class="m-t" style="color:#808080;margin:12.8px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Stan początkowy</figcaption></figure><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#F1F8E9;padding:0px"><div class="m-t" style="background:#2E7D32;color:#fff;font-size:22.4px;padding:8px;align-self:stretch">Szlaki turystyczne</div><div class="m-img" style="height:144px;align-self:stretch"><img src="../assets/zasoby/wodospad.png" alt="" style="object-fit:cover"></div><div class="m-t" style="font-size:17.6px;font-weight:700;margin:8px 0px 0px 8px">Do wodospadu</div><div class="m-t" style="color:#808080;margin:0px 8px 0px 8px">4 km, łatwy, najlepszy wiosną</div><div class="m-row" style="margin:8px;align-self:stretch"><div class="m-b" style="background:#2E7D32;color:#ffffff;margin:0px 4px 0px 0px;flex:1 1 0;min-width:0">POPRZEDNI</div><div class="m-b" style="background:#2E7D32;color:#ffffff;margin:0px 0px 0px 4px;flex:1 1 0;min-width:0">NASTĘPNY</div></div><div class="m-row" style="margin:0px 8px 0px 8px;align-self:stretch;align-items:center"><div class="m-b" style="background:#F9A825;color:#000;align-self:flex-start">POLUB</div><div class="m-t" style="font-size:14.4px;text-align:right;flex:1 1 0;min-width:0">Polubienia: 2</div></div><div class="m-t" style="color:#808080;margin:12.8px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 2. Kliknięto POPRZEDNI, potem 2 × POLUB</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Szlaki turystyczne”.</li><li>Obraz szlaku (w stanie początkowym <code>gory</code>).</li><li>Napis z nazwą szlaku i napis z opisem.</li><li>Przyciski „POPRZEDNI” i „NASTĘPNY” umiejscowione obok siebie.</li><li>Przycisk „POLUB” i napis „Polubienia: 0” w jednym rzędzie.</li><li>Napis „Autor: ”, dalej numer zdającego.</li></ul>
+<p><strong>Dane szlaków</strong> (w tej kolejności): <code>gory</code> — „Szlak graniowy”, „12 km, trudny, piękne widoki ze szczytu”; <code>jezioro</code> — „Wokół jeziora”, „6 km, łatwy, dla rodzin z dziećmi”; <code>las</code> — „Leśna ścieżka”, „9 km, średni, dużo cienia”; <code>wodospad</code> — „Do wodospadu”, „4 km, łatwy, najlepszy wiosną”.</p>
+<p><strong>Działanie aplikacji:</strong></p>
+<ul><li>„NASTĘPNY” pokazuje kolejny szlak (obraz, nazwę, opis); po ostatnim — pierwszy.</li><li>„POPRZEDNI” pokazuje poprzedni szlak; przed pierwszym — ostatni.</li><li>„POLUB” zwiększa o 1 liczbę polubień <strong>aktualnie wyświetlanego</strong> szlaku. Każdy szlak ma własny licznik, zapamiętywany w trakcie działania aplikacji (po powrocie do szlaku widać jego polubienia).</li></ul>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs w XML; rozkład liniowy pionowy z zagnieżdżonymi rozkładami poziomymi.</li><li>Obrazy zapisane w zasobach aplikacji. Obraz: wysokość 180, wypełnia całą szerokość (może być przycięty).</li><li>Tło strony #F1F8E9; tytuł: tło #2E7D32, biała czcionka, największa, marginesy wewnętrzne 10.</li><li>Nazwa szlaku 22sp pogrubiona; opis w kolorze Gray (#808080).</li><li>Przyciski POPRZEDNI/NASTĘPNY: tło #2E7D32, biała czcionka, razem wypełniają szerokość. Przycisk POLUB: tło #F9A825, czarna czcionka. Napis polubień wyrównany do prawej.</li><li>Obrazy, nazwy, opisy i liczniki polubień przechowywane w tablicach.</li></ul>
+<h4>Zasoby do zadania</h4><div class="res-list"><figure><a href="../assets/zasoby/gory.png" download><img src="../assets/zasoby/gory.png" alt="gory.png"></a><figcaption>gory.png</figcaption></figure><figure><a href="../assets/zasoby/jezioro.png" download><img src="../assets/zasoby/jezioro.png" alt="jezioro.png"></a><figcaption>jezioro.png</figcaption></figure><figure><a href="../assets/zasoby/las.png" download><img src="../assets/zasoby/las.png" alt="las.png"></a><figcaption>las.png</figcaption></figure><figure><a href="../assets/zasoby/wodospad.png" download><img src="../assets/zasoby/wodospad.png" alt="wodospad.png"></a><figcaption>wodospad.png</figcaption></figure></div><p class="small">Pobierz wszystkie: <a href="../materialy/zasoby_b06-inf.zip" download>zasoby_b06-inf.zip</a>. Obrazy skopiuj do <code>app/src/main/res/drawable</code> (nazwy: małe litery, bez spacji i myślników).</p>
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b06-inf"><li><label><input type="checkbox"> <span>obrazy są w <code>res/drawable</code> i aplikacja buduje się bez błędów zasobów</span></label></li><li><label><input type="checkbox"> <span>stan początkowy: góry, „Szlak graniowy”, „Polubienia: 0”</span></label></li><li><label><input type="checkbox"> <span>NASTĘPNY ×4 wraca do pierwszego szlaku; POPRZEDNI na starcie pokazuje „Do wodospadu”</span></label></li><li><label><input type="checkbox"> <span>2 × POLUB przy wodospadzie → „Polubienia: 2”; NASTĘPNY → „Polubienia: 0”; POPRZEDNI → znów 2</span></label></li><li><label><input type="checkbox"> <span>dane w tablicach (<code>int[]</code>, <code>String[]</code>, <code>int[]</code> polubień), brak <code>if</code> dla każdego szlaku</span></label></li><li><label><input type="checkbox"> <span>obraz 180dp, na całą szerokość, <code>centerCrop</code></span></label></li><li><label><input type="checkbox"> <span>kolory, rozmiary, wyrównanie napisu polubień do prawej</span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>To połączenie galerii (tablice + indeks cykliczny) z licznikiem z bloku 2. Nowe jest tylko to, że licznik polubień też jest tablicą — po jednym elemencie na szlak.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p><code>private final int[] polubienia = new int[4];</code> — tablica liczb startuje z zerami. Polubienie: <code>polubienia[aktualny]++;</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">pola: obrazy[], nazwy[], opisy[], polubienia[4], aktualny = 0
+NASTĘPNY : aktualny = (aktualny + 1) % 4 ; pokazSzlak()
+POPRZEDNI: aktualny = (aktualny - 1 + 4) % 4 ; pokazSzlak()
+POLUB    : polubienia[aktualny]++ ; pokazSzlak()
+pokazSzlak(): obraz, nazwa, opis, "Polubienia: " + polubienia[aktualny]</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">void</span> pokazSzlak() {
+    ivSzlak.setImageResource(obrazy[aktualny]);
+    tvNazwa.setText(nazwy[aktualny]);
+    tvOpis.setText(opisy[aktualny]);
+    tvPolubienia.setText(<span class="t-s">"Polubienia: "</span> + polubienia[aktualny]);
+}</code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#F1F8E9"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#2E7D32"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Szlaki turystyczne"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;ImageView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/ivSzlak"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"180dp"</span>
+        <span class="t-a">android:contentDescription</span>=<span class="t-s">"Zdjęcie szlaku"</span>
+        <span class="t-a">android:scaleType</span>=<span class="t-s">"centerCrop"</span>
+        <span class="t-a">android:src</span>=<span class="t-s">"@drawable/gory"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvNazwa"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Szlak graniowy"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"22sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvOpis"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"12 km, trudny, piękne widoki ze szczytu"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnPoprzedni"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginEnd</span>=<span class="t-s">"5dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#2E7D32"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"POPRZEDNI"</span>
+            <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnNastepny"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"5dp"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#2E7D32"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"NASTĘPNY"</span>
+            <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;LinearLayout</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginHorizontal</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center_vertical"</span>
+        <span class="t-a">android:orientation</span>=<span class="t-s">"horizontal"</span><span class="t-k">&gt;</span>
+
+        <span class="t-k">&lt;Button</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/btnPolub"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:backgroundTint</span>=<span class="t-s">"#F9A825"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"POLUB"</span>
+            <span class="t-a">android:textColor</span>=<span class="t-s">"#000000"</span> <span class="t-k">/&gt;</span>
+
+        <span class="t-k">&lt;TextView</span>
+            <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvPolubienia"</span>
+            <span class="t-a">android:layout_width</span>=<span class="t-s">"0dp"</span>
+            <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+            <span class="t-a">android:layout_weight</span>=<span class="t-s">"1"</span>
+            <span class="t-a">android:gravity</span>=<span class="t-s">"end"</span>
+            <span class="t-a">android:text</span>=<span class="t-s">"Polubienia: 0"</span>
+            <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+    <span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvAutor"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">Button</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">ImageView</span>;
+<span class="t-k">import</span> android.widget.<span class="t-t">TextView</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] obrazy = {<span class="t-t">R</span>.drawable.gory, <span class="t-t">R</span>.drawable.jezioro, <span class="t-t">R</span>.drawable.las, <span class="t-t">R</span>.drawable.wodospad};
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">String</span>[] nazwy = {<span class="t-s">"Szlak graniowy"</span>, <span class="t-s">"Wokół jeziora"</span>, <span class="t-s">"Leśna ścieżka"</span>, <span class="t-s">"Do wodospadu"</span>};
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-t">String</span>[] opisy = {
+            <span class="t-s">"12 km, trudny, piękne widoki ze szczytu"</span>,
+            <span class="t-s">"6 km, łatwy, dla rodzin z dziećmi"</span>,
+            <span class="t-s">"9 km, średni, dużo cienia"</span>,
+            <span class="t-s">"4 km, łatwy, najlepszy wiosną"</span>
+    };
+    <span class="t-k">private</span> <span class="t-k">final</span> <span class="t-k">int</span>[] polubienia = <span class="t-k">new</span> <span class="t-k">int</span>[<span class="t-n">4</span>];   <span class="t-c">// dla każdego szlaku osobny licznik, start: same zera</span>
+    <span class="t-k">private</span> <span class="t-k">int</span> aktualny = <span class="t-n">0</span>;
+
+    <span class="t-k">private</span> <span class="t-t">ImageView</span> ivSzlak;
+    <span class="t-k">private</span> <span class="t-t">TextView</span> tvNazwa, tvOpis, tvPolubienia;
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+
+        ivSzlak = findViewById(<span class="t-t">R</span>.id.ivSzlak);
+        tvNazwa = findViewById(<span class="t-t">R</span>.id.tvNazwa);
+        tvOpis = findViewById(<span class="t-t">R</span>.id.tvOpis);
+        tvPolubienia = findViewById(<span class="t-t">R</span>.id.tvPolubienia);
+        <span class="t-t">Button</span> btnPoprzedni = findViewById(<span class="t-t">R</span>.id.btnPoprzedni);
+        <span class="t-t">Button</span> btnNastepny = findViewById(<span class="t-t">R</span>.id.btnNastepny);
+        <span class="t-t">Button</span> btnPolub = findViewById(<span class="t-t">R</span>.id.btnPolub);
+
+        btnNastepny.setOnClickListener(v -&gt; {
+            aktualny = (aktualny + <span class="t-n">1</span>) % obrazy.length;
+            pokazSzlak();
+        });
+        btnPoprzedni.setOnClickListener(v -&gt; {
+            aktualny = (aktualny - <span class="t-n">1</span> + obrazy.length) % obrazy.length;
+            pokazSzlak();
+        });
+        btnPolub.setOnClickListener(v -&gt; {
+            polubienia[aktualny]++;
+            pokazSzlak();
+        });
+        pokazSzlak();
+    }
+
+    <span class="t-k">private</span> <span class="t-k">void</span> pokazSzlak() {
+        ivSzlak.setImageResource(obrazy[aktualny]);
+        tvNazwa.setText(nazwy[aktualny]);
+        tvOpis.setText(opisy[aktualny]);
+        tvPolubienia.setText(<span class="t-s">"Polubienia: "</span> + polubienia[aktualny]);
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b06_inf/">rozwiazania/b06_inf/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b06-inf">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="checklista"><h2><span class="sec-num">8.</span> Checklista</h2><p class="small muted">Sprawdź swoją aplikację z zadania INF.04 punkt po punkcie (krok 10 procedury).</p><ul class="checklist" data-key="b06-check"><li><label><input type="checkbox"> <span>nazwy zasobów: małe litery, cyfry, <code>_</code>, zaczynają się literą</span></label></li><li><label><input type="checkbox"> <span>obrazy są w <code>res/drawable</code> (nie w <code>mipmap</code>, nie w folderze z dopiskiem wersji)</span></label></li><li><label><input type="checkbox"> <span><code>ImageView</code> ma wysokość/szerokość z polecenia i właściwy <code>scaleType</code></span></label></li><li><label><input type="checkbox"> <span>obrazy zmieniane w kodzie przez <code>setImageResource(R.drawable.…)</code></span></label></li><li><label><input type="checkbox"> <span>tablice obrazów mają typ <code>int[]</code></span></label></li><li><label><input type="checkbox"> <span>przewijanie w obie strony działa na krańcach (bez <code>ArrayIndexOutOfBoundsException</code>)</span></label></li><li><label><input type="checkbox"> <span>stan początkowy ustawiony wywołaniem metody pokazującej w <code>onCreate</code> lub w XML</span></label></li></ul></section>
+<section class="sec" id="test"><h2><span class="sec-num">9.</span> Mini-test</h2><div class="quiz" data-quiz="b06"><script type="application/json">[{"q": "<p>Który zapis w XML wyświetla plik <code>res/drawable/pralka.jpg<\/code>?<\/p>", "o": ["<code>android:src=\"pralka.jpg\"<\/code>", "<code>android:src=\"@drawable/pralka\"<\/code>", "<code>android:src=\"@drawable/pralka.jpg\"<\/code>", "<code>android:image=\"R.drawable.pralka\"<\/code>"], "a": 1, "e": "<p>W odwołaniu do zasobu nie podaje się rozszerzenia.<\/p>"}, {"q": "<p>Która nazwa pliku spowoduje błąd budowania zasobów?<\/p>", "o": ["<code>kosc1.png<\/code>", "<code>question.jpg<\/code>", "<code>Kosc-1.png<\/code>", "<code>kosc_1.png<\/code>"], "a": 2, "e": "<p>Wielka litera i myślnik są niedozwolone.<\/p>"}, {"q": "<p>Obraz ma wypełniać całą szerokość i wysokość 180dp, może być przycięty. <code>scaleType<\/code>:<\/p>", "o": ["<code>fitCenter<\/code>", "<code>centerCrop<\/code>", "<code>center<\/code>", "<code>matrix<\/code>"], "a": 1, "e": "<p><code>centerCrop<\/code> wypełnia cały obszar, zachowując proporcje, i przycina nadmiar.<\/p>"}, {"q": "<p>Tablica ma 5 elementów, <code>i = 0<\/code>. Jaki wzór da poprzedni indeks (4)?<\/p>", "o": ["<code>(i - 1) % 5<\/code>", "<code>(i - 1 + 5) % 5<\/code>", "<code>i - 1<\/code>", "<code>(i + 1) % 5<\/code>"], "a": 1, "e": "<p>W Javie <code>-1 % 5<\/code> daje −1. Dodanie długości zapewnia wynik nieujemny.<\/p>"}, {"q": "<p>Jak zmienić obraz w kodzie?<\/p>", "o": ["<code>iv.setSrc(\"deszcz\")<\/code>", "<code>iv.setImageResource(R.drawable.deszcz)<\/code>", "<code>iv.setText(R.drawable.deszcz)<\/code>", "<code>iv.src = deszcz<\/code>"], "a": 1, "e": "<p><code>setImageResource<\/code> przyjmuje identyfikator zasobu.<\/p>"}, {"q": "<p>Każdy z 4 szlaków ma własną liczbę polubień. Jak ją najprościej przechowywać?<\/p>", "o": ["4 osobne zmienne i <code>switch<\/code>", "<code>int[] polubienia = new int[4];<\/code> indeksowane jak obrazy", "w napisie <code>TextView<\/code>", "w pliku XML"], "a": 1, "e": "<p>Tablica równoległa do tablicy obrazów — ten sam indeks, ten sam szlak.<\/p>"}]</script></div></section>
+<section class="sec" id="dodatkowe"><h2><span class="sec-num">10.</span> Skończyłeś wcześniej?</h2><div class="micro"><h4>Kości z tablicy</h4><p>Przygotuj tablicę <code>int[] kosci</code> z sześcioma obrazami kości (możesz użyć dowolnych 6 obrazów z zasobów kursu) i przycisk, który pokazuje obraz dla wartości wpisanej w pole (1–6). Uwaga: wartość 1 to indeks 0.</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p><code>ivKosc.setImageResource(kosci[wartosc - 1]);</code> — sprawdź zakres, zanim użyjesz indeksu.</p></div></details></div><div class="micro"><h4>Obraz po nazwie (desktop Arkusz_09)</h4><p>Pole tekstowe + przycisk: po wpisaniu „mars” pokaż <code>R.drawable.mars</code>. Jeśli takiego obrazu nie ma — ukryj obraz.</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p><code>int id = getResources().getIdentifier(nazwa, "drawable", getPackageName());</code> zwraca 0, gdy zasobu nie ma. Ukrycie: <code>ivObraz.setVisibility(View.INVISIBLE)</code> (blok 7).</p></div></details></div><div class="micro"><h4>Licznik polubień wszystkich szlaków</h4><p>Dodaj napis „Razem polubień: n” — suma całej tablicy liczona pętlą przy każdym polubieniu.</p></div></section>
+<div class="nav-bottom"><a class="btn secondary" href="blok05.html">← Blok 5</a><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button><a class="btn secondary" href="blok07.html">Blok 7 →</a></div></article></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
