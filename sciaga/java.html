@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ściąga Java — tylko to, czego potrzebujesz w aplikacji mobilnej — INF.04 — Aplikacje mobilne</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html" class="active">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="page"><h1>Ściąga Java — tylko to, czego potrzebujesz w aplikacji mobilnej</h1><p>Zakres wynika z zadań mobilnych w analizowanych arkuszach. Nie jest to kurs całego języka.</p>
+<h3>Zmienne i typy</h3>
+<div class="table-wrap"><table><thead><tr><th>Typ</th><th>Przykład</th><th>Uwagi</th></tr></thead><tbody><tr><td><code>int</code></td><td><code>int licznik = 0;</code></td><td>liczby całkowite (wartość suwaka, liczniki)</td></tr><tr><td><code>double</code></td><td><code>double kwota = 12.5;</code></td><td>ułamki — kropka w kodzie</td></tr><tr><td><code>boolean</code></td><td><code>boolean wlaczony = false;</code></td><td>przełączniki</td></tr><tr><td><code>String</code></td><td><code>String imie = "Ola";</code></td><td>napisy — porównuj przez <code>equals</code></td></tr><tr><td><code>char</code></td><td><code>char c = tekst.charAt(0);</code></td><td>pojedynczy znak — porównuj przez <code>==</code></td></tr><tr><td>stała</td><td><code>private static final int LIMIT = 12;</code></td><td>wielkie litery, bez „magicznych liczb”</td></tr></tbody></table></div>
+<p><strong>Pole klasy</strong> (deklaracja nad <code>onCreate</code>) = stan aplikacji, pamiętany między kliknięciami. <strong>Zmienna lokalna</strong> (wewnątrz metody) znika po jej zakończeniu.</p>
+<h3>Operatory</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">licznik++;  licznik--;  suma += <span class="t-n">5</span>;
+<span class="t-k">int</span> reszta = <span class="t-n">7</span> % <span class="t-n">3</span>;          <span class="t-c">// 1  (modulo — cykle, parzystość)</span>
+<span class="t-k">double</span> sr = suma / <span class="t-n">3.0</span>;      <span class="t-c">// 3.0, żeby uniknąć dzielenia całkowitego</span>
+<span class="t-k">boolean</span> ok = n &gt;= <span class="t-n">1</span> &amp;&amp; n &lt;= <span class="t-n">12</span>;
+<span class="t-k">boolean</span> zle = n &lt; <span class="t-n">1</span> || n &gt; <span class="t-n">12</span>;
+<span class="t-t">String</span> s = x &gt; <span class="t-n">0</span> ? <span class="t-s">"+"</span> : <span class="t-s">""</span>;  <span class="t-c">// operator warunkowy</span></code></pre></div>
+<h3>Napisy (String)</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-s">"Wynik: "</span> + <span class="t-n">5</span> + <span class="t-n">3</span>          <span class="t-c">// "Wynik: 53"</span>
+<span class="t-s">"Wynik: "</span> + (<span class="t-n">5</span> + <span class="t-n">3</span>)        <span class="t-c">// "Wynik: 8"</span>
+s.length()   s.isEmpty()   s.trim()   s.toUpperCase()
+s.equals(t)  s.equalsIgnoreCase(t)  s.contains(<span class="t-s">"@"</span>)  s.startsWith(<span class="t-s">"48"</span>)
+s.charAt(i)  s.substring(<span class="t-n">0</span>, <span class="t-n">2</span>)  s.substring(<span class="t-n">2</span>)  s.replace(<span class="t-s">','</span>, <span class="t-s">'.'</span>)
+<span class="t-t">String</span>.valueOf(<span class="t-n">12</span>)                        <span class="t-c">// "12"</span>
+<span class="t-t">String</span>.format(<span class="t-s">"%.2f"</span>, <span class="t-n">3.14159</span>)            <span class="t-c">// "3,14" (polskie ustawienia)</span>
+<span class="t-t">String</span>.format(<span class="t-s">"%02d:%02d"</span>, <span class="t-n">9</span>, <span class="t-n">5</span>)          <span class="t-c">// "09:05"</span>
+<span class="t-t">String</span>.format(<span class="t-s">"%s ma %d lat"</span>, <span class="t-s">"Ola"</span>, <span class="t-n">18</span>)
+<span class="t-t">Character</span>.isDigit(c)   <span class="t-t">Character</span>.isLetterOrDigit(c)</code></pre></div>
+<h3>Konwersje</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">int</span> n = <span class="t-t">Integer</span>.parseInt(<span class="t-s">"42"</span>);         <span class="t-c">// NumberFormatException przy "", "4a"</span>
+<span class="t-k">double</span> d = <span class="t-t">Double</span>.parseDouble(<span class="t-s">"4.5"</span>);   <span class="t-c">// nie przyjmie "4,5" → replace(',', '.')</span>
+<span class="t-k">try</span> {
+    <span class="t-k">int</span> wiek = <span class="t-t">Integer</span>.parseInt(tekst);
+} <span class="t-k">catch</span> (<span class="t-t">NumberFormatException</span> e) {
+    <span class="t-c">// komunikat dla użytkownika</span>
+}</code></pre></div>
+<h3>Warunki</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">if</span> (email.contains(<span class="t-s">"@"</span>) == <span class="t-k">false</span>) { … }            <span class="t-c">// lub: if (!email.contains("@"))</span>
+<span class="t-k">if</span> (a &gt; b) { … } <span class="t-k">else</span> <span class="t-k">if</span> (b &gt; a) { … } <span class="t-k">else</span> { … }  <span class="t-c">// pierwszy spełniony wygrywa</span></code></pre></div>
+<h3>Pętle</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">for</span> (<span class="t-k">int</span> i = <span class="t-n">0</span>; i &lt; t.length; i++) { … t[i] … }   <span class="t-c">// z indeksem</span>
+<span class="t-k">for</span> (<span class="t-k">int</span> x : t) { suma += x; }                       <span class="t-c">// po elementach</span>
+<span class="t-k">while</span> (wylosowane &lt; <span class="t-n">3</span>) { … }                          <span class="t-c">// dopóki warunek</span></code></pre></div>
+<h3>Tablice</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">int</span>[] obrazy = {<span class="t-t">R</span>.drawable.a, <span class="t-t">R</span>.drawable.b};         <span class="t-c">// identyfikatory zasobów</span>
+<span class="t-t">String</span>[] nazwy = {<span class="t-s">"A"</span>, <span class="t-s">"B"</span>};
+<span class="t-k">int</span>[] liczniki = <span class="t-k">new</span> <span class="t-k">int</span>[<span class="t-n">4</span>];                          <span class="t-c">// cztery zera</span>
+<span class="t-t">String</span>[][] odp = {{<span class="t-s">"x"</span>, <span class="t-s">"y"</span>}, {<span class="t-s">"z"</span>, <span class="t-s">"w"</span>}};            <span class="t-c">// dwuwymiarowa: odp[1][0] = "z"</span>
+obrazy.length                                         <span class="t-c">// długość (bez nawiasów)</span>
+<span class="t-t">TextView</span>[] pola = {findViewById(<span class="t-t">R</span>.id.tv1), findViewById(<span class="t-t">R</span>.id.tv2)};  <span class="t-c">// tablica kontrolek</span></code></pre></div>
+<h3>Kolekcje</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">import</span> java.util.<span class="t-t">ArrayList</span>;  <span class="t-k">import</span> java.util.<span class="t-t">Arrays</span>;
+<span class="t-t">ArrayList</span>&lt;<span class="t-t">String</span>&gt; lista = <span class="t-k">new</span> <span class="t-t">ArrayList</span>&lt;&gt;();
+<span class="t-t">ArrayList</span>&lt;<span class="t-t">String</span>&gt; start = <span class="t-k">new</span> <span class="t-t">ArrayList</span>&lt;&gt;(<span class="t-t">Arrays</span>.asList(<span class="t-s">"a"</span>, <span class="t-s">"b"</span>));
+<span class="t-t">ArrayList</span>&lt;<span class="t-t">Double</span>&gt; kwoty = <span class="t-k">new</span> <span class="t-t">ArrayList</span>&lt;&gt;();          <span class="t-c">// typ obiektowy: Double, Integer</span>
+lista.add(<span class="t-s">"c"</span>);  lista.get(<span class="t-n">0</span>);  lista.size();  lista.remove(<span class="t-n">0</span>);  lista.contains(<span class="t-s">"a"</span>);  lista.clear();</code></pre></div>
+<h3>Metody</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">private</span> <span class="t-k">int</span> suma(<span class="t-k">int</span>[] t) {            <span class="t-c">// zwraca wartość</span>
+    <span class="t-k">int</span> s = <span class="t-n">0</span>;
+    <span class="t-k">for</span> (<span class="t-k">int</span> x : t) s += x;
+    <span class="t-k">return</span> s;
+}
+<span class="t-k">private</span> <span class="t-k">void</span> pokaz() { … }             <span class="t-c">// nic nie zwraca (void)</span>
+<span class="t-k">private</span> <span class="t-t">String</span> sprawdz(<span class="t-t">String</span> kod) {   <span class="t-c">// walidacja → komunikat</span>
+    <span class="t-k">if</span> (kod.length() != <span class="t-n">5</span>) <span class="t-k">return</span> <span class="t-s">"Zła długość"</span>;
+    <span class="t-k">return</span> <span class="t-s">"OK"</span>;
+}</code></pre></div>
+<h3>Losowanie i matematyka</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">import</span> java.util.<span class="t-t">Random</span>;
+<span class="t-t">Random</span> los = <span class="t-k">new</span> <span class="t-t">Random</span>();
+los.nextInt(<span class="t-n">6</span>) + <span class="t-n">1</span>      <span class="t-c">// 1..6</span>
+los.nextInt(<span class="t-n">2</span>)          <span class="t-c">// 0 lub 1</span>
+<span class="t-t">Math</span>.max(a, b)  <span class="t-t">Math</span>.min(a, <span class="t-n">40.0</span>)  <span class="t-t">Math</span>.ceil(x)  <span class="t-t">Math</span>.round(x)</code></pre></div>
+<h3>Lambda vs klasa anonimowa</h3>
+<div class="code"><div class="code-bar"><span>Java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java">btn.setOnClickListener(v -&gt; zrobCos());                  <span class="t-c">// lambda: interfejs z 1 metodą</span>
+sb.setOnSeekBarChangeListener(<span class="t-k">new</span> <span class="t-t">SeekBar</span>.<span class="t-t">OnSeekBarChangeListener</span>() { … });  <span class="t-c">// 3 metody → klasa</span>
+<span class="t-c">// w klasie anonimowej: MainActivity.this zamiast this</span></code></pre></div></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
