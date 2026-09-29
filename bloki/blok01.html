@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blok 1 — Start: projekt, emulator i pierwszy ekran ze specyfikacji</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../" data-page="block" data-block="b01">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html" class="active">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="block-layout"><aside class="toc no-print"><strong>Blok 1</strong><ol><li><a href="#cel">Cel</a></li><li><a href="#przypomnienie">Krótkie przypomnienie</a></li><li><a href="#przyklad">Przykład</a></li><li><a href="#mikro">Mikroćwiczenia</a></li><li><a href="#prowadzone">Zadanie prowadzone</a></li><li><a href="#samodzielne">Zadanie samodzielne</a></li><li><a href="#inf04">Zadanie w stylu INF.04</a></li><li><a href="#checklista">Checklista</a></li><li><a href="#test">Mini-test</a></li><li><a href="#dodatkowe">Skończyłeś wcześniej?</a></li></ol><a class="skip" href="#samodzielne">Silniejszy? Przejdź od razu do zadania samodzielnego →</a><p class="small muted" style="margin-top:.8rem">Słabszy? Przypomnienie → Przykład → Mikroćwiczenia → Zadanie prowadzone (z podpowiedziami).</p></aside><article class="page"><div class="block-head"><div><div class="muted small"><a href="../index.html">Bloki</a> › Blok 1</div><h1>Blok 1. Start: projekt, emulator i pierwszy ekran ze specyfikacji</h1><span class="badge p1">Faza I — wyrównanie</span> <span id="block-status" class="badge">W trakcie</span></div><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button></div>
+<p>Tworzysz projekt Empty Views Activity w Javie, budujesz ekran z LinearLayout i TextView według opisu, uruchamiasz go w emulatorze i przygotowujesz pliki tak jak na egzaminie.</p>
+<section class="sec" id="cel"><h2><span class="sec-num">1.</span> Cel</h2><p><strong>Po wykonaniu tego bloku będziesz potrafił:</strong></p><ul><li>utworzyć projekt <strong>Empty Views Activity</strong> w języku <strong>Java</strong> i uruchomić go w emulatorze,</li><li>wskazać pliki, które oddaje się na egzaminie: <code>activity_main.xml</code>, <code>MainActivity.java</code>, <code>mobilna.zip</code>,</li><li>zbudować ekran w pionowym <code>LinearLayout</code> z napisów o podanych kolorach, rozmiarach i wyrównaniu,</li><li>przeanalizować polecenie według 6 pytań: INTERFEJS, DANE, ZDARZENIA, LOGIKA, WYNIK, WYGLĄD.</li></ul><details class="hint"><summary>Plan czasu (4 × 45 min = 180 min)</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>Przypomnienie (projekt, emulator)</td><td>20 min</td></tr><tr><td>Przykład</td><td>15 min</td></tr><tr><td>Mikroćwiczenia</td><td>25 min</td></tr><tr><td>Zadanie prowadzone</td><td>35 min</td></tr><tr><td>Zadanie samodzielne</td><td>35 min</td></tr><tr><td>Zadanie INF.04</td><td>40 min</td></tr><tr><td>Checklista + mini-test</td><td>10 min</td></tr><tr><th>Razem</th><th>180 min</th></tr></tbody></table></div></div></details><p class="small muted">Powiązanie z arkuszami: wszystkie 7 zadań mobilnych wymaga interfejsu w XML i rozkładu liniowego; kolory HEX oraz „tytuł największą czcionką” pojawiają się w 7/7 zadań (Arkusze 01, 02, 05, 07, 10, 12, 13).</p></section>
+<section class="sec" id="przypomnienie"><h2><span class="sec-num">2.</span> Krótkie przypomnienie</h2><h4>Nowy projekt — zawsze tak samo</h4>
+<ol><li><strong>File → New → New Project → Empty Views Activity</strong>. Uwaga: szablon „Empty Activity” tworzy projekt Compose — bez pliku XML, niezgodny z wymaganiem arkuszy.</li><li>Name: <code>Egzamin</code>, Package name: <code>com.example.egzamin</code>, <strong>Language: Java</strong>, Minimum SDK: API 24.</li><li><strong>Finish</strong> i poczekaj, aż skończy się synchronizacja Gradle (pasek postępu na dole okna).</li><li>Uruchom emulator (Device Manager) i aplikację: zielony trójkąt ▶ lub <strong>Shift+F10</strong>.</li></ol>
+<h4>Gdzie co jest</h4>
+<div class="table-wrap"><table><thead><tr><th>Plik w widoku <em>Android</em></th><th>Zawartość</th><th>Na egzaminie</th></tr></thead><tbody><tr><td><code>app/res/layout/activity_main.xml</code></td><td>wygląd (język znaczników XML)</td><td>kopiujesz do folderu <code>mobilna</code></td></tr><tr><td><code>app/java/com.example.egzamin/MainActivity.java</code></td><td>logika (Java)</td><td>kopiujesz do folderu <code>mobilna</code></td></tr><tr><td><code>app/res/drawable/</code></td><td>obrazy z archiwum</td><td>wchodzą do <code>mobilna.zip</code></td></tr><tr><td>cały folder projektu</td><td>—</td><td>pakujesz jako <code>mobilna.zip</code></td></tr></tbody></table></div>
+<h4>Upraszczamy szablon</h4>
+<p>Nowe Android Studio generuje w <code>onCreate</code> linie <code>EdgeToEdge.enable(this)</code> i <code>ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), …)</code>. W tym kursie <strong>usuwamy je</strong> (razem z nieużywanymi importami) — kod jest krótszy, a padding ustawiony w XML działa tak, jak opisuje arkusz:</p>
+<div class="code"><div class="code-bar"><span>MainActivity.java — wersja kursowa</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+    }
+}</code></pre></div>
+<div class="box box-warn"><p>Jeśli zostawisz linie z <code>ViewCompat…findViewById(R.id.main)</code>, korzeń układu <strong>musi</strong> mieć <code>android:id="@+id/main"</code>. Po zamianie korzenia na <code>LinearLayout</code> bez tego ID aplikacja zamknie się zaraz po starcie.</p></div>
+<h4>Rozkład pionowy i napis</h4>
+<p>Zamień w <code>activity_main.xml</code> domyślny <code>ConstraintLayout</code> na <code>LinearLayout</code> (tryb <strong>Code</strong> w prawym górnym rogu edytora):</p>
+<div class="code"><div class="code-bar"><span>XML</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml"><span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Rejestracja"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#008080"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div>
+<div class="table-wrap"><table><thead><tr><th>Atrybut</th><th>Znaczenie</th><th>Przykład</th></tr></thead><tbody><tr><td><code>layout_width</code> / <code>layout_height</code></td><td>wymagane w każdym elemencie</td><td><code>match_parent</code> (cała szerokość), <code>wrap_content</code> (tyle, ile treść)</td></tr><tr><td><code>textSize</code></td><td>rozmiar czcionki — zawsze w <strong>sp</strong></td><td><code>24sp</code></td></tr><tr><td><code>textColor</code>, <code>background</code></td><td>kolor w HEX, zawsze z <code>#</code></td><td><code>#FFFFFF</code>, <code>#008080</code></td></tr><tr><td><code>textStyle</code></td><td>pogrubienie / kursywa</td><td><code>bold</code>, <code>italic</code></td></tr><tr><td><code>padding</code></td><td>odstęp <strong>wewnątrz</strong> elementu (w <strong>dp</strong>)</td><td><code>10dp</code></td></tr><tr><td><code>layout_margin</code></td><td>odstęp <strong>na zewnątrz</strong> elementu</td><td><code>layout_marginTop="20dp"</code></td></tr><tr><td><code>gravity</code></td><td>wyrównanie <strong>treści</strong> w elemencie</td><td><code>center</code>, <code>end</code></td></tr></tbody></table></div>
+<p><strong>Ćwiczenie natychmiastowe:</strong> wpisz powyższy układ, uruchom aplikację, a potem zmień tło na <code>#2E8B57</code> (SeaGreen) i rozmiar na <code>32sp</code>. Uruchom ponownie.</p></section>
+<section class="sec" id="przyklad"><h2><span class="sec-num">3.</span> Przykład</h2><p>Ekran informacyjny wydarzenia: tytuł na kolorowym tle na całą szerokość, dwie linie informacji z marginesem i wyśrodkowany podpis autora. Kod Java nie zawiera jeszcze żadnej logiki — cały wygląd jest w XML.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#ffffff;padding:0px"><div class="m-t" style="background:#1D4F91;color:#fff;font-size:22.4px;font-weight:700;padding:9.6px;align-self:stretch">Dzień otwarty szkoły</div><div class="m-t" style="font-size:14.4px;margin:8px">Sobota, 15 marca, 10:00</div><div class="m-t" style="color:#808080;font-size:12.8px;margin:0px 0px 0px 8px">Sala 12, budynek B</div><div class="m-t" style="font-size:11.2px;margin:16px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Przykład — wynik w emulatorze</figcaption></figure></div><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#FFFFFF"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Dzień otwarty szkoły"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#1D4F91"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"12dp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvData"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Sobota, 15 marca, 10:00"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvMiejsce"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Sala 12, budynek B"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"16sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvAutor"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"20dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"14sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+    }
+}</code></pre></div><p>Zwróć uwagę: <code>tvAutor</code> ma <code>layout_width="match_parent"</code> <strong>i</strong> <code>gravity="center"</code> — napis jest wyśrodkowany, bo element zajmuje całą szerokość, a treść jest ułożona na środku.</p></section>
+<section class="sec" id="mikro"><h2><span class="sec-num">4.</span> Mikroćwiczenia</h2><div class="micro"><h4>Ćwiczenie 1.1 — Tytuł ze specyfikacji</h4><p>Specyfikacja: <em>„Napis «Wizyta u weterynarza» czcionką większą niż pozostałe, kolor tła SeaGreen (#2E8B57), marginesy wewnętrzne 10”</em>. Napisz sam element <code>TextView</code>.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>XML</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml"><span class="t-k">&lt;TextView</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+    <span class="t-a">android:text</span>=<span class="t-s">"Wizyta u weterynarza"</span>
+    <span class="t-a">android:textSize</span>=<span class="t-s">"28sp"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#2E8B57"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span> <span class="t-k">/&gt;</span></code></pre></div>
+<p>„Marginesy wewnętrzne” = <code>padding</code>. Szerokość <code>match_parent</code>, bo na zrzutach tło tytułu sięga krawędzi.</p></div></details></div><div class="micro"><h4>Ćwiczenie 1.2 — match_parent czy wrap_content?</h4><p>Dwa napisy mają tło <code>#FFD700</code>. Pierwszy ma <code>layout_width="wrap_content"</code>, drugi <code>match_parent</code>. Który będzie miał żółty pasek na całą szerokość ekranu? Który trzeba wybrać, gdy arkusz mówi „pola rozciągnięte na całą szerokość ekranu”?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><p>Drugi (<code>match_parent</code>). Wymaganie „na całą szerokość” (Arkusze 01, 07, 12) zawsze oznacza <code>match_parent</code>.</p></div></details></div><div class="micro"><h4>Ćwiczenie 1.3 — gravity czy layout_gravity?</h4><p>Napis ma <code>layout_width="match_parent"</code>. Chcesz, aby tekst był na środku. Który atrybut zadziała: <code>android:gravity="center"</code> czy <code>android:layout_gravity="center"</code>? A jeśli napis ma <code>wrap_content</code>?</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><ul><li><code>match_parent</code> → element zajmuje całą szerokość, więc trzeba wyśrodkować <strong>treść</strong>: <code>gravity="center"</code>.</li><li><code>wrap_content</code> → element jest wąski, więc trzeba przesunąć <strong>cały element</strong> w rodzicu: <code>layout_gravity="center"</code> (lub <code>center_horizontal</code>).</li></ul>
+<p>Zapamiętaj: <code>gravity</code> = treść w środku mnie; <code>layout_gravity</code> = ja w rodzicu.</p></div></details></div><div class="micro"><h4>Ćwiczenie 1.4 — Znajdź 4 błędy</h4><div class="code"><div class="code-bar"><span>XML</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml"><span class="t-k">&lt;TextView</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:text</span>=<span class="t-s">"Cena: 10 zł"</span>
+    <span class="t-a">android:textSize</span>=<span class="t-s">"20"</span>
+    <span class="t-a">android:textColor</span>=<span class="t-s">"008080"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"10"</span> <span class="t-k">/&gt;</span></code></pre></div><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><ol><li>brak <code>android:layout_height</code> (błąd budowania),</li><li><code>textSize="20"</code> → <code>20sp</code>,</li><li><code>textColor="008080"</code> → <code>#008080</code>,</li><li><code>padding="10"</code> → <code>10dp</code>.</li></ol></div></details></div><div class="micro"><h4>Ćwiczenie 1.5 — Analiza polecenia</h4><p>Przeczytaj fragment: <em>„Aplikacja wyświetla napis «Kantor» (tło #1D4F91, biała czcionka, największa), pole edycyjne z podpowiedzią «Kwota w PLN», przycisk «PRZELICZ». Po wybraniu przycisku pod nim wyświetla się «&lt;kwota&gt; PLN = &lt;wynik&gt; EUR», kurs 4,30.”</em> Uzupełnij tabelę: INTERFEJS, DANE, ZDARZENIA, LOGIKA, WYNIK, WYGLĄD.</p><details class="hint answer"><summary>Sprawdź odpowiedź</summary><div class="hint-body"><div class="table-wrap"><table><thead><tr><th></th><th></th></tr></thead><tbody><tr><td>INTERFEJS</td><td>TextView (tytuł), EditText, Button, TextView (wynik)</td></tr><tr><td>DANE</td><td>kwota wpisana w polu</td></tr><tr><td>ZDARZENIA</td><td>kliknięcie „PRZELICZ”</td></tr><tr><td>LOGIKA</td><td>wynik = kwota / 4,30</td></tr><tr><td>WYNIK</td><td>tekst „&lt;kwota&gt; PLN = &lt;wynik&gt; EUR” pod przyciskiem</td></tr><tr><td>WYGLĄD</td><td>tytuł: tło #1D4F91, biała czcionka, największy rozmiar</td></tr></tbody></table></div></div></details></div></section>
+<section class="sec" id="prowadzone"><h2><span class="sec-num">5.</span> Zadanie prowadzone</h2><div class="task" id="b01-prowadzone">
+<div class="task-head"><h3>Profil ucznia</h3><span class="meta">⏱ ok. 35 min</span></div>
+<p>Zbuduj ekran profilu. Wykonuj kroki po kolei i po każdym kroku uruchamiaj aplikację — tak szybciej zauważysz błąd.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#F0F4F8;padding:0px"><div class="m-t" style="background:#0B6E6E;color:#fff;font-size:24px;font-weight:700;padding:12.8px;align-self:stretch">Profil ucznia</div><div class="m-t" style="font-size:14.4px;margin:12.8px 0px 0px 12.8px">Imię i nazwisko: Jan Kowalski</div><div class="m-t" style="font-size:14.4px;margin:6.4px 0px 0px 12.8px">Klasa: 5 TP</div><div class="m-t" style="font-size:14.4px;font-style:italic;margin:6.4px 0px 0px 12.8px">Zawód: technik programista</div><div class="m-t" style="color:#808080;font-size:11.2px;margin:19.2px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Wygląd docelowy</figcaption></figure></div>
+<p><strong>Kroki:</strong></p>
+<ol><li>Utwórz nowy projekt <em>Empty Views Activity</em> (Java) i uprość <code>onCreate</code> (usuń EdgeToEdge i ViewCompat).</li><li>W <code>activity_main.xml</code> zamień korzeń na <code>LinearLayout</code> pionowy z tłem <code>#F0F4F8</code> i <code>android:id="@+id/main"</code>.</li><li>Dodaj tytuł „Profil ucznia”: 30sp, pogrubiony, biały, tło <code>#0B6E6E</code>, padding 16dp, na całą szerokość.</li><li>Dodaj trzy napisy 18sp z marginesem lewym 16dp i górnym 16dp / 8dp / 8dp. Ostatni zapisz kursywą.</li><li>Dodaj podpis „Autor: …” (wpisz swój numer): szary <code>#808080</code>, 14sp, wyśrodkowany, margines górny 24dp.</li><li>Uruchom i porównaj z makietą.</li></ol>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Każdy napis to osobny <code>TextView</code>. Wszystkie leżą bezpośrednio w jednym pionowym <code>LinearLayout</code>.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Margines lewy to <code>android:layout_marginStart="16dp"</code>, górny <code>android:layout_marginTop="…dp"</code>. Kursywa: <code>android:textStyle="italic"</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><p>Struktura:</p>
+<div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">LinearLayout (vertical, tło #F0F4F8, id main)
+ ├─ TextView tvTytul   (match_parent, 30sp, bold, biały, tło #0B6E6E, padding 16dp)
+ ├─ TextView tvImie    (marginStart 16dp, marginTop 16dp, 18sp)
+ ├─ TextView tvKlasa   (marginStart 16dp, marginTop 8dp, 18sp)
+ ├─ TextView tvZawod   (… italic)
+ └─ TextView tvAutor   (match_parent, gravity center, szary, 14sp, marginTop 24dp)</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>XML</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml"><span class="t-k">&lt;TextView</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvAutor"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+    <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"24dp"</span>
+    <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+    <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+    <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span>
+    <span class="t-a">android:textSize</span>=<span class="t-s">"14sp"</span> <span class="t-k">/&gt;</span></code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#F0F4F8"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Profil ucznia"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"30sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#0B6E6E"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"16dp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvImie"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Imię i nazwisko: Jan Kowalski"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvKlasa"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"8dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Klasa: 5 TP"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvZawod"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"16dp"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"8dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Zawód: technik programista"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"italic"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvAutor"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"24dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"14sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b01_prowadzone/">rozwiazania/b01_prowadzone/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b01-prowadzone">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="samodzielne"><h2><span class="sec-num">6.</span> Zadanie samodzielne</h2><div class="task" id="b01-samodzielne">
+<div class="task-head"><h3>Plakat koncertu</h3><span class="meta">⏱ ok. 35 min</span></div>
+<p>Odtwórz ekran wyłącznie na podstawie makiety i opisu. Nie ma listy kroków — sam zaplanuj kolejność elementów.</p>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#222222;padding:16px"><div class="m-t" style="color:#FFD700;font-size:27.2px;font-weight:700;text-align:center;align-self:stretch">ECHO PUŁTUSKA</div><div class="m-t" style="color:#fff;font-size:16px;font-style:italic;text-align:center;align-self:stretch">koncert jesienny</div><div class="m-t" style="color:#fff;font-size:14.4px;margin:24px 0px 0px 0px">Data: 24 października, 19:00</div><div class="m-t" style="color:#fff;font-size:14.4px;margin:6.4px 0px 0px 0px">Miejsce: aula szkoły</div><div class="m-t" style="color:#fff;font-size:14.4px;margin:6.4px 0px 0px 0px">Cena: 15 zł</div><div class="m-t" style="background:#C62828;color:#fff;font-size:16px;font-weight:700;padding:9.6px;margin:24px 0px 0px 0px;text-align:center;align-self:stretch">Bilety w sekretariacie</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Makieta</figcaption></figure></div>
+<ul><li>Tło całego ekranu <code>#222222</code>, odstęp treści od krawędzi ekranu 20dp.</li><li>Nazwa zespołu: złota <code>#FFD700</code>, 34sp, pogrubiona, wyśrodkowana.</li><li>Podtytuł: biały, 20sp, kursywa, wyśrodkowany.</li><li>Trzy wiersze informacji: białe, 18sp, pierwszy 30dp poniżej podtytułu, kolejne co 8dp.</li><li>Pasek „Bilety w sekretariacie”: na całą szerokość, tło <code>#C62828</code>, biały pogrubiony tekst 20sp na środku, padding 12dp, 30dp od informacji.</li></ul>
+
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>Odstęp „od krawędzi ekranu” dla wszystkich elementów najłatwiej uzyskać jednym atrybutem na korzeniu.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Korzeń: <code>android:padding="20dp"</code>, <code>android:background="#222222"</code>. Wyśrodkowane napisy: <code>match_parent</code> + <code>gravity="center"</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">LinearLayout (vertical, #222222, padding 20dp)
+ ├─ tvZespol (center, #FFD700, 34sp, bold)
+ ├─ tvPodtytul (center, biały, 20sp, italic)
+ ├─ tvData (marginTop 30dp)   ├─ tvMiejsce (marginTop 8dp)   ├─ tvCena (marginTop 8dp)
+ └─ tvBilety (match_parent, marginTop 30dp, tło #C62828, padding 12dp, center, bold)</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>XML</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml"><span class="t-k">&lt;TextView</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvBilety"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+    <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"30dp"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#C62828"</span>
+    <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"12dp"</span>
+    <span class="t-a">android:text</span>=<span class="t-s">"Bilety w sekretariacie"</span>
+    <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+    <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span>
+    <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span></code></pre></div></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#222222"</span>
+    <span class="t-a">android:padding</span>=<span class="t-s">"20dp"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvZespol"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"ECHO PUŁTUSKA"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFD700"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"34sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvPodtytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"koncert jesienny"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"italic"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvData"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"30dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Data: 24 października, 19:00"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvMiejsce"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"8dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Miejsce: aula szkoły"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvCena"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"8dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Cena: 15 zł"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvBilety"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"30dp"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#C62828"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"12dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Bilety w sekretariacie"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b01_samodzielne/">rozwiazania/b01_samodzielne/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b01-samodzielne">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="inf04"><h2><span class="sec-num">7.</span> Zadanie w stylu INF.04</h2><div class="task exam" id="b01-inf">
+<div class="task-head"><h3>Schronisko „Łapa” — ekran informacyjny</h3><span class="meta">⏱ ok. 40 min</span></div>
+<p>Za pomocą środowiska programistycznego wykonaj aplikację mobilną będącą ekranem informacyjnym schroniska dla zwierząt i uruchom ją w emulatorze.</p>
+<div class="box box-exam"><strong>Krok 1–6: analiza polecenia.</strong> Zanim otworzysz Android Studio, wypisz na kartce (lub w komentarzu) odpowiedzi:<div class="table-wrap"><table class="analysis"><tbody><tr><td>INTERFEJS</td><td>Co musi znaleźć się na ekranie?</td></tr><tr><td>DANE</td><td>Co wpisuje / wybiera użytkownik?</td></tr><tr><td>ZDARZENIA</td><td>Co uruchamia działania?</td></tr><tr><td>LOGIKA</td><td>Co trzeba policzyć / sprawdzić / zmienić?</td></tr><tr><td>WYNIK</td><td>Co aplikacja wyświetla lub zmienia?</td></tr><tr><td>WYGLĄD</td><td>Kolory, rozmiary, marginesy, rozkłady?</td></tr></tbody></table></div></div><details class="hint answer"><summary>Porównaj swoją analizę z wzorcową</summary><div class="hint-body"><div class="table-wrap"><table><tbody><tr><td>INTERFEJS</td><td>6 napisów (TextView)</td></tr><tr><td>DANE</td><td>brak — aplikacja tylko wyświetla</td></tr><tr><td>ZDARZENIA</td><td>brak</td></tr><tr><td>LOGIKA</td><td>brak</td></tr><tr><td>WYNIK</td><td>statyczny ekran z numerem zdającego</td></tr><tr><td>WYGLĄD</td><td>tło #FFF8DC; tytuł #8B4513 biały największy; „Godziny otwarcia” pogrubiony; pasek adopcji #DEB887 na całą szerokość; podpis wyśrodkowany szary</td></tr></tbody></table></div></div></details>
+<div class="phones"><figure class="phone-wrap"><div class="phone"><div class="m-status"><span>12:00</span><span>▾ ◢ ▮</span></div><div class="m-screen" style="background:#FFF8DC;padding:0px"><div class="m-t" style="background:#8B4513;color:#fff;font-size:24px;padding:8px;align-self:stretch">Schronisko Łapa</div><div class="m-t" style="font-size:16px;font-weight:700;margin:8px">Godziny otwarcia:</div><div class="m-t" style="font-size:14.4px;margin:0px 0px 0px 8px">pon.–pt. 10:00–18:00</div><div class="m-t" style="font-size:14.4px;margin:0px 0px 0px 8px">sobota 10:00–14:00</div><div class="m-t" style="background:#DEB887;font-size:14.4px;padding:8px;margin:8px;text-align:center;align-self:stretch">Adopcje: tel. 123 456 789</div><div class="m-t" style="color:#808080;font-size:11.2px;margin:16px 0px 0px 0px;text-align:center;align-self:stretch">Autor: 00000000000</div></div><div class="m-nav">◀ ● ■</div></div><figcaption>Obraz 1. Stan aplikacji po uruchomieniu</figcaption></figure></div>
+<p><strong>Elementy aplikacji:</strong></p>
+<ul><li>Napis „Schronisko Łapa”.</li><li>Napis „Godziny otwarcia:”.</li><li>Napisy „pon.–pt. 10:00–18:00” oraz „sobota 10:00–14:00”.</li><li>Napis „Adopcje: tel. 123 456 789”.</li><li>Napis „Autor: ”, dalej wstawiony numer zdającego.</li></ul>
+<p><strong>Założenia aplikacji:</strong></p>
+<ul><li>Interfejs użytkownika zapisany w języku znaczników (XML), rozkład liniowy pionowy.</li><li>Tło strony Cornsilk (#FFF8DC).</li><li>Napis tytułowy: tło SaddleBrown (#8B4513), biała czcionka, rozmiar największy w aplikacji, marginesy wewnętrzne 10.</li><li>Napis „Godziny otwarcia:” pogrubiony; napisy z godzinami mają lewy margines 10.</li><li>Napis o adopcjach: tło BurlyWood (#DEB887), czarna czcionka, na całą szerokość (z marginesem 10), tekst wyśrodkowany.</li><li>Napis z numerem zdającego wyśrodkowany, kolor Gray (#808080).</li><li>Kod aplikacji przygotuj tak jak na egzaminie: zrzut ekranu <code>mobile1.png</code> (emulator + środowisko), archiwum <code>mobilna.zip</code>, kopie <code>activity_main.xml</code> i <code>MainActivity.java</code> w folderze <code>mobilna</code>.</li></ul>
+
+<h4>Checklista zadania</h4><ul class="checklist" data-key="b01-inf"><li><label><input type="checkbox"> <span>projekt to Empty Views Activity w Javie i uruchamia się bez błędów</span></label></li><li><label><input type="checkbox"> <span>korzeń to pionowy <code>LinearLayout</code> z tłem #FFF8DC</span></label></li><li><label><input type="checkbox"> <span>tytuł ma tło #8B4513, białą czcionkę, padding 10dp i jest największy</span></label></li><li><label><input type="checkbox"> <span>„Godziny otwarcia:” jest pogrubiony</span></label></li><li><label><input type="checkbox"> <span>napisy z godzinami mają lewy margines 10dp</span></label></li><li><label><input type="checkbox"> <span>pasek adopcji: tło #DEB887, czarna czcionka, tekst wyśrodkowany, szerokość całego ekranu minus margines</span></label></li><li><label><input type="checkbox"> <span>napis „Autor: …” zawiera mój numer, jest wyśrodkowany i szary</span></label></li><li><label><input type="checkbox"> <span>wykonano zrzut <code>mobile1.png</code>, spakowano projekt do <code>mobilna.zip</code>, skopiowano XML i Java do folderu <code>mobilna</code></span></label></li></ul>
+<div class="hints"><p class="small muted">Pomoc — otwieraj po kolei i tylko wtedy, gdy utkniesz:</p><details class="hint l1"><summary>Poziom 1 — kierunek</summary><div class="hint-body"><p>To zadanie sprawdza tylko wygląd. Zacznij od drzewa elementów: ile napisów, który na całą szerokość, który ma tło.</p></div></details><details class="hint l2"><summary>Poziom 2 — konkretna wskazówka</summary><div class="hint-body"><p>Pasek adopcji: <code>layout_width="match_parent"</code> + <code>layout_margin="10dp"</code> + <code>gravity="center"</code>. Lewy margines godzin: <code>layout_marginStart="10dp"</code>.</p></div></details><details class="hint l3"><summary>Poziom 3 — pseudokod / struktura</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>Tekst</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-text">LinearLayout vertical (#FFF8DC, id main)
+ ├─ tvTytul    match_parent, tło #8B4513, biały, 30sp, padding 10dp
+ ├─ tvGodziny  margin 10dp, 20sp, bold
+ ├─ tvTydzien  marginStart 10dp, 18sp
+ ├─ tvSobota   marginStart 10dp, 18sp
+ ├─ tvAdopcje  match_parent, margin 10dp, tło #DEB887, padding 10dp, center, czarny
+ └─ tvAutor    match_parent, center, #808080, marginTop 20dp</code></pre></div></div></details><details class="hint l4"><summary>Poziom 4 — fragment implementacji</summary><div class="hint-body"><p><strong>Pakowanie (Windows):</strong> zamknij Android Studio lub wybierz <em>File → Close Project</em>, w Eksploratorze kliknij prawym przyciskiem folder projektu (np. <code>C:\Users\Egzamin\AndroidStudioProjects\Egzamin</code>) → <em>Wyślij do → Folder skompresowany (zip)</em> → zmień nazwę na <code>mobilna.zip</code>. Pliki do skopiowania: <code>app\src\main\res\layout\activity_main.xml</code> i <code>app\src\main\java\com\example\egzamin\MainActivity.java</code>.</p></div></details><details class="hint l5"><summary>Poziom 5 — pełne rozwiązanie</summary><div class="hint-body"><div class="code"><div class="code-bar"><span>res/layout/activity_main.xml</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-xml">&lt;?xml <span class="t-a">version</span>=<span class="t-s">"1.0"</span> <span class="t-a">encoding</span>=<span class="t-s">"utf-8"</span>?<span class="t-k">&gt;</span>
+<span class="t-k">&lt;LinearLayout</span> <span class="t-a">xmlns:android</span>=<span class="t-s">"http://schemas.android.com/apk/res/android"</span>
+    <span class="t-a">android:id</span>=<span class="t-s">"@+id/main"</span>
+    <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:layout_height</span>=<span class="t-s">"match_parent"</span>
+    <span class="t-a">android:orientation</span>=<span class="t-s">"vertical"</span>
+    <span class="t-a">android:background</span>=<span class="t-s">"#FFF8DC"</span><span class="t-k">&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTytul"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#8B4513"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Schronisko Łapa"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#FFFFFF"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"30sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvGodziny"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Godziny otwarcia:"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"20sp"</span>
+        <span class="t-a">android:textStyle</span>=<span class="t-s">"bold"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvTydzien"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"pon.–pt. 10:00–18:00"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvSobota"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginStart</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"sobota 10:00–14:00"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvAdopcje"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_margin</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:background</span>=<span class="t-s">"#DEB887"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:padding</span>=<span class="t-s">"10dp"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Adopcje: tel. 123 456 789"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#000000"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"18sp"</span> <span class="t-k">/&gt;</span>
+
+    <span class="t-k">&lt;TextView</span>
+        <span class="t-a">android:id</span>=<span class="t-s">"@+id/tvAutor"</span>
+        <span class="t-a">android:layout_width</span>=<span class="t-s">"match_parent"</span>
+        <span class="t-a">android:layout_height</span>=<span class="t-s">"wrap_content"</span>
+        <span class="t-a">android:layout_marginTop</span>=<span class="t-s">"20dp"</span>
+        <span class="t-a">android:gravity</span>=<span class="t-s">"center"</span>
+        <span class="t-a">android:text</span>=<span class="t-s">"Autor: 00000000000"</span>
+        <span class="t-a">android:textColor</span>=<span class="t-s">"#808080"</span>
+        <span class="t-a">android:textSize</span>=<span class="t-s">"14sp"</span> <span class="t-k">/&gt;</span>
+
+<span class="t-k">&lt;/LinearLayout</span><span class="t-k">&gt;</span></code></pre></div><div class="code"><div class="code-bar"><span>java/com/example/egzamin/MainActivity.java</span><button type="button" class="copy-btn">Kopiuj</button></div><pre><code class="lang-java"><span class="t-k">package</span> com.example.egzamin;
+
+<span class="t-k">import</span> android.os.<span class="t-t">Bundle</span>;
+
+<span class="t-k">import</span> androidx.appcompat.app.<span class="t-t">AppCompatActivity</span>;
+
+<span class="t-k">public</span> <span class="t-k">class</span> <span class="t-t">MainActivity</span> <span class="t-k">extends</span> <span class="t-t">AppCompatActivity</span> {
+
+    <span class="t-a">@Override</span>
+    <span class="t-k">protected</span> <span class="t-k">void</span> onCreate(<span class="t-t">Bundle</span> savedInstanceState) {
+        <span class="t-k">super</span>.onCreate(savedInstanceState);
+        setContentView(<span class="t-t">R</span>.layout.activity_main);
+    }
+}</code></pre></div><p class="small">Pliki rozwiązania: <a href="../rozwiazania/b01_inf/">rozwiazania/b01_inf/</a> (pierwsza linia <code>package</code> musi odpowiadać Twojemu projektowi).</p></div></details></div>
+<button type="button" class="btn secondary task-done-btn" data-task="b01-inf">Oznacz zadanie jako wykonane</button>
+</div></section>
+<section class="sec" id="checklista"><h2><span class="sec-num">8.</span> Checklista</h2><p class="small muted">Sprawdź swoją aplikację z zadania INF.04 punkt po punkcie (krok 10 procedury).</p><ul class="checklist" data-key="b01-check"><li><label><input type="checkbox"> <span>aplikacja uruchamia się w emulatorze bez błędów</span></label></li><li><label><input type="checkbox"> <span>korzeń układu to <code>LinearLayout</code> z <code>android:orientation="vertical"</code></span></label></li><li><label><input type="checkbox"> <span>każdy element ma <code>layout_width</code> i <code>layout_height</code></span></label></li><li><label><input type="checkbox"> <span>rozmiary czcionek w <strong>sp</strong>, marginesy i padding w <strong>dp</strong>, kolory z <code>#</code></span></label></li><li><label><input type="checkbox"> <span>tytuł ma największą czcionkę w aplikacji</span></label></li><li><label><input type="checkbox"> <span>elementy „na całą szerokość” mają <code>match_parent</code></span></label></li><li><label><input type="checkbox"> <span>wyśrodkowanie: <code>gravity</code> (treść) lub <code>layout_gravity</code> (element) — użyte właściwie</span></label></li><li><label><input type="checkbox"> <span>numer zdającego jest widoczny tam, gdzie wymaga polecenie</span></label></li></ul></section>
+<section class="sec" id="test"><h2><span class="sec-num">9.</span> Mini-test</h2><div class="quiz" data-quiz="b01"><script type="application/json">[{"q": "<p>Który szablon projektu wybierasz w Android Studio, aby otrzymać plik <code>activity_main.xml<\/code> i kod w Javie?<\/p>", "o": ["Empty Activity", "Empty Views Activity + Language: Java", "Basic Activity + Kotlin", "No Activity"], "a": 1, "e": "<p>„Empty Activity” w nowych wersjach tworzy projekt Jetpack Compose (bez XML). Arkusze wymagają interfejsu w języku znaczników.<\/p>"}, {"q": "<p>W jakiej jednostce podaje się <code>textSize<\/code>?<\/p>", "o": ["px", "dp", "sp", "pt"], "a": 2, "e": "<p><code>sp<\/code> skaluje się z ustawieniem rozmiaru czcionki w systemie. Marginesy i padding podajemy w <code>dp<\/code>.<\/p>"}, {"q": "<p>Arkusz: „Pola edycyjne są rozciągnięte na całą szerokość ekranu”. Jaki atrybut ustawisz?<\/p>", "o": ["<code>layout_width=\"wrap_content\"<\/code>", "<code>layout_width=\"match_parent\"<\/code>", "<code>gravity=\"fill\"<\/code>", "<code>layout_height=\"match_parent\"<\/code>"], "a": 1, "e": "<p><code>match_parent<\/code> = element zajmuje całą szerokość rodzica.<\/p>"}, {"q": "<p>Które pliki (oprócz <code>mobilna.zip<\/code>) kopiuje się do folderu <code>mobilna<\/code> według arkuszy?<\/p>", "o": ["<code>build.gradle<\/code> i <code>AndroidManifest.xml<\/code>", "<code>activity_main.xml<\/code> i <code>MainActivity.java<\/code>", "tylko plik <code>.apk<\/code>", "<code>strings.xml<\/code> i <code>colors.xml<\/code>"], "a": 1, "e": "<p>Arkusze: „plik źródłowy interfejsu użytkownika (XAML lub XML) oraz plik źródłowy kodu skojarzonego z interfejsem”.<\/p>"}, {"q": "<p>Co oznacza „marginesy wewnętrzne 10”?<\/p>", "o": ["<code>layout_margin=\"10dp\"<\/code>", "<code>padding=\"10dp\"<\/code>", "<code>textSize=\"10sp\"<\/code>", "<code>layout_weight=\"10\"<\/code>"], "a": 1, "e": "<p>Margines wewnętrzny = padding (odstęp treści od krawędzi elementu).<\/p>"}, {"q": "<p>Napis ma <code>layout_width=\"wrap_content\"<\/code>. Jak przesunąć go na środek ekranu w pionowym LinearLayout?<\/p>", "o": ["<code>android:gravity=\"center\"<\/code>", "<code>android:layout_gravity=\"center_horizontal\"<\/code>", "<code>android:textAlignment=\"center\"<\/code>", "nie da się"], "a": 1, "e": "<p>Wąski element trzeba przesunąć w rodzicu (<code>layout_gravity<\/code>). <code>gravity<\/code> wyrównuje treść wewnątrz elementu, który i tak ma szerokość tekstu.<\/p>"}]</script></div></section>
+<section class="sec" id="dodatkowe"><h2><span class="sec-num">10.</span> Skończyłeś wcześniej?</h2><div class="micro"><h4>Nazwa aplikacji</h4><p>Zmień nazwę wyświetlaną pod ikoną aplikacji na „Schronisko”. Gdzie ją znajdziesz?</p><details class="hint l2"><summary>Wskazówka</summary><div class="hint-body"><p>Plik <code>res/values/strings.xml</code>, element <code>&lt;string name="app_name"&gt;</code>.</p></div></details></div><div class="micro"><h4>Druga sekcja</h4><p>Dodaj do ekranu schroniska sekcję „Potrzebujemy:” (pogrubiona) i trzy pozycje: „karma”, „koce”, „zabawki” z wcięciem 20dp. Dobierz kolory tak, aby pasowały do reszty ekranu.</p></div><div class="micro"><h4>Tryb Design</h4><p>Przełącz edytor XML w tryb <em>Split</em>. Kliknij element w podglądzie i zmień jego kolor w panelu <em>Attributes</em>. Sprawdź, jaki atrybut dopisał się w kodzie. Na egzaminie szybciej jest jednak pisać kod ręcznie — porównaj czas.</p></div></section>
+<div class="nav-bottom"><a class="btn secondary" href="../index.html">← Strona główna</a><button type="button" class="btn block-done-btn">✓ Oznacz blok jako ukończony</button><a class="btn secondary" href="blok02.html">Blok 2 →</a></div></article></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
