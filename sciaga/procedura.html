@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Procedura egzaminacyjna — część mobilna — INF.04 — Aplikacje mobilne</title>
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body data-root="../">
+<header class="topbar"><div class="in"><a class="brand" href="../index.html">INF.04 — Aplikacje mobilne</a><nav><a href="../index.html">Bloki</a><a href="../zadania/index.html">Zadania</a><a href="../sciaga/android.html">Ściąga Android</a><a href="../sciaga/java.html">Ściąga Java</a><a href="../sciaga/procedura.html" class="active">Procedura egzaminu</a><a href="../wyniki.html">Moje wyniki</a></nav></div></header>
+<main class="wrap">
+<div class="storage-warn">Przeglądarka blokuje zapis postępu (localStorage). Materiały działają, ale postęp nie zostanie zapamiętany. Użyj Chrome lub Edge.</div>
+<div class="page"><h1>Procedura egzaminacyjna — część mobilna</h1><p>Na podstawie poleceń z analizowanych arkuszy. Zawsze <strong>czytaj własne polecenie</strong> — nazwy folderów i zrzutów różnią się między sesjami (np. <code>mobilna</code> / <code>mobilne</code>, <code>mobile1.png</code> / <code>mobilna.jpg</code>).</p>
+<h3>Przed startem (2 min)</h3>
+<ol><li>Utwórz folder nazwany <strong>numerem zdającego</strong>, a w nim podfoldery z polecenia (np. <code>konsola</code> lub <code>konsolowa</code>, <code>mobilna</code>, <code>dokumentacja</code> lub <code>testy</code>).</li><li>Rozpakuj archiwum z zasobami (hasło podane w arkuszu).</li><li>Uruchom Android Studio i emulator (Device Manager) — emulator startuje długo, więc zrób to od razu.</li></ol>
+<h3>Workflow 10 kroków</h3>
+<div class="table-wrap"><table><thead><tr><th>Krok</th><th>Czynność</th></tr></thead><tbody><tr><td>1</td><td>Przeczytaj całe zadanie</td></tr><tr><td>2</td><td>Wypisz elementy interfejsu</td></tr><tr><td>3</td><td>Wypisz dane wejściowe</td></tr><tr><td>4</td><td>Wypisz zdarzenia</td></tr><tr><td>5</td><td>Wypisz wymaganą logikę</td></tr><tr><td>6</td><td>Wypisz wymagane wyniki</td></tr><tr><td>7</td><td>Zbuduj interfejs (XML) — uruchom</td></tr><tr><td>8</td><td>Dodaj logikę (Java) — uruchamiaj po każdym zdarzeniu</td></tr><tr><td>9</td><td>Uruchom i przetestuj każdy punkt „Działania aplikacji”</td></tr><tr><td>10</td><td>Porównaj aplikację punkt po punkcie ze specyfikacją (także wygląd)</td></tr></tbody></table></div>
+<h3>Nowy projekt</h3>
+<p><em>File → New → New Project → <strong>Empty Views Activity</strong></em> → Name: dowolna (np. <code>Mobilna</code>), Language: <strong>Java</strong>, Minimum SDK: domyślne → Finish. Korzeń w <code>activity_main.xml</code> zamień na <code>LinearLayout</code>. Jeśli w <code>onCreate</code> są linie <code>EdgeToEdge</code>/<code>ViewCompat</code> — usuń je albo nadaj korzeniowi <code>android:id="@+id/main"</code>.</p>
+<h3>Zrzuty ekranu</h3>
+<ul><li>Obejmują <strong>cały ekran z paskiem zadań</strong>: widoczny emulator z aplikacją <strong>i</strong> otwarte środowisko z projektem.</li><li>Tyle zrzutów, ile interakcji (stan początkowy + każda czynność z polecenia).</li><li>Gdy aplikacja się nie kompiluje: zrzut z oknem błędów (Build) i środowiskiem.</li><li>Windows: <strong>PrtSc</strong> → Paint (Ctrl+V) → <em>Zapisz jako</em> PNG/JPG z nazwą z polecenia; lub <strong>Win+Shift+S</strong>.</li></ul>
+<h3>Pakowanie i kopiowanie</h3>
+<ol><li><em>File → Close Project</em> (zamyka pliki projektu).</li><li>Eksplorator: <code>C:\Users\&lt;konto&gt;\AndroidStudioProjects\&lt;Projekt&gt;</code> → prawy przycisk → <em>Wyślij do → Folder skompresowany (zip)</em> → nazwa <code>mobilna.zip</code> → przenieś do folderu <code>mobilna</code>.</li><li>Skopiuj do folderu <code>mobilna</code>:<ul><li><code>app\src\main\res\layout\activity_main.xml</code> (i inne zmieniane układy, np. <code>list_item.xml</code>),</li><li><code>app\src\main\java\com\example\…\MainActivity.java</code>.</li></ul></li></ol>
+<h3>Dokumentacja (gdy wymagana)</h3>
+<p>Plik <code>egzamin</code> (edytor tekstu pakietu biurowego) lub <code>srodowisko.txt</code> (Arkusz_07) zawiera:</p>
+<ul><li>nazwę systemu operacyjnego (np. Windows 10 Pro),</li><li>nazwy środowisk programistycznych (np. Android Studio + wersja z <em>Help → About</em>; środowisko części konsolowej),</li><li>nazwy języków programowania (Java, XML; + język części konsolowej),</li><li>nazwę emulatora (np. <em>Pixel 5 API 30</em> — z Device Manager),</li><li>podpisane zrzuty ekranu (jeśli polecenie tego wymaga) i opcjonalny komentarz.</li></ul>
+<h3>Lista kontrolna oddania</h3><ul class="checklist" data-key="procedura-oddanie">
+<li><label><input type="checkbox"> <span>folder z numerem zdającego i podfoldery o nazwach z polecenia</span></label></li>
+<li><label><input type="checkbox"> <span>aplikacja kompiluje się i uruchamia w emulatorze (lub zrzut błędów)</span></label></li>
+<li><label><input type="checkbox"> <span>zrzuty: stan początkowy + każda interakcja, cały ekran z paskiem zadań, poprawne nazwy</span></label></li>
+<li><label><input type="checkbox"> <span><code>mobilna.zip</code> z całym folderem projektu</span></label></li>
+<li><label><input type="checkbox"> <span>kopie <code>activity_main.xml</code> (+ inne układy) i <code>MainActivity.java</code></span></label></li>
+<li><label><input type="checkbox"> <span>dokumentacja / <code>srodowisko.txt</code>: system, środowiska, języki, emulator</span></label></li>
+<li><label><input type="checkbox"> <span>numer zdającego wstawiony w aplikacji tam, gdzie wymaga polecenie</span></label></li>
+<li><label><input type="checkbox"> <span>sprawdziłem zawartość płyty / folderu po nagraniu</span></label></li>
+</ul></div>
+</main>
+<script src="../js/config.js"></script>
+<script src="../js/data.js"></script>
+<script src="../js/progress.js"></script>
+<script src="../js/sync.js"></script>
+<script src="../js/quiz.js"></script>
+<script src="../js/app.js"></script>
+</body>
+</html>
