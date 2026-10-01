@@ -1,213 +1,81 @@
-/* Logika portalu: kopiowanie kodu, checklisty, statusy, dashboard, wyniki. */
-(function () {
-  var C = window.COURSE || { blocks: [], tasks: [] };
-  function $(s, r) { return (r || document).querySelector(s); }
-  function $all(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
-  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-  function root() { return document.body.getAttribute('data-root') || ''; }
-  function pct(a, b) { return b ? Math.round(100 * a / b) : 0; }
-  function fmtTime(sec) { var m = Math.round((sec || 0) / 60); return m < 60 ? m + ' min' : Math.floor(m / 60) + ' h ' + (m % 60) + ' min'; }
-  function fmtDate(iso) { if (!iso) return ''; var d = new Date(iso); return d.toLocaleDateString('pl-PL') + ' ' + d.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' }); }
-
-  /* ---- kopiowanie kodu ---- */
-  function copyText(text, done) {
-    function fallback() {
-      var ta = document.createElement('textarea');
-      ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px';
-      document.body.appendChild(ta); ta.select();
-      var ok = false; try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
-      document.body.removeChild(ta); done(ok);
-    }
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text).then(function () { done(true); }, fallback);
-    } else { fallback(); }
-  }
-  function initCopy() {
-    $all('.copy-btn').forEach(function (b) {
-      b.addEventListener('click', function () {
-        var code = b.closest('.code').querySelector('code').innerText;
-        copyText(code, function (ok) {
-          b.textContent = ok ? 'Skopiowano ✓' : 'Zaznacz i Ctrl+C';
-          b.classList.toggle('ok', ok);
-          setTimeout(function () { b.textContent = 'Kopiuj'; b.classList.remove('ok'); }, 1800);
-        });
-      });
-    });
-  }
-
-  /* ---- checklisty ---- */
-  function initChecklists() {
-    $all('ul.checklist[data-key]').forEach(function (ul) {
-      var key = ul.getAttribute('data-key');
-      var st = Progress.getChecks(key);
-      $all('input[type=checkbox]', ul).forEach(function (inp, i) {
-        inp.checked = !!st[i];
-        inp.addEventListener('change', function () { Progress.setCheck(key, i, inp.checked); });
-      });
-    });
-  }
-  function paintChecklists() {
-    $all('ul.checklist[data-key]').forEach(function (ul) {
-      var st = Progress.getChecks(ul.getAttribute('data-key'));
-      $all('input[type=checkbox]', ul).forEach(function (inp, i) { inp.checked = !!st[i]; });
-    });
-  }
-
-  /* ---- zadania: oznacz jako wykonane ---- */
-  function paintTaskBtn(b) {
-    var id = b.getAttribute('data-task');
-    var done = Progress.isTaskDone(id);
-    b.classList.toggle('done', done);
-    b.textContent = done ? '✓ Zadanie wykonane (kliknij, aby cofnąć)' : 'Oznacz zadanie jako wykonane';
-  }
-  function initTaskBtns() {
-    $all('.task-done-btn[data-task]').forEach(function (b) {
-      paintTaskBtn(b);
-      b.addEventListener('click', function () {
-        var id = b.getAttribute('data-task');
-        Progress.setTaskDone(id, !Progress.isTaskDone(id));
-        paintTaskBtn(b);
-      });
-    });
-  }
-
-  /* ---- blok: ukończony ---- */
-  function paintBlockBtns(id) {
-    var done = Progress.isDone(id);
-    $all('.block-done-btn').forEach(function (b) {
-      b.classList.toggle('done', done);
-      b.textContent = done ? '✓ Blok ukończony — cofnij' : '✓ Oznacz blok jako ukończony';
-    });
-    var st = $('#block-status');
-    if (st) { st.textContent = done ? 'Ukończony' : 'W trakcie'; st.className = 'badge ' + (done ? 'ok' : ''); }
-  }
-  function initBlock() {
-    var id = document.body.getAttribute('data-block');
-    if (!id) return;
-    Progress.visit(id);
-    paintBlockBtns(id);
-    initTimer(id);
-    $all('.block-done-btn').forEach(function (b) {
-      b.addEventListener('click', function () { Progress.setDone(id, !Progress.isDone(id)); paintBlockBtns(id); });
-    });
-  }
-
-  /* ---- czas pracy: liczony, gdy strona bloku jest widoczna i uczeń był aktywny w ostatnich 3 min ---- */
-  var TICK = 20, IDLE = 180000;
-  function initTimer(id) {
-    var lastAct = Date.now();
-    function act() { lastAct = Date.now(); }
-    ['mousemove', 'mousedown', 'keydown', 'scroll', 'touchstart', 'wheel'].forEach(function (ev) {
-      window.addEventListener(ev, act, { passive: true });
-    });
-    setInterval(function () {
-      if (document.visibilityState === 'visible' && Date.now() - lastAct < IDLE) Progress.addTime(id, TICK);
-    }, TICK * 1000);
-  }
-
-  /* ---- dashboard ---- */
-  function statusLabel(s) {
-    return s === 'done' ? ['Ukończony', 'done'] : s === 'progress' ? ['W trakcie', 'progress-s'] : ['Nierozpoczęty', 'new'];
-  }
-  function courseStats() {
-    var done = 0; C.blocks.forEach(function (b) { if (Progress.isDone(b.id)) done++; });
-    var tasksDone = 0; C.tasks.forEach(function (t) { if (Progress.isTaskDone(t.id)) tasksDone++; });
-    var quizzes = 0, qSum = 0, qMax = 0;
-    var time = 0;
-    C.blocks.forEach(function (b) { var q = Progress.quiz(b.id); if (q) { quizzes++; qSum += q.best; qMax += q.max; } time += Progress.time(b.id); });
-    return { done: done, total: C.blocks.length, tasksDone: tasksDone, tasksTotal: C.tasks.length, quizzes: quizzes, qSum: qSum, qMax: qMax, time: time };
-  }
-  function renderHome() {
-    var host = $('#dash'); if (!host) return;
-    var s = courseStats();
-    $('#course-pct').textContent = pct(s.done, s.total) + '%';
-    $('#course-bar').style.width = pct(s.done, s.total) + '%';
-    $('#course-done').textContent = s.done + ' / ' + s.total;
-    $('#course-tasks').textContent = s.tasksDone + ' / ' + s.tasksTotal;
-    $('#course-quiz').textContent = s.qMax ? pct(s.qSum, s.qMax) + '%' : '—';
-    var phases = { 1: 'Faza I — przypomnienie i wyrównanie poziomu', 2: 'Faza II — łączenie umiejętności', 3: 'Faza III — tryb egzaminacyjny' };
-    var html = '';
-    [1, 2, 3].forEach(function (ph) {
-      html += '<h2 class="phase-title">' + phases[ph] + '</h2><div class="cards">';
-      C.blocks.filter(function (b) { return b.phase === ph; }).forEach(function (b) {
-        var st = Progress.status(b.id), lab = statusLabel(st), q = Progress.quiz(b.id);
-        var n = C.tasks.filter(function (t) { return t.block === b.id; });
-        var nd = n.filter(function (t) { return Progress.isTaskDone(t.id); }).length;
-        html += '<div class="card"><div class="muted small">Blok ' + b.num + ' · 4 × 45 min</div>' +
-          '<h3>' + esc(b.title) + '</h3><div class="small">' + esc(b.short) + '</div>' +
-          '<div class="status ' + lab[1] + '">' + lab[0] + '</div>' +
-          '<div class="small muted">Zadania: ' + nd + '/' + n.length + ' · Mini-test: ' + (q ? q.best + '/' + q.max : '—') + '</div>' +
-          '<div class="foot"><a class="btn" href="bloki/' + b.file + '">' + (st === 'new' ? 'Rozpocznij' : st === 'done' ? 'Otwórz' : 'Kontynuuj') + '</a></div></div>';
-      });
-      html += '</div>';
-    });
-    host.innerHTML = html;
-  }
-
-  /* ---- Moje wyniki ---- */
-  function renderResults() {
-    var host = $('#results'); if (!host) return;
-    var s = courseStats();
-    var h = '<div class="stats">' +
-      '<div class="stat">Postęp kursu<b>' + pct(s.done, s.total) + '%</b></div>' +
-      '<div class="stat">Ukończone bloki<b>' + s.done + ' / ' + s.total + '</b></div>' +
-      '<div class="stat">Zadania wykonane<b>' + s.tasksDone + ' / ' + s.tasksTotal + '</b></div>' +
-      '<div class="stat">Mini-testy (najlepsze)<b>' + (s.qMax ? s.qSum + ' / ' + s.qMax : '—') + '</b></div>' +
-      '<div class="stat">Czas pracy w blokach<b>' + fmtTime(s.time) + '</b></div></div>' +
-      '<div class="progress"><div style="width:' + pct(s.done, s.total) + '%"></div></div>';
-    h += '<h2>Bloki i mini-testy</h2><div class="table-wrap"><table><thead><tr><th>Blok</th><th>Status</th><th>Mini-test (ostatni)</th><th>Najlepszy</th><th>Podejść</th><th>Zadania</th><th>Czas</th></tr></thead><tbody>';
-    C.blocks.forEach(function (b) {
-      var lab = statusLabel(Progress.status(b.id)), q = Progress.quiz(b.id);
-      var n = C.tasks.filter(function (t) { return t.block === b.id; });
-      var nd = n.filter(function (t) { return Progress.isTaskDone(t.id); }).length;
-      h += '<tr><td>' + b.num + '. ' + esc(b.title) + '</td><td>' + lab[0] + (Progress.data().blocks[b.id] && Progress.data().blocks[b.id].doneAt ? '<br><span class="small muted">' + fmtDate(Progress.data().blocks[b.id].doneAt) + '</span>' : '') + '</td>' +
-        '<td>' + (q ? q.score + '/' + q.max : '—') + '</td><td>' + (q ? q.best + '/' + q.max : '—') + '</td><td>' + (q ? q.attempts : 0) + '</td><td>' + nd + '/' + n.length + '</td><td>' + (Progress.time(b.id) ? fmtTime(Progress.time(b.id)) : '—') + '</td></tr>';
-    });
-    h += '</tbody></table></div>';
-    h += '<h2>Zadania kontrolne (INF.04 i próbne egzaminy)</h2><div class="table-wrap"><table><thead><tr><th>Blok</th><th>Zadanie</th><th>Status</th></tr></thead><tbody>';
-    C.tasks.filter(function (t) { return t.kind === 'exam' || t.kind === 'mock'; }).forEach(function (t) {
-      var d = Progress.data().tasks[t.id];
-      h += '<tr><td>' + t.num + '</td><td>' + esc(t.title) + '</td><td>' + (d ? '✓ wykonane <span class="small muted">' + fmtDate(d) + '</span>' : '—') + '</td></tr>';
-    });
-    h += '</tbody></table></div>';
-    host.innerHTML = h;
-    var pd = $('#print-date'); if (pd) pd.textContent = new Date().toLocaleString('pl-PL');
-  }
-
-  /* ---- lista zadań ---- */
-  function renderTasks() {
-    $all('[data-task-status]').forEach(function (td) {
-      var d = Progress.data().tasks[td.getAttribute('data-task-status')];
-      td.innerHTML = d ? '✓ <span class="small muted">' + fmtDate(d) + '</span>' : '—';
-    });
-  }
-
-  /* ---- reset ---- */
-  function initReset() {
-    var b = $('#reset-btn'); if (!b) return;
-    var row = $('#reset-confirm');
-    b.addEventListener('click', function () { row.classList.add('show'); });
-    $('#reset-no').addEventListener('click', function () { row.classList.remove('show'); });
-    $('#reset-yes').addEventListener('click', function () {
-      Progress.reset(); row.classList.remove('show'); renderResults(); renderHome();
-      var m = $('#reset-msg'); if (m) { m.textContent = 'Postęp został wyczyszczony.'; }
-    });
-  }
-
-  /* ---- odświeżenie po synchronizacji (js/sync.js) ---- */
-  function refreshAll() {
-    paintChecklists();
-    $all('.task-done-btn[data-task]').forEach(paintTaskBtn);
-    var bid = document.body.getAttribute('data-block');
-    if (bid) paintBlockBtns(bid);
-    renderHome(); renderResults(); renderTasks();
-  }
-
-  document.addEventListener('DOMContentLoaded', function () {
-    if (!Progress.storageOk()) { var w = $('.storage-warn'); if (w) w.style.display = 'block'; }
-    initCopy(); initChecklists(); initTaskBtns(); initBlock(); renderHome(); renderResults(); renderTasks(); initReset();
-    $all('.print-btn').forEach(function (b) { b.addEventListener('click', function () { window.print(); }); });
-    document.addEventListener('quiz-saved', function () { renderResults(); });
-    document.addEventListener('progress-synced', refreshAll);
-  });
-})();
+import {CONFIG} from './config.js';
+import {api as requestApi,isDemo,setContent,resetDemoData,seedDashboard,clearReadCache,setCredential} from './api.js';
+import {loginDemo,logout,mountGoogle,restoreLogin} from './auth.js';
+import {esc,csv,download,date} from './utils.js';
+import {runCode} from './editor.js';
+const $=s=>document.querySelector(s), app=$('#app');
+let content,user,dashboard,currentAttempt=null,currentTest='',pendingStart=null,routeSequence=0,activeLesson=null,lastInteraction=Date.now(),timer;
+let lessonSeconds=0;
+const openedLessons=new Set();
+async function api(action,payload={}){const lessonId=activeLesson,seconds=lessonSeconds;if(lessonId&&seconds>0&&['startTest','submitTest','completeLesson'].includes(action))payload={...payload,activity:{lessonId,seconds:Math.min(seconds,2700)}};const result=await requestApi(action,payload);if(payload.activity&&activeLesson===lessonId)lessonSeconds=Math.max(0,lessonSeconds-seconds);return result;}
+function acceptLogin(u){openedLessons.clear();user=u;dashboard=u.dashboard;seedDashboard(dashboard);shell();const target=location.hash.slice(1)||(user.role==='STUDENT'?'dashboard':'teacher');if(location.hash.slice(1)!==target)location.hash=target;else route();}
+const navigation=[['dashboard','◫','Dashboard'],['course','▤','Kurs · 120 lekcji'],['exercises','⌘','Ćwiczenia'],['tests','▣','Testy'],['exam','⚑','Egzamin'],['progress','▥','Moje postępy'],['checklist','☑','Checklista'],['glossary','Aa','Słownik'],['reference','⌥','Quick reference']];
+function notify(message){const n=$('#notice');n.textContent=message;n.hidden=false;clearTimeout(timer);timer=setTimeout(()=>n.hidden=true,7000);}
+function error(e){notify(e.message||'Nie udało się wykonać operacji.');if(e.code==='UNAUTHORIZED'&&!isDemo&&user&&!$('#reauth')){const dialog=document.createElement('dialog');dialog.id='reauth';dialog.innerHTML='<h2>Odnów logowanie</h2><p>Twoje odpowiedzi pozostają w formularzu. Zaloguj się na to samo konto, a potem ponów wysłanie.</p><div id="reauth-google"></div><p id="reauth-error" role="alert"></p><button id="reauth-close">Wróć do formularza</button>';document.body.append(dialog);dialog.showModal();bind('#reauth-close','click',()=>{dialog.close();dialog.remove();});mountGoogle($('#reauth-google'),u=>{if(u.userId!==user.userId){logout();$('#reauth-error').textContent='Wybierz to samo konto, na którym rozpoczęto test.';return;}dialog.close();dialog.remove();notify('Sesja odnowiona. Możesz ponowić wysłanie formularza.');},err=>$('#reauth-error').textContent=err.message);}}
+function bind(selector,event,fn){const el=$(selector);if(el)el.addEventListener(event,async e=>{try{await fn(e);}catch(err){error(err);}});}
+function head(title,description,extra=''){return `<div class="page-head"><div><h1>${esc(title)}</h1><p class="muted">${esc(description)}</p></div>${extra}</div>`;}
+function bar(value){return `<div class="bar" role="progressbar" aria-valuenow="${value}" aria-valuemin="0" aria-valuemax="100"><span style="width:${value}%"></span></div>`;}
+function stat(label,value,note,symbol){return `<div class="card metric"><div><span class="muted">${esc(label)}</span><strong>${esc(value)}</strong><small>${esc(note)}</small></div><span class="symbol" aria-hidden="true">${symbol}</span></div>`;}
+function inCategory(skill,category){return content.questions.some(q=>q.category===category&&q.skills.includes(skill));}
+function empty(text){return `<p class="empty">${esc(text)}</p>`;}
+function lessonRow(l){const done=dashboard?.progress.some(p=>p.lessonId===l.id&&p.status==='COMPLETED');return `<div class="list-item"><span class="number">${String(l.number).padStart(3,'0')}</span><div class="grow"><a href="#lesson/${l.id}"><strong>${esc(l.title)}</strong></a><small>${l.duration} min · ${esc(l.skills.join(' · '))}</small></div><span class="badge ${done?'green':''}">${done?'Ukończona':l.examPriority}</span></div>`;}
+function moduleCard(m){const count=dashboard.moduleProgress.find(x=>x.id===m.id);return `<a class="card course-card" href="#course/${m.id}"><span class="course-icon">${esc(m.icon)}</span><h3>${esc(m.title)}</h3><p>${esc(m.description)}</p>${bar(Math.round(count.completed/count.total*100))}<footer><span>${count.completed} / ${count.total} lekcji</span><span>Otwórz →</span></footer></a>`;}
+function shell(){app.innerHTML=`<div class="shell"><aside class="sidebar" id="sidebar"><a class="brand" href="#dashboard"><img src="assets/favicon.svg" alt=""><span>INF.03 Academy<small>TWOJA DROGA DO EGZAMINU</small></span></a><div class="eyebrow nav-caption">Przestrzeń nauki</div><nav class="nav" aria-label="Menu główne">${navigation.map(([id,icon,label])=>`<a href="#${id}" data-nav="${id}"><span class="icon" aria-hidden="true">${icon}</span>${label}</a>`).join('')}${user.role!=='STUDENT'?'<div class="eyebrow nav-caption">Dla nauczyciela</div><a href="#teacher" data-nav="teacher"><span class="icon">▦</span>Klasy i analityka</a>':''}${user.role==='ADMIN'?'<a href="#admin" data-nav="admin"><span class="icon">⚙</span>Administracja</a>':''}</nav><div class="sidebar-bottom"><div class="sidebar-note"><strong>Małe kroki. Realne umiejętności.</strong>Każda lekcja przybliża Cię do samodzielnego rozwiązania zadania.</div><button id="logout" class="quiet small">↪ Wyloguj się</button></div></aside><div class="layout-main"><header class="topbar"><button class="mobile-menu" id="menu" aria-label="Otwórz menu" aria-expanded="false">☰</button><form id="search-form" role="search"><input id="search" type="search" aria-label="Szukaj lekcji" placeholder="Szukaj tematu, np. flexbox…"></form><div class="top-actions"><label class="sr-label"><select id="theme" aria-label="Motyw"><option value="system">System</option><option value="light">Jasny</option><option value="dark">Ciemny</option></select></label><div class="avatar" aria-hidden="true">${esc(user.name.slice(0,1))}</div><div class="account">${esc(user.name)}<br><small>${esc(user.role)}</small></div></div></header>${isDemo?'<div class="demo-strip"><strong>TRYB DEMO</strong>Dane na tym urządzeniu. Wyniki nie są wysyłane do szkoły.</div>':''}<main id="main" tabindex="-1"></main></div></div>`;
+  $('#theme').value=localStorage.getItem('inf03-theme')||'system';bind('#theme','change',e=>{document.documentElement.dataset.theme=e.target.value;localStorage.setItem('inf03-theme',e.target.value);});bind('#logout','click',()=>{logout();routeSequence++;openedLessons.clear();user=null;currentAttempt=null;pendingStart=null;activeLesson=null;location.hash='';showLogin();});bind('#menu','click',e=>{const open=$('#sidebar').classList.toggle('open');e.currentTarget.setAttribute('aria-expanded',String(open));});bind('#search-form','submit',e=>{e.preventDefault();location.hash='course?q='+encodeURIComponent($('#search').value);});}
+function showLogin(){app.innerHTML=`<div class="login"><section class="login-art"><a class="brand" href="#"><img src="assets/favicon.svg" alt=""><span>INF.03 Academy</span></a><div><div class="eyebrow" style="color:#a9c9b4">KODUJ. ROZUMIEJ. ZDAWAJ ŚWIADOMIE.</div><h1>Od pierwszej linii<br>do własnej strony.</h1><p>120 lekcji HTML, CSS i JavaScript. Konkretne przykłady, praktyczne ćwiczenia i postępy, które możesz zobaczyć.</p><div class="tag-list"><span class="badge">&lt;HTML&gt;</span><span class="badge">{ CSS }</span><span class="badge">JavaScript()</span></div></div><footer>Część webowa kwalifikacji INF.03 · materiały autorskie</footer></section><main class="login-main" id="main" tabindex="-1"><div><div class="eyebrow">Twoja przestrzeń nauki</div><h1>Dobrze Cię widzieć.</h1><p class="muted">Zaloguj się i zrób kolejny krok.</p>${isDemo?`<div class="tip">Tryb demonstracyjny — konta fikcyjne. Dane zostają w tej przeglądarce.</div><button class="primary" data-demo="student-a">Wejdź jako Aleksandra →</button><button data-demo="student-b">Wejdź jako Michał</button><button data-demo="teacher">Zobacz panel nauczyciela</button><button data-demo="admin">Panel administratora</button><button class="quiet small" id="reset-demo">Wyczyść dane demo</button>`:'<div id="google-login"></div>'}<p class="subtle" style="font-size:.78rem;margin-top:22px">Logowanie w szkole wymaga zatwierdzonego konta. Przed użyciem sprawdź <a href="docs/PRIVACY.md">zasady przetwarzania danych</a>.</p><p id="login-error" role="alert"></p></div></main></div>`;
+  document.querySelectorAll('[data-demo]').forEach(b=>b.onclick=async()=>{try{acceptLogin(await loginDemo(b.dataset.demo));}catch(e){error(e);}});bind('#reset-demo','click',()=>{resetDemoData();notify('Dane demo zostały usunięte.');});if(!isDemo)mountGoogle($('#google-login'),u=>acceptLogin(u),e=>$('#login-error').textContent=e.message);
+}
+async function route(){if(!user)return;const sequence=++routeSequence;activeLesson=null;lessonSeconds=0;try{const raw=location.hash.slice(1)||'dashboard',[path,query]=raw.split('?'),[page,id]=path.split('/'),main=$('#main');main.innerHTML=head(navigation.find(n=>n[0]===page)?.[2]||({teacher:'Klasy i analityka',admin:'Administracja',lesson:'Lekcja'}[page]||'Wczytywanie'),'')+'<p role="status">Wczytywanie danych…</p>';document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('active',a.dataset.nav===(page==='lesson'?'course':page)));$('#sidebar').classList.remove('open');$('#menu').setAttribute('aria-expanded','false');window.scrollTo(0,0);if(['dashboard','course','progress'].includes(page))dashboard=await api('getStudentDashboard');if(sequence!==routeSequence)return;
+  switch(page){case'dashboard':renderDashboard();break;case'course':renderCourse(id,new URLSearchParams(query).get('q')||'');break;case'lesson':await renderLesson(id);break;case'exercises':renderExercises();break;case'tests':await renderTests();break;case'exam':renderExams();break;case'progress':renderProgress();break;case'checklist':await renderChecklist();break;case'glossary':renderGlossary();break;case'reference':renderReference();break;case'teacher':await renderTeacher(id);break;case'admin':await renderAdmin();break;default:main.innerHTML=head('Nie znaleziono strony','Wybierz pozycję z menu.');}
+  if(sequence!==routeSequence)return;if(['dashboard','course','progress','teacher','tests','checklist'].includes(page)){main.insertAdjacentHTML('afterbegin','<div class="toolbar"><button id="refresh-data" class="small">↻ Odśwież dane</button><small class="muted">Dane są przechowywane w tej sesji do 60 sekund.</small></div>');bind('#refresh-data','click',()=>{clearReadCache();return route();});}main.insertAdjacentHTML('beforeend','<footer class="site-footer"><span>INF.03 Academy · Część webowa · 2026.1</span><span>120 × 45 min · Nauka w Twoim tempie</span></footer>');document.title=(main.querySelector('h1')?.textContent||'Nauka')+' · INF.03 Academy';window.scrollTo(0,0);
+ }catch(e){if(sequence!==routeSequence)return;$('#main').innerHTML=`<div class="error-box"><h1>${e.code==='FORBIDDEN'?'Brak dostępu':'Nie udało się wczytać danych'}</h1><p>${esc(e.message)}</p><button id="retry">Spróbuj ponownie</button></div>`;bind('#retry','click',route);if(e.code==='UNAUTHORIZED')error(e);}}
+function renderDashboard(){const d=dashboard,next=content.lessons.find(l=>!d.progress.some(p=>p.lessonId===l.id&&p.status==='COMPLETED'))||content.lessons[119];$('#main').innerHTML=head('Cześć, '+user.name.split(' ')[0]+' 👋','Dobry moment, żeby nauczyć się czegoś nowego.',`<span class="badge green">● TWÓJ PLAN · 120 GODZIN</span>`)+`<div class="grid cols-4">${stat('Postęp kursu',d.courseProgress+'%',d.completed+' ze 120 lekcji','↗')}${stat('Ukończone moduły',d.moduleProgress.filter(m=>m.completed===m.total).length+' / 12','Krok po kroku do celu','▤')}${stat('Średni wynik',d.testAverage===null?'—':d.testAverage+'%',d.attempts.length+' zakończonych testów','✓')}${stat('Dni z nauką',d.activityDays.length,'Każda sesja ma znaczenie','◷')}</div><div class="grid cols-2 section"><section class="card hero"><div class="hero-content"><div class="eyebrow">KONTYNUUJ TAM, GDZIE SKOŃCZYŁEŚ</div><h2>${esc(next.title)}</h2><p>Lekcja ${next.number} · ${esc(content.modules.find(m=>m.id===next.module).title)} · 45 minut</p><a class="button primary" href="#lesson/${next.id}">Kontynuuj naukę <span>→</span></a></div><div class="code-art" aria-hidden="true">&lt;/&gt;<span>JEDNA LEKCJA DALEJ.</span></div></section><section class="card readiness"><div class="eyebrow">GOTOWOŚĆ · CZĘŚĆ WEBOWA</div><div class="ring" style="--value:${d.readiness}"><div class="ring-inner"><strong>${d.readiness}%</strong><small>opanowanych kompetencji</small></div></div><p>Kompetencje P1 mają największą wagę.<br>Wskaźnik nie przewiduje wyniku egzaminu.</p><a href="#progress" class="small">Zobacz swoje kompetencje →</a></section></div><section class="section"><div class="section-title"><h2>Twoja ścieżka nauki</h2><a href="#course" class="small">Wszystkie moduły →</a></div><div class="grid cols-3">${content.modules.slice(0,3).map(moduleCard).join('')}</div></section><div class="grid cols-2 section"><section class="card"><div class="section-title"><h2>${d.recommendations.length?'Warto powtórzyć':'Na dobry początek'}</h2><span class="badge">TWÓJ NASTĘPNY KROK</span></div>${(d.recommendations.length?d.recommendations:content.lessons.slice(0,3)).map(lessonRow).join('')}</section><section class="card"><h2>Ostatnia aktywność</h2>${d.testTrend.length?d.testTrend.slice(-3).reverse().map(a=>`<div class="list-item"><span class="number">✓</span><div class="grow"><strong>${esc(a.title)}</strong><small>${date(a.finishedAt)}</small></div><b>${a.percentage}%</b></div>`).join(''):empty('Twoje ukończone testy pojawią się tutaj. Zacznij od pierwszej lekcji.')}<div class="tip">Na egzaminie liczą się szczegóły. Czytaj polecenie, sprawdzaj nazwy plików i testuj efekt po każdej zmianie.</div></section></div>`;}
+function renderCourse(module,search){const lessons=content.lessons.filter(l=>(!module||l.module===module)&&(!search||[l.title,...l.skills,...l.theory].join(' ').toLocaleLowerCase('pl').includes(search.toLocaleLowerCase('pl'))));$('#main').innerHTML=head('Twoja ścieżka nauki',search?'Wyniki wyszukiwania: '+search:'12 modułów · 120 lekcji · 5400 minut praktyki')+(module||search?`<a href="#course">← Wszystkie moduły</a><div class="card section">${lessons.length?lessons.map(lessonRow).join(''):empty('Brak wyników. Spróbuj innego hasła.')}</div>`:`<div class="grid cols-3">${content.modules.map(moduleCard).join('')}</div><div class="tip section">Zakres kursu: HTML, CSS, JavaScript i DOM. Bazy danych, SQL i programowanie serwerowe wymagają odrębnego przygotowania.</div>`);}
+async function renderLesson(id){const sequence=routeSequence;const l=content.lessons.find(l=>l.id===id);if(!l)throw Error('Nieznana lekcja.');if(!openedLessons.has(id)){openedLessons.add(id);void api('saveProgress',{lessonId:id,seconds:0}).catch(e=>{openedLessons.delete(id);if(sequence===routeSequence)error(e);});}activeLesson=id;$('#main').innerHTML=`<div class="breadcrumb"><a href="#course">Kurs</a> / <a href="#course/${l.module}">${esc(content.modules.find(m=>m.id===l.module).title)}</a> / Lekcja ${l.number}</div><article class="lesson-body"><header class="lesson-header"><div class="eyebrow">LEKCJA ${l.number} · 45 MINUT · ${l.examPriority}</div><h1>${esc(l.title)}</h1><div class="tag-list">${l.skills.map(s=>`<span class="badge">${esc(s)}</span>`).join('')}</div></header><section class="card"><h2>Dzisiaj nauczysz się</h2><ul>${l.objectives.map(x=>`<li>${esc(x)}</li>`).join('')}</ul><div class="tip"><strong>Po co Ci to na INF.03?</strong><br>${esc(l.examReason)}</div></section><section class="card"><h2>Teoria</h2>${l.theory.map(t=>`<p>${esc(t)}</p>`).join('')}<h3>Przykład</h3>${l.examples.map(x=>`<p>${esc(x.description)}</p><pre><code>${esc(x.code)}</code></pre>`).join('')}</section><section class="card"><h2>Spróbuj sam</h2><ol>${l.exercises.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>${editorMarkup(l.code)}</section><section class="card"><h2>Znajdź błąd</h2><pre>${esc(l.debug.code)}</pre><p>${esc(l.debug.question)}</p><details><summary>Sprawdź wyjaśnienie</summary><p>${esc(l.debug.answer)}</p></details><h3>Typowy błąd na egzaminie</h3><div class="tip">${esc(l.examTips.join(' '))}</div></section><section class="card"><h2>Zapamiętaj</h2><ul>${l.remember.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></section><section class="card"><h2>Zadanie praktyczne</h2><p>${esc(l.task)}</p><p class="muted">Plan 45 minut: 5 min przypomnienia, 10 min teorii, 15 min ćwiczeń, 10 min zadania, 5 min mini testu.</p></section><section class="card" id="lesson-test"><h2>Mini test</h2><p>5 pytań · próg zaliczenia zależy od ustawień szkoły. Po zaliczeniu możesz ukończyć lekcję.</p><button class="primary" id="lesson-quiz">Rozpocznij mini test</button><div id="test-area"></div></section><div class="toolbar"><button id="complete-lesson" class="primary">Ukończ lekcję ✓</button>${l.number<120?`<a class="button" href="#lesson/${content.lessons[l.number].id}">Następna lekcja →</a>`:''}</div></article>`;mountEditor(l.code);bind('#lesson-quiz','click',()=>startTest('lesson:'+id));bind('#complete-lesson','click',async()=>{await api('completeLesson',{lessonId:id});notify('Lekcja ukończona. Postęp został zapisany.');await route();});}
+function editorMarkup(code={}){return `<div class="editor-grid"><label>HTML<textarea id="editor-html" spellcheck="false">${esc(code.html||'')}</textarea></label><label>CSS<textarea id="editor-css" spellcheck="false">${esc(code.css||'')}</textarea></label><label>JavaScript<textarea id="editor-js" spellcheck="false">${esc(code.js||'')}</textarea></label></div><div class="toolbar"><button class="primary" id="run-code">▷ Uruchom</button><button id="stop-code">Zatrzymaj podgląd</button><button id="save-code">Pobierz kod</button></div><iframe class="preview" id="preview" title="Izolowany podgląd kodu" sandbox="allow-scripts"></iframe>`;}
+function mountEditor(){bind('#run-code','click',()=>runCode($('#preview'),$('#editor-html').value,$('#editor-css').value,$('#editor-js').value));bind('#stop-code','click',()=>$('#preview').srcdoc='');bind('#save-code','click',()=>{download('index.html',$('#editor-html').value,'text/html');download('style.css',$('#editor-css').value,'text/css');download('script.js',$('#editor-js').value,'text/javascript');});}
+function renderExercises(){const types=[['find-bug','Znajdź błąd'],['fill-code','Uzupełnij kod'],['analysis','Co zrobi ten kod?'],['practical','Zadanie praktyczne']];$('#main').innerHTML=head('Praktyka robi różnicę','Wybierz rodzaj ćwiczenia i przejdź od czytania do działania.')+`<div class="toolbar"><label>Rodzaj<select id="exercise-type">${types.map(([id,name])=>`<option value="${id}">${name}</option>`).join('')}</select></label><button id="draw-exercise">Losuj ćwiczenie</button></div><div class="card" id="exercise"></div><section class="card section"><h2>Pracownia kodu</h2>${editorMarkup({html:'<h1>Moja pracownia</h1><p id="wynik">Czas na kod.</p>',css:'body { font-family: sans-serif; padding: 24px; }',js:''})}</section>`;function draw(){const bank=content.questions.filter(q=>q.type===$('#exercise-type').value),q=bank[Math.floor(Math.random()*bank.length)];$('#exercise').innerHTML=`<span class="badge">${q.category} · ${q.priority}</span><h2>${esc(q.question)}</h2>${q.code?`<pre>${esc(q.code)}</pre>`:''}<label>Twoja odpowiedź<textarea id="exercise-answer"></textarea></label><button id="check-exercise">Sprawdź</button><div id="exercise-feedback"></div><p class="muted">Swobodna praktyka. Aby zapisać kompetencje, wykonaj test lekcji.</p>`;bind('#check-exercise','click',()=>{const a=$('#exercise-answer').value;const score=AcademyCore.grade(q,a);$('#exercise-feedback').innerHTML=`<div class="tip section">${score.pending?'Oceń pracę według kryteriów lub przekaż nauczycielowi.':score.correct?'Poprawnie.':'Warto spróbować jeszcze raz.'} ${esc(q.explanation)} ${q.rubric?esc(q.rubric.join(' · ')):''}</div>`;});}draw();bind('#draw-exercise','click',draw);bind('#exercise-type','change',draw);mountEditor();}
+async function renderTests(){const sequence=routeSequence;
+  const {tests,active}=await api('getTestsPage');if(sequence!==routeSequence)return;
+  $('#main').innerHTML=head('Sprawdź, co już potrafisz','Wynik to wskazówka, nad czym pracować dalej.')+
+    (active.length?`<section class="card section"><h2>Rozpoczęte próby</h2><p>Po odświeżeniu strony możesz wrócić do zestawu. Niewysłane odpowiedzi nie są zapisane na serwerze.</p>${active.map(a=>`<div class="list-item"><span class="grow">${esc(a.title)} · do ${date(a.expiresAt)}</span><button data-resume="${a.attemptId}">Wznów</button></div>`).join('')}</section>`:'')+
+    `<div class="grid cols-3 section">${tests.filter(t=>t.mode!=='MOCK_EXAM').map(t=>`<section class="card"><span class="badge ${t.mode==='ASSESSMENT'?'orange':''}">${t.mode}</span><h2 class="section">${esc(t.title)}</h2><p class="muted">${t.duration} min · ${t.count||5} pytań</p><button data-start="${t.id}" class="primary">Rozpocznij →</button></section>`).join('')}</div><section class="section" id="test-area"></section>`;
+  document.querySelectorAll('[data-start]').forEach(b=>b.onclick=()=>startTest(b.dataset.start).catch(error));
+  document.querySelectorAll('[data-resume]').forEach(b=>b.onclick=async()=>{try{currentAttempt=await api('resumeTest',{attemptId:b.dataset.resume});currentTest=currentAttempt.testId;renderAttempt();}catch(e){error(e);}});
+}
+async function startTest(testId){if(currentAttempt&&currentTest===testId&&currentAttempt.status==='STARTED'){renderAttempt();return;}if(!pendingStart||pendingStart.testId!==testId)pendingStart={testId,requestId:crypto.randomUUID()};currentTest=testId;currentAttempt=await api('startTest',pendingStart);pendingStart=null;renderAttempt();}
+function renderAttempt(){const a=currentAttempt;$('#test-area').innerHTML=`<form id="test-form" class="card"><div class="section-title"><h2>Twój test</h2><span class="badge">Do ${date(a.expiresAt)}</span></div><p class="muted">Odpowiedzi zostaną ocenione po wysłaniu. Przy błędzie sieci pozostają w formularzu — ponów wysłanie.</p>${a.questions.map((q,i)=>`<fieldset><legend>${i+1}. ${esc(q.question)}</legend>${q.code?`<pre>${esc(q.code)}</pre>`:''}${q.options?q.options.map(o=>`<label class="option"><input name="${q.id}" type="${q.type==='multiple-choice'?'checkbox':'radio'}" value="${esc(o)}"><code>${esc(o)}</code></label>`).join(''):`<label>Odpowiedź<textarea name="${q.id}" ${q.type==='practical'?'maxlength="20000"':'maxlength="2000"'}></textarea></label>`}</fieldset>`).join('')}<button class="primary" type="submit">Zakończ i zapisz wynik</button></form>`;$('#test-area').scrollIntoView({behavior:'smooth',block:'start'});bind('#test-form','submit',async e=>{e.preventDefault();const button=e.target.querySelector('button[type=submit]');button.disabled=true;try{const fd=new FormData(e.target),answers=Object.fromEntries(a.questions.map(q=>[q.id,q.type==='multiple-choice'?fd.getAll(q.id):fd.get(q.id)||'']));const r=await api('submitTest',{attemptId:a.attemptId,answers});currentAttempt=null;$('#test-area').innerHTML=`<section class="card"><h2>${r.status==='PENDING_REVIEW'?'Praca oczekuje na ocenę nauczyciela':r.passed?'Dobra robota! Test zaliczony.':'Jeszcze trochę praktyki.'}</h2><p>${r.status==='PENDING_REVIEW'?'Część praktyczna wymaga sprawdzenia według kryteriów.':`Twój wynik: <strong>${r.score} / ${r.maxScore} · ${r.percentage}%</strong>`}</p>${(r.feedback||[]).map(f=>`<p><strong>${f.correct?'✓':f.pending?'◷':'↻'} ${esc(f.questionId)}</strong> ${esc(f.explanation)}</p>`).join('')}<a href="#progress">Zobacz analizę umiejętności →</a></section>`;dashboard=null;notify('Wynik został zapisany.');}finally{button.disabled=false;}});}
+function renderExams(){$('#main').innerHTML=head('Próba przed egzaminem','Autorskie arkusze treningowe części webowej — od 20 do 150 minut.')+`<div class="tip">Trening dotyczy frontendu. Pełny INF.03 obejmuje także SQL i backend. Zadania praktyczne ocenia nauczyciel, a wskaźniki portalu nie gwarantują wyniku egzaminu.</div><div class="grid cols-3 section">${content.exams.map(e=>`<section class="card"><span class="badge">${e.mode} · ${e.duration} MIN</span><h2 class="section">${esc(e.title)}</h2><p>${esc(e.description)}</p><details><summary>Polecenie i kryteria</summary><ol>${e.requirements.map(r=>`<li>${esc(r)}</li>`).join('')}</ol><h3>Oddaj</h3><p>${esc(e.deliverables.join(', '))}</p><h3>Sprawdź przed oddaniem</h3><ul>${e.rubric.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></details><button data-exam="${e.testId}" class="primary">Rozpocznij trening</button></section>`).join('')}</div><section class="card section"><h2>Tryb egzaminator</h2><p>„Zbuduj witrynę klubu czytelnika. Style zapisz w osobnym pliku, formularz oblicza koszt wypożyczenia po kliknięciu przycisku, a wynik trafia do akapitu pod formularzem.”</p><fieldset id="examiner"><legend>Zaznacz wymagania wynikające z polecenia</legend>${['Osobny plik CSS','Plik dokumentu HTML','Obsługa zdarzenia kliknięcia','Modyfikacja tekstu w DOM','Instalacja React','Publiczny arkusz z danymi uczniów'].map((t,i)=>`<label class="option"><input type="checkbox" value="${i}">${t}</label>`).join('')}</fieldset><button id="check-examiner">Sprawdź analizę</button><p id="examiner-result"></p></section><div class="section" id="test-area"></div>`;document.querySelectorAll('[data-exam]').forEach(b=>b.onclick=()=>startTest(b.dataset.exam).catch(error));bind('#check-examiner','click',()=>{const chosen=[...document.querySelectorAll('#examiner input:checked')].map(x=>Number(x.value));$('#examiner-result').textContent=JSON.stringify(chosen)==='[0,1,2,3]'?'Poprawnie. Najpierw pliki i struktura, potem styl, zdarzenie i wynik.':'Polecenie wymaga HTML, zewnętrznego CSS, kliknięcia i zmiany DOM. Nie wymaga React ani arkusza.';});}
+function skillsMarkup(d){return d.skills.length?d.skills.map(s=>`<div class="progress-row"><div class="progress-head"><span>${esc(s.skill)}</span><b>${s.percentage}% · ${s.correctAnswers+s.wrongAnswers} odp.</b></div>${bar(s.percentage)}</div>`).join(''):empty('Brak pomiarów. Wykonaj pierwszy test.');}
+function historyMarkup(d){return `<div class="table-wrap"><table><thead><tr><th>Test</th><th>Data</th><th>Wynik</th><th>Czas</th></tr></thead><tbody>${d.attempts.map(a=>`<tr><td>${esc(a.title)}</td><td>${date(a.finishedAt)}</td><td>${a.percentage}%</td><td>${Math.round(a.duration/60)} min</td></tr>`).join('')}</tbody></table></div>`;}
+function renderProgress(){$('#main').innerHTML=head('Widzisz, jak daleko jesteś?','Analiza odpowiedzi pomaga wybrać następną lekcję.')+`<div class="grid cols-2"><section class="card"><h2>Twoje kompetencje</h2>${skillsMarkup(dashboard)}</section><section class="card"><h2>Wyniki kolejnych testów</h2>${dashboard.testTrend.length?`<div class="chart">${dashboard.testTrend.map((a,i)=>`<div class="chart-col"><small>${a.percentage}%</small><div class="chart-bar" style="height:${a.percentage}%"></div><small>Test ${i+1}</small></div>`).join('')}</div>`:empty('Tutaj pojawi się trend wyników.')}<h3>Odznaki</h3><div class="tag-list">${dashboard.badges.map(b=>`<span class="badge green">✓ ${esc(b)}</span>`).join('')||'Pierwsza odznaka czeka po ukończeniu lekcji.'}</div><p class="muted section">Orientacyjny czas pracy: ${Math.round(dashboard.timeSpent/60)} min. Nie jest podstawą oceny.</p><details><summary>Jak liczymy gotowość?</summary><p>Dla każdej umiejętności: poprawne odpowiedzi / wszystkie ocenione odpowiedzi. Waga P1 = 4, P2 = 3, P3 = 1. Brak pomiaru daje 0. Suma ważonych kompetencji / suma wag daje ${dashboard.readiness}%. Prace oczekujące na ocenę są pomijane.</p><p>Ukończenie lekcji oznacza zaliczony mini test, nie potwierdzenie samodzielnego wykonania pracy.</p></details></section></div><section class="card section"><h2>Historia testów</h2>${historyMarkup(dashboard)}</section><section class="card section"><h2>Rekomendowane powtórki</h2>${dashboard.recommendations.map(lessonRow).join('')||empty('Po pierwszych odpowiedziach wskażemy lekcje do powtórzenia.')}<p>Po powtórce wykonaj ponownie mini test lekcji.</p></section>`;}
+async function renderChecklist(){const sequence=routeSequence;const saved=await api('getChecklist'),skills=[...new Set(content.lessons.flatMap(l=>l.skills))];if(sequence!==routeSequence)return;$('#main').innerHTML=head('Czy jestem gotowy?','Samoocena uzupełnia wyniki testów. Nie zmienia wskaźnika gotowości.')+`<section class="card">${skills.map(s=>`<label class="option"><input type="checkbox" data-skill="${s}" ${saved.some(x=>x.skill===s&&x.checked)?'checked':''}>Potrafię samodzielnie: ${esc(content.lessons.find(l=>l.skills.includes(s)).objectives[0])}</label>`).join('')}</section>`;document.querySelectorAll('[data-skill]').forEach(c=>c.onchange=async()=>{try{await api('saveChecklist',{skill:c.dataset.skill,checked:c.checked});}catch(e){c.checked=!c.checked;error(e);}});}
+function renderGlossary(){$('#main').innerHTML=head('Słownik INF.03','Krótko i konkretnie. Pojęcia, które spotkasz w kodzie.')+`<div class="grid cols-3">${content.glossary.map(x=>`<section class="card"><h2>${esc(x.term)}</h2><p>${esc(x.definition)}</p><a href="#course?q=${encodeURIComponent(x.term)}">Powiązane lekcje →</a></section>`).join('')}</div>`;}
+function renderReference(){$('#main').innerHTML=head('Quick reference','Podręczna pomoc do nauki i powtórek.')+`<div class="grid cols-3">${content.reference.map(x=>`<section class="card"><h2>${esc(x.title)}</h2><p>${esc(x.description)}</p><pre>${esc(x.code)}</pre></section>`).join('')}</div>`;}
+async function renderTeacher(id){const sequence=routeSequence;
+  if(id){const d=await api('getStudentStats',{userId:id});if(sequence!==routeSequence)return;$('#main').innerHTML=head(d.profile.name,'Profil ucznia · '+d.profile.email)+`<div class="toolbar"><a href="#teacher" class="button">← Klasa</a><button id="print-report">Drukuj raport</button><button id="export-student">Eksport CSV</button></div><div class="grid cols-3">${stat('Postęp',d.courseProgress+'%',d.completed+' lekcji','✓')}${stat('Średni wynik',d.testAverage===null?'—':d.testAverage+'%','Testy zakończone','▣')}${stat('Czas orientacyjny',Math.round(d.timeSpent/60)+' min','Aktywna praca w portalu','◷')}</div><div class="grid cols-2 section"><section class="card"><h2>Umiejętności</h2>${skillsMarkup(d)}</section><section class="card"><h2>Historia wyników</h2>${historyMarkup(d)}</section></div><section class="card section"><h2>Błędne odpowiedzi</h2>${d.answers.filter(a=>a.correct===false).map(a=>`<div class="list-item"><div><strong>${esc(a.questionId)}</strong><p>${esc(Array.isArray(a.answer)?a.answer.join(', '):a.answer)}</p><small>${esc(a.skills.join(', '))}</small></div></div>`).join('')||empty('Brak błędnych odpowiedzi.')}</section><section class="card section"><h2>Wszystkie lekcje</h2><div class="table-wrap"><table><thead><tr><th>Lekcja</th><th>Status</th><th>Czas (min)</th></tr></thead><tbody>${content.lessons.map(l=>{const p=d.progress.find(p=>p.lessonId===l.id);return `<tr><td>${l.number}. ${esc(l.title)}</td><td>${p?.status||'Nierozpoczęta'}</td><td>${Math.round((p?.timeSpent||0)/60)}</td></tr>`;}).join('')}</tbody></table></div></section>`;bind('#print-report','click',()=>window.print());bind('#export-student','click',()=>download('uczen.csv',csv([['Uczeń','Lekcja','Status','Czas sekund'],...d.progress.map(p=>[d.profile.name,p.lessonId,p.status,p.timeSpent]),[],['Test','Wynik %','Data'],...d.attempts.map(a=>[a.title,a.percentage,a.finishedAt]),[],['Umiejętność','Poprawne','Błędne','Wynik %'],...d.skills.map(s=>[s.skill,s.correctAnswers,s.wrongAnswers,s.percentage])])));return;}
+  const d=await api('getTeacherDashboard');if(sequence!==routeSequence)return;const avg=(key)=>{const a=d.students.map(x=>x[key]).filter(x=>x!==null);return a.length?Math.round(a.reduce((n,x)=>n+x,0)/a.length)+'%':'—';};
+  $('#main').innerHTML=head('Twoja klasa w jednym miejscu','Obserwuj postępy, wspieraj uczniów i planuj kolejne powtórki.')+`<div class="grid cols-4">${stat('Uczniowie',d.students.length,d.active7+' aktywnych w 7 dni','♙')}${stat('Średni postęp',avg('courseProgress'),'Wszystkie Twoje klasy','↗')}${stat('Średni wynik',avg('testAverage'),d.students.reduce((n,s)=>n+s.attempts.length,0)+' testów','▣')}${stat('Potrzebują uwagi',d.students.filter(s=>s.reasons.length).length,'Sygnał do rozmowy, nie ocena','⚑')}</div><section class="card section"><div class="section-title"><h2>Uczniowie</h2><button id="export-class" class="small">↓ Eksport CSV</button></div><div class="toolbar"><label>Klasa<select id="class-filter"><option value="">Wszystkie</option>${d.classes.map(c=>`<option value="${c.classId}">${esc(c.name)}</option>`).join('')}</select></label><label>Widok<select id="attention-filter"><option value="all">Wszyscy uczniowie</option><option value="attention">Wymagający uwagi</option></select></label></div><div class="table-wrap" id="students-table"></div></section><div class="grid cols-2 section"><section class="card"><h2>Analityka pytań</h2>${d.questionAnalysis.sort((a,b)=>a.percentage-b.percentage).slice(0,20).map(q=>`<div class="progress-row"><div class="progress-head"><span>${esc(q.id)} · ${q.total} odpowiedzi</span><b>${q.percentage}%</b></div>${bar(q.percentage)}</div>`).join('')||empty('Wyniki pojawią się po pierwszych testach.')}<h3 class="section">Średnie kompetencje klasy</h3>${['HTML','CSS','JS','DOM'].map(cat=>{const values=d.students.flatMap(s=>s.skills.filter(k=>inCategory(k.skill,cat)).map(k=>k.percentage));const value=values.length?Math.round(values.reduce((n,v)=>n+v,0)/values.length):0;return `<div class="progress-row"><div class="progress-head"><span>${cat}</span><b>${values.length?value+'%':'Brak danych'}</b></div>${bar(value)}</div>`;}).join('')}</section><section class="card"><h2>Status systemu</h2>${Object.entries(d.status).map(([k,v])=>`<div class="status-row"><span>${esc(k)}</span><strong>${esc(v)}</strong></div>`).join('')}<p class="muted section">${isDemo?'Symulacja lokalna. Ten status nie potwierdza połączenia z Google.':'Status odczytany z uwierzytelnionego API.'}</p><h3>Prace do oceny</h3>${d.pending.map(a=>`<div class="list-item"><span class="grow">${esc(a.title)}</span><button class="small" data-review="${a.attemptId}">Oceń</button></div>`).join('')||empty('Brak prac oczekujących.')}</section></div><div id="review-area" class="section"></div><details class="section"><summary>Dodaj klasę i uczniów</summary><form id="class-form" class="toolbar"><label>Nazwa klasy<input name="name" required maxlength="50"></label><label>Rok szkolny<input name="schoolYear" value="2026/2027" required></label><button class="primary">Utwórz klasę</button></form><form id="import-form"><label>Klasa<select name="classId" required>${d.classes.map(c=>`<option value="${c.classId}">${esc(c.name)}</option>`).join('')}</select></label><label class="section">Uczniowie — email;imię (jeden wiersz na ucznia)<textarea name="csv" required placeholder="anna@szkola.edu.pl;Anna Kowalska"></textarea></label><button class="primary">Importuj uczniów</button></form></details><details><summary>Prywatny bank pytań i generator sprawdzianów A/B</summary><p>Sprawdziany korzystają wyłącznie z pytań dodanych tutaj. Ich klucze nie trafiają do publicznego repozytorium. Schemat importu opisuje instrukcja nauczyciela.</p><form id="question-form"><label>JSON z prywatnymi pytaniami<textarea name="questions" required spellcheck="false"></textarea></label><button>Importuj prywatne pytania</button></form><form id="generate-test"><div class="toolbar"><label>Nazwa<input name="title" required></label><label>Klasa<select name="classId">${d.classes.map(c=>`<option value="${c.classId}">${esc(c.name)}</option>`).join('')}</select></label><label>Kategoria<select name="category">${['ALL','HTML','CSS','JS','DOM','FORM','LAYOUT','PATHS','FILES','DEBUG','INF03'].map(c=>`<option>${c}</option>`).join('')}</select></label></div><div class="toolbar"><label>Liczba pytań<input type="number" min="1" max="100" name="count" value="20"></label><label>Maks. trudność<select name="difficulty"><option value="1">Łatwy</option><option value="2" selected>Średni</option><option value="3">Trudny</option></select></label><label>Priorytety<select name="priorities"><option value="P1,P2">P1 + P2</option><option value="P1">P1</option><option value="P1,P2,P3">P1 + P2 + P3</option></select></label><label>Czas (min)<input type="number" name="duration" min="5" max="180" value="30"></label><button class="primary">Utwórz A/B</button></div></form><div id="generated-tests"></div></details>`;
+  const filtered=()=>d.students.filter(s=>(!$('#class-filter').value||s.profile.class===$('#class-filter').value)&&($('#attention-filter').value==='all'||s.reasons.length));
+  function table(){const students=filtered();$('#students-table').innerHTML=`<table><thead><tr><th>Uczeń</th><th>Postęp</th><th>HTML</th><th>CSS</th><th>JS</th><th>DOM</th><th>Testy</th><th>Ostatnia aktywność</th><th>Wsparcie</th></tr></thead><tbody>${students.map(s=>`<tr><td><a href="#teacher/${s.profile.userId}">${esc(s.profile.name)}</a></td><td>${s.courseProgress}%</td>${['HTML','CSS','JS','DOM'].map(cat=>{const sk=s.skills.filter(k=>inCategory(k.skill,cat));return `<td>${sk.length?Math.round(sk.reduce((n,k)=>n+k.percentage,0)/sk.length)+'%':'—'}</td>`;}).join('')}<td>${s.attempts.length}</td><td>${date(s.lastActivity)}</td><td class="${s.alert}">${esc(s.reasons.join(' · ')||'Bez alertów')}</td></tr>`).join('')}</tbody></table>`;}table();bind('#class-filter','change',table);bind('#attention-filter','change',table);
+  bind('#export-class','click',()=>download('wyniki-klasy.csv',csv([['Uczeń','Email','Klasa','Postęp %','Średni wynik %','Testy','Ostatnia aktywność','Wsparcie'],...filtered().map(s=>[s.profile.name,s.profile.email,d.classes.find(c=>c.classId===s.profile.class)?.name,s.courseProgress,s.testAverage,s.attempts.length,s.lastActivity,s.reasons.join(', ')])])));
+  bind('#class-form','submit',async e=>{e.preventDefault();await api('createClass',Object.fromEntries(new FormData(e.target)));await route();notify('Klasa została utworzona.');});bind('#import-form','submit',async e=>{e.preventDefault();const r=await api('importStudents',Object.fromEntries(new FormData(e.target)));await route();notify('Dodano uczniów: '+r.imported);});bind('#question-form','submit',async e=>{e.preventDefault();const r=await api('importQuestions',{questions:JSON.parse(new FormData(e.target).get('questions'))});notify('Dodano prywatnych pytań: '+r.imported);e.target.reset();});bind('#generate-test','submit',async e=>{e.preventDefault();const p=Object.fromEntries(new FormData(e.target));['count','difficulty','duration'].forEach(k=>p[k]=Number(p[k]));p.priorities=p.priorities.split(',');const tests=await api('createTest',p);$('#generated-tests').innerHTML=tests.map(t=>`<div class="list-item"><strong class="grow">${esc(t.title)}</strong><button data-key="${t.id}">Test i klucz do druku</button></div>`).join('');document.querySelectorAll('[data-key]').forEach(b=>b.onclick=async()=>{try{const v=await api('getTestKey',{testId:b.dataset.key});$('#review-area').innerHTML=`<section class="card"><h2>${esc(v.test.title)}</h2>${v.questions.map((q,i)=>`<p>${i+1}. ${esc(q.question)}</p>${q.options?`<ul>${q.options.map(o=>`<li>${esc(o)}</li>`).join('')}</ul>`:'<p>.....................................................................</p>'}`).join('')}<details><summary>Klucz — otwórz tylko przed wydrukiem klucza</summary>${v.questions.map((q,i)=>`<p>${i+1}. ${esc(Array.isArray(q.answer)?q.answer.join(', '):q.answer||q.rubric?.join(', '))}</p>`).join('')}</details><button id="print-key">Drukuj</button><button id="export-test">Eksport CSV</button></section>`;bind('#print-key','click',()=>printSection('#review-area'));bind('#export-test','click',()=>download('test.csv',csv([['Pytanie','Odpowiedź'],...v.questions.map(q=>[q.question,Array.isArray(q.answer)?q.answer.join(' | '):q.answer])])));$('#review-area').scrollIntoView();}catch(e){error(e);}});});
+  const existingTests=d.tests.filter(t=>t.mode==='ASSESSMENT');
+  $('#main').insertAdjacentHTML('beforeend',`<section class="card section"><h2>Zapisane sprawdziany</h2>${existingTests.map(t=>`<div class="list-item"><strong class="grow">${esc(t.title)}</strong><button data-existing-key="${t.id}">Drukuj / eksportuj</button></div>`).join('')||empty('Utwórz pierwszy sprawdzian w generatorze powyżej.')}</section>`);
+  document.querySelectorAll('[data-existing-key]').forEach(b=>b.onclick=()=>showExistingKey(b.dataset.existingKey).catch(error));
+  document.querySelectorAll('[data-review]').forEach(b=>b.onclick=async()=>{try{const r=await api('getReview',{attemptId:b.dataset.review});$('#review-area').innerHTML=`<form id="review-form" class="card"><h2>${esc(r.attempt.title)}</h2>${r.answers.filter(a=>a.pending).map(a=>{const q=r.attempt.questions.find(q=>q.id===a.questionId);return `<fieldset><legend>${esc(q.question)}</legend><pre>${esc(a.answer)}</pre><p>${esc(q.rubric?.join(' · '))}</p><label>Ocena<select name="${a.questionId}"><option value="0">0 — kryteria niespełnione</option><option value="1">1 — kryteria spełnione</option></select></label></fieldset>`;}).join('')}<button class="primary">Zapisz ocenę</button></form>`;bind('#review-form','submit',async e=>{e.preventDefault();await api('reviewAttempt',{attemptId:r.attempt.attemptId,marks:Object.fromEntries([...new FormData(e.target)].map(([k,v])=>[k,Number(v)]))});await route();notify('Ocena zapisana.');});$('#review-area').scrollIntoView();}catch(e){error(e);}});
+}
+async function renderAdmin(){const sequence=routeSequence;const d=await api('getAdminDashboard'),users=d.users;if(sequence!==routeSequence)return;$('#main').innerHTML=head('Administracja','Dostęp, klasy i retencja danych. Operacje są autoryzowane przez backend.')+`<section class="card"><div class="table-wrap"><table><thead><tr><th>Użytkownik</th><th>Rola</th><th>Klasa</th><th>Aktywny</th><th>Operacje</th></tr></thead><tbody>${users.map(u=>`<tr data-user="${u.userId}"><td>${esc(u.name)}<br>${esc(u.email)}</td><td><select data-role aria-label="Rola ${esc(u.name)}">${['STUDENT','TEACHER','ADMIN'].map(r=>`<option ${r===u.role?'selected':''}>${r}</option>`).join('')}</select></td><td><select data-class aria-label="Klasa ${esc(u.name)}"><option value="">Bez klasy</option>${d.classes.map(c=>`<option value="${c.classId}" ${c.classId===u.class?'selected':''}>${esc(c.name)}</option>`).join('')}</select></td><td><input aria-label="Aktywność ${esc(u.name)}" type="checkbox" data-active ${u.active?'checked':''}></td><td>${u.userId===user.userId?'Twoje konto':`<button data-save class="small">Zapisz</button> <button data-reset class="small">Reset postępu</button> <button data-delete class="small danger">Usuń dane</button>`}</td></tr>`).join('')}</tbody></table></div></section><section class="card section"><h2>Progi i plan</h2><form id="settings-form"><div class="toolbar">${Object.entries(d.settings).map(([k,v])=>`<label>${esc(k)}<input type="number" name="${k}" value="${v}"></label>`).join('')}</div><button class="primary">Zapisz ustawienia</button></form></section>`;document.querySelectorAll('[data-user]').forEach(row=>{const id=row.dataset.user;row.querySelector('[data-save]')?.addEventListener('click',async()=>{try{await api('updateUser',{userId:id,role:row.querySelector('[data-role]').value,class:row.querySelector('[data-class]').value,active:row.querySelector('[data-active]').checked});notify('Użytkownik zaktualizowany.');}catch(e){error(e);}});for(const [selector,action,label] of [['[data-reset]','resetProgress','Zresetować postęp'],['[data-delete]','deleteUser','Usunąć konto i historię']])row.querySelector(selector)?.addEventListener('click',async()=>{if(!confirm(label+' tego użytkownika? Tej operacji nie można cofnąć w portalu.'))return;try{await api(action,{userId:id});await route();}catch(e){error(e);}});});bind('#settings-form','submit',async e=>{e.preventDefault();await api('saveSettings',Object.fromEntries([...new FormData(e.target)].map(([k,v])=>[k,Number(v)])));notify('Ustawienia zapisane.');});}
+function printSection(selector){const target=$(selector);if(!target)return;target.classList.add('print-target');document.body.classList.add('print-single');window.addEventListener('afterprint',()=>{target.classList.remove('print-target');document.body.classList.remove('print-single');},{once:true});window.print();}
+async function showExistingKey(testId){
+  const v=await api('getTestKey',{testId});
+  $('#review-area').innerHTML=`<section class="card"><h2>${esc(v.test.title)}</h2><p>Imię i nazwisko: ......................................................</p>${v.questions.map((q,i)=>`<fieldset><legend>${i+1}. ${esc(q.question)}</legend>${q.code?`<pre>${esc(q.code)}</pre>`:''}${q.options?`<ul>${q.options.map(o=>`<li>□ ${esc(o)}</li>`).join('')}</ul>`:'<p>.....................................................................</p>'}</fieldset>`).join('')}<details><summary>Klucz odpowiedzi — otwórz do wydruku klucza</summary>${v.questions.map((q,i)=>`<p>${i+1}. ${esc(Array.isArray(q.answer)?q.answer.join(', '):q.answer||q.rubric?.join(' · '))}</p>`).join('')}</details><div class="toolbar"><button id="print-existing">Drukuj test / klucz</button><button id="csv-existing">Eksport CSV</button></div></section>`;
+  bind('#print-existing','click',()=>printSection('#review-area'));bind('#csv-existing','click',()=>download('sprawdzian.csv',csv([['Pytanie','Kod','Opcje','Klucz'],...v.questions.map(q=>[q.question,q.code,q.options?.join(' | '),Array.isArray(q.answer)?q.answer.join(' | '):q.answer])])));$('#review-area').scrollIntoView();
+}
+document.documentElement.dataset.theme=localStorage.getItem('inf03-theme')||'system';
+bind('.skip','click',e=>{e.preventDefault();const main=document.querySelector('main');main?.focus();main?.scrollIntoView();});
+for(const event of ['pointerdown','keydown','scroll'])document.addEventListener(event,()=>lastInteraction=Date.now(),{passive:true});
+setInterval(()=>{if(user&&activeLesson&&!document.hidden&&Date.now()-lastInteraction<90000)lessonSeconds=Math.min(2700,lessonSeconds+1);},1000);
+window.addEventListener('hashchange',()=>route());
+window.addEventListener('inf03-session-ended',()=>{setCredential('');routeSequence++;openedLessons.clear();user=null;currentAttempt=null;pendingStart=null;activeLesson=null;showLogin();notify('Wylogowano portal w innej karcie.');});
+try{const response=await fetch(new URL('../data/course.json',import.meta.url));if(!response.ok)throw Error('Nie można wczytać treści kursu.');content=await response.json();setContent(content);if(isDemo)showLogin();else{app.innerHTML='<main><p role="status">Przywracanie sesji…</p></main>';const restored=await restoreLogin();if(restored)acceptLogin(restored);else showLogin();}}catch(e){app.innerHTML=`<main><h1>Nie udało się uruchomić portalu</h1><p>${esc(e.message)}</p><p>Otwórz stronę przez serwer HTTP lub GitHub Pages, nie jako plik file://.</p></main>`;}
